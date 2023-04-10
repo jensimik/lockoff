@@ -12,6 +12,3 @@ Components:
 - Daytickets printed on paper
 
 [![fistbump-backend](https://github.com/jensimik/lockoff/actions/workflows/backend.yml/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/backend.yml) [![CodeQL](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql)
-
-development sponsored by nørrebro klatreklub
-![NKK logo](https://nkk.klub-modul.dk/cms/clubnkk/images/banner.jpg)
