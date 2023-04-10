@@ -11,6 +11,6 @@ Components:
 - Danish yellow health insurance card with barcode (barcode use C128 encoding)
 - Daytickets printed on paper
 
-[![fistbump-backend](https://github.com/jensimik/lockoff/actions/workflows/backend.yml/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/backend.yml)
+[![fistbump-backend](https://github.com/jensimik/lockoff/actions/workflows/backend.yml/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/backend.yml) [![CodeQL](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql)
 
 development sponsored by nørrebro klatreklub
