@@ -12,14 +12,6 @@ from .utils import TokenEnum, relay_buzz
 log = logging.getLogger(__name__)
 
 
-class OpticonReader:
-    def __init__(self):
-        pass
-
-    async def setup(self):
-        self.r, self.w = await serial_asyncio.open_serial_connection()
-
-
 async def barcode_reader(lcd: LCD):
     opticon_r, opticon_w = await serial_asyncio.open_serial_connection(
         url=settings.opticon_url
