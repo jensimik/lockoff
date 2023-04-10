@@ -1,4 +1,4 @@
-# 💪 Lockoff - a single door access system
+# Lockoff - a single door access system
 
 Components:
 
