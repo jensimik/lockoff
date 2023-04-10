@@ -26,6 +26,7 @@ httpx==0.23.3
 hyperframe==6.0.1
 idna==3.4
 iniconfig==2.0.0
+mock-serial==0.0.1
 mypy-extensions==1.0.0
 packaging==23.0
 pathspec==0.11.1
@@ -36,6 +37,7 @@ pyftdi==0.54.0
 pyserial==3.5
 pyserial-asyncio==0.6
 pytest==7.3.0
+pytest-asyncio==0.21.0
 python-dateutil==2.8.2
 python-dotenv==1.0.0
 pyusb==1.2.1
