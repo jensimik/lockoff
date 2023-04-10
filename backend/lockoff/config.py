@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     app_name: str = "lockoff"
     klubmodul_username: str
     klubmodul_password: str
+    klubmodul_country_id: int = 1
+    klubmodul_club_id: int = 2002
     opticon_url: str = "loop://?logging=debug"
     display_url: str = "loop://?logging=debug"
     database_url: str = "sqlite:///./test.db"

@@ -47,17 +47,18 @@ class LCD:
         await self.lcd_w.drain()
 
     async def runner(self):
-        try:
-            line1, line2 = await asyncio.wait_for(self.queue.get(), timeout=5)
-            await self.clear_screen()
-            self.line1_message(line1.encode())
-            if line2:
-                self.line2_message(line2.encode())
-            await self.drain()
-            # show message for 5 seconds and then go back to idle
-            await asyncio.sleep(5)
-        except TimeoutError:
-            pass
-        finally:
-            await self.clear_screen()
-            await self.idle_message()
+        while True:
+            try:
+                line1, line2 = await asyncio.wait_for(self.queue.get(), timeout=5)
+                await self.clear_screen()
+                self.line1_message(line1.encode())
+                if line2:
+                    self.line2_message(line2.encode())
+                await self.drain()
+                # show message for 5 seconds and then go back to idle
+                await asyncio.sleep(5)
+            except TimeoutError:
+                pass
+            finally:
+                await self.clear_screen()
+                await self.idle_message()

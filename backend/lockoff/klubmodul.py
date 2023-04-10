@@ -1,8 +1,9 @@
-from datetime import datetime
+import asyncio
 
 import httpx
 
 from . import db
+from .config import settings
 from .utils import Member, TokenEnum
 
 TEAMS = {
@@ -13,7 +14,11 @@ TEAMS = {
 
 class Klubmodul:
     def __init__(
-        self, username: str, password: str, country_id: int = 1, club_id: int = 2002
+        self,
+        username: str,
+        password: str,
+        country_id: int = settings.klubmodul_country_id,
+        club_id: int = settings.klubmodul_club_id,
     ):
         self.username = username
         self.password = password
@@ -57,34 +62,9 @@ class Klubmodul:
 
     async def refresh(self):
         members = await self.get_members()
-        async with db.database.transaction():
-            batch = datetime.utcnow()
-            insert = db.tokens.insert().values(
-                [
-                    {
-                        "batch": batch,
-                        "name": member.name,
-                        "token": member.token,
-                        "token_type": member.token_type,
-                        "last_access": batch,
-                    }
-                    for member in members
-                ]
-            )
-            upsert = insert.on_conflict_do_update(
-                index_elements=[db.tokens.c.token.name],
-                set_=dict(
-                    batch=batch,
-                    name=insert.excluded.name,
-                    token=insert.excluded.token,
-                ),
-            )
-            # bulk upsert all users from klubmodul
-            await db.database.execute(upsert)
-            # remove full/morning users not in this batch
-            await db.database.execute(
-                db.tokens.delete().where(
-                    db.tokens.c.token_type.in_([TokenEnum.full, TokenEnum.morning]),
-                    db.tokens.c.batch.name < batch,
-                )
-            )
+        await db.bulk_upsert_members(members)
+
+    async def runner(self):
+        while True:
+            self.refresh()
+            asyncio.sleep(12 * 60 * 60)

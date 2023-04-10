@@ -17,38 +17,18 @@ class OpticonReader:
         self.r, self.w = await serial_asyncio.open_serial_connection()
 
 
-async def barcode_reader():
+async def barcode_reader(lcd: LCD):
     opticon_r, opticon_w = await serial_asyncio.open_serial_connection(
         url=settings.opticon_url
     )
-    # start LCD runner
-    lcd = LCD()
-    await lcd.setup()
-    display_task = asyncio.create_task(lcd.runner())
     while True:
         # read a scan from the barcode reader
         barcode = await opticon_r.readline()
         now = datetime.now(tz=settings.tz).replace(tzinfo=None)
         # check the last letters of the barcode in the database
-        token = barcode[:8]
-        query = db.tokens.select().where(db.tokens.c.token.name == token)
-        # morning members allowed weekends before 12 and weekdays before 15
-        if (now.weekday() in [5, 6] and now.hour < 12) or (
-            now.weekday() < 5 and now.hour < 15
-        ):
-            query = query.where(
-                db.tokens.c.token_type.in_(
-                    [TokenEnum.full, TokenEnum.morning, TokenEnum.special]
-                )
-            )
-        # else only query full members or special barcodes
-        else:
-            query = query.where(
-                db.tokens.c.token_type.in_([TokenEnum.full, TokenEnum.special])
-            )
-
-        # if token found in database then success
-        if token := await db.database.fetch_one(query):
+        token_str = barcode[:8]
+        entry_granted, token = await db.check_token(token=token_str, now=now)
+        if entry_granted:
             async with asyncio.TaskGroup() as tg:
                 # buzz person in
                 tg.create_task(relay_buzz())
@@ -64,10 +44,11 @@ async def barcode_reader():
                 # flush commands to scanner
                 tg.create_task(opticon_w.drain())
                 # log access in database
-                log_insert = db.access_log.insert().values(
-                    token=token, timestamp=now, token_type=token.token_type
+                tg.create_task(
+                    db.access_log(
+                        token=token_str, timestamp=now, token_type=token.token_type
+                    )
                 )
-                tg.create_task(db.database.execute(log_insert))
         else:
             async with asyncio.TaskGroup() as tg:
                 # show error message on LCD
@@ -77,7 +58,8 @@ async def barcode_reader():
                 # flush command to scanner
                 tg.create_task(opticon_w.drain())
                 # log error access in db
-                log_insert = db.access_log.insert().values(
-                    token=token, timestamp=now, token_type=TokenEnum.denied
+                tg.create_task(
+                    db.access_log(
+                        token=token_str, timestamp=now, token_type=TokenEnum.denied
+                    )
                 )
-                tg.create_task(db.database.execute(log_insert))
