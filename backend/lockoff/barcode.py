@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from datetime import datetime
 
 import serial_asyncio
@@ -7,6 +8,8 @@ from . import db
 from .config import settings
 from .display import LCD
 from .utils import TokenEnum, relay_buzz
+
+log = logging.getLogger(__name__)
 
 
 class OpticonReader:

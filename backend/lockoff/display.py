@@ -1,9 +1,12 @@
 import asyncio
 import random
+import logging
 
 import serial_asyncio
 
 from .config import settings
+
+log = logging.getLogger(__name__)
 
 
 class LCD:

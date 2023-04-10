@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 import httpx
 
@@ -10,6 +11,11 @@ TEAMS = {
     111: TokenEnum.full,
     112: TokenEnum.morning,
 }
+log = logging.getLogger(__name__)
+
+
+class KlubmodulException(Exception):
+    pass
 
 
 class Klubmodul:
@@ -39,7 +45,7 @@ class Klubmodul:
                 },
             )
             if response.is_error:
-                raise Exception("failed to login: " + response.reason_phrase)
+                raise KlubmodulException("failed to login: " + response.reason_phrase)
             profile_creds = response.json().get("d")
 
             # get list of users in both teams (morning/full)
@@ -51,11 +57,13 @@ class Klubmodul:
                 }
                 response = await client.post("/GetMembersByTeamID", json=post_data)
                 if response.is_error:
-                    raise Exception(
+                    raise KlubmodulException(
                         "failed to receive members by team: " + response.reason_phrase
                     )
                 members += [
-                    Member(name=d["ProfileName"], member_type=team_type, token="")
+                    Member(
+                        name=d["ProfileName"], member_type=team_type, token=""
+                    )  # TODO: find field with birthday and last digits
                     for d in response.json().get("d")
                 ]
             return members
@@ -66,5 +74,11 @@ class Klubmodul:
 
     async def runner(self):
         while True:
-            self.refresh()
-            asyncio.sleep(12 * 60 * 60)
+            try:
+                log.info("klubmodul refreshing data")
+                self.refresh()
+                log.info("klubmodul refresh done")
+                asyncio.sleep(12 * 60 * 60)
+            except KlubmodulException:
+                log.error("failed to fetch klubmodul data retry in 5 minutes")
+                asyncio.sleep(5 * 60)
