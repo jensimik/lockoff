@@ -2,10 +2,9 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
-import db
-import schemas
 from fastapi import FastAPI
 
+from . import db, schemas
 from .barcode import barcode_reader
 from .config import settings
 from .klubmodul import Klubmodul
@@ -26,15 +25,17 @@ async def _refresh_klubmodul():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await db.database.connect()
-    await _refresh_klubmodul()
-    barcode_task = asyncio.create_task(barcode_reader())
+    if settings.prod:
+        await _refresh_klubmodul()
+        barcode_task = asyncio.create_task(barcode_reader())
     yield
     # clear things now at shutdown
-    barcode_task.cancel()
-    try:
-        await barcode_task
-    except asyncio.CancelledError:
-        log.info("barcode_reader is canceled now")
+    if settings.prod:
+        barcode_task.cancel()
+        try:
+            await barcode_task
+        except asyncio.CancelledError:
+            log.info("barcode_reader is canceled now")
     await db.database.disconnect()
 
 
@@ -49,7 +50,7 @@ async def healthz():
     return {"everything": "is awesome"}
 
 
-@app.get("/tokens", response_model=[schemas.Token])
+@app.get("/tokens", response_model=list[schemas.Token])
 async def get_tokens():
     query = db.tokens.select()
     return await db.database.fetch_all(query)

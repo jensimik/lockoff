@@ -18,7 +18,9 @@ class OpticonReader:
 
 
 async def barcode_reader():
-    opticon_r, opticon_w = await serial_asyncio.open_serial_connection()
+    opticon_r, opticon_w = await serial_asyncio.open_serial_connection(
+        url=settings.opticon_url
+    )
     # start LCD runner
     lcd = LCD()
     await lcd.setup()

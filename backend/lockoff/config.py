@@ -9,7 +9,10 @@ class Settings(BaseSettings):
     app_name: str = "lockoff"
     klubmodul_username: str
     klubmodul_password: str
+    opticon_url: str = "loop://?logging=debug"
+    display_url: str = "loop://?logging=debug"
     database_url: str = "sqlite:///./test.db"
+    prod: bool = False
     tz: tzfile = gettz("Europe/Copenhagen")
 
     class Config:

@@ -10,3 +10,5 @@ Components:
 - 12volt door deadbolt
 - Danish yellow health insurance card with barcode (barcode use C128 encoding)
 - Daytickets printed on paper
+
+development sponsored by nørrebro klatreklub

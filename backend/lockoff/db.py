@@ -22,8 +22,8 @@ access_log = sqlalchemy.Table(
     "access_log",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("token", sqlalchemy.Integer, index=True)
-    sqlalchemy.Column("token_type", sqlalchemy.Enum(TokenEnum), index=True)
+    sqlalchemy.Column("token", sqlalchemy.Integer, index=True),
+    sqlalchemy.Column("token_type", sqlalchemy.Enum(TokenEnum), index=True),
     sqlalchemy.Column("timestamp", sqlalchemy.DateTime),
 )
 
