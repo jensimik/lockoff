@@ -1,6 +1,7 @@
-import enum
-import gpiozero
 import asyncio
+import enum
+
+import gpiozero
 from pydantic.dataclasses import dataclass
 
 

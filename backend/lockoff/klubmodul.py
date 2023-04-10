@@ -1,5 +1,7 @@
-import httpx
 from datetime import datetime
+
+import httpx
+
 from . import db
 from .utils import Member, TokenEnum
 
@@ -79,7 +81,10 @@ class Klubmodul:
             )
             # bulk upsert all users from klubmodul
             await db.database.execute(upsert)
-            # remove users not in this batch
+            # remove full/morning users not in this batch
             await db.database.execute(
-                db.tokens.delete().where(db.tokens.c.batch.name < batch)
+                db.tokens.delete().where(
+                    db.tokens.c.token_type.in_([TokenEnum.full, TokenEnum.morning]),
+                    db.tokens.c.batch.name < batch,
+                )
             )

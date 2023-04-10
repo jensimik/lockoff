@@ -1,5 +1,4 @@
-from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from dateutil.tz import gettz, tzfile
 from pydantic import BaseSettings

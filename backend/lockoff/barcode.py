@@ -1,10 +1,12 @@
 import asyncio
-import serial_asyncio
 from datetime import datetime
+
+import serial_asyncio
+
 from . import db
+from .config import settings
 from .display import LCD
 from .utils import TokenEnum, relay_buzz
-from .config import settings
 
 
 class OpticonReader:

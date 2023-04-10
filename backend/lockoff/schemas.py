@@ -1,5 +1,7 @@
 import datetime
+
 from pydantic import BaseModel
+
 from .utils import TokenEnum
 
 
