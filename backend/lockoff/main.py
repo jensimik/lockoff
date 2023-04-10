@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from . import db, schemas
+from . import db
 from .barcode import barcode_reader
 from .config import settings
 from .display import LCD
