@@ -9,6 +9,7 @@ from .barcode import barcode_reader
 from .config import settings
 from .display import LCD
 from .klubmodul import Klubmodul
+from .utils import TokenEnum, generate_token
 from .watchdog import Watchdog
 
 log = logging.getLogger(__name__)
@@ -63,3 +64,17 @@ async def healthz():
 async def get_tokens():
     query = db.tokens.select()
     return await db.database.fetch_all(query)
+
+
+@app.get("/daytickets")
+async def generate_daytickets():
+    num = 100
+    tokens = []
+    while num > 0:
+        token = generate_token(8)
+        # check if token already exist
+        if not await db.token_exist(token=token):
+            await db.token_insert(token=token, token_type=TokenEnum.dayticket)
+            tokens.append(token)
+            num -= 1
+    # TODO: generate pdf from the tokens

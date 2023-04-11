@@ -1,5 +1,7 @@
 import asyncio
 import enum
+import random
+import string
 
 # import gpiozero
 from pydantic.dataclasses import dataclass
@@ -9,6 +11,7 @@ class TokenEnum(enum.Enum):
     full = 1
     morning = 2
     special = 3
+    dayticket = 10
     denied = 99
 
 
@@ -28,3 +31,8 @@ async def relay_buzz():
         # relay.on()
         asyncio.sleep(4)
         # relay.off()
+
+
+def generate_token(length):
+    letters = string.ascii_uppercase + string.digits
+    return "".join(random.choice(letters) for i in range(length))

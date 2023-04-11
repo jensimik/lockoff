@@ -39,12 +39,21 @@ metadata.create_all(engine)
 
 async def log_access(token: str, timestamp: datetime, token_type: TokenEnum):
     log_insert = access_log.insert().values(
-        token=token, timestamp=timestamp, token_type=token.token_type
+        {"token": token, "timestamp": timestamp, "token_type": token.token_type}
     )
     await database.execute(log_insert)
 
 
-async def check_token(token: str, now: datetime) -> tuple[bool, Union[Member, None]]:
+async def token_insert(token: str, token_type: TokenEnum):
+    pass
+
+
+async def token_exist(token: str) -> bool:
+    query = tokens.select().where(tokens.c.token == token)
+    return bool(await database.execute(query))
+
+
+async def token_check(token: str, now: datetime) -> tuple[bool, Union[Member, None]]:
     query = tokens.select().where(tokens.c.token.name == token)
     # morning members allowed weekends before 12 and weekdays before 15
     if (now.weekday() in [5, 6] and now.hour < 12) or (

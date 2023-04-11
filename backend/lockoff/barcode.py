@@ -22,7 +22,7 @@ async def barcode_reader(lcd: LCD):
         now = datetime.now(tz=settings.tz).replace(tzinfo=None)
         # check the last letters of the barcode in the database
         token_str = barcode[:8]
-        entry_granted, token = await db.check_token(token=token_str, now=now)
+        entry_granted, token = await db.token_check(token=token_str, now=now)
         if entry_granted:
             async with asyncio.TaskGroup() as tg:
                 # buzz person in
