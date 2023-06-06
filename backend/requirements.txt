@@ -1,4 +1,4 @@
-Adafruit-Blinka==8.18.0
+Adafruit-Blinka==8.19.0
 adafruit-circuitpython-busdevice==5.2.4
 adafruit-circuitpython-requests==1.14.0
 adafruit-circuitpython-typing==1.9.3
