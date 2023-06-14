@@ -4,11 +4,12 @@ Components:
 
 - Klubmodul sync of member data
 - [Opticon USB barcode scanner](https://opticon.shop/scanners/stationary/opticon-m-11-usb/)
-- [PyPortal LCD](https://www.adafruit.com/product/4444)
+- [Pimoroni Badger 2040 w display](https://shop.pimoroni.com/products/badger-2040-w?variant=40514062188627)
 - [Edatec CM4 nano / raspberry pi](https://www.edatec.cn/en/elpc/cm4-nano.html) ([manual](https://docs.edatec.cn/cm4-nano/))
 - [Pimoroni Automation hat mini](https://shop.pimoroni.com/products/automation-hat-mini) ([manual](https://github.com/pimoroni/automation-hat))
-- 12volt door deadbolt
-- Danish yellow health insurance card with barcode (barcode use C128 encoding)
-- Daytickets printed on paper
+- 12/24 volt door deadbolt
+- Apple/Android wallet for digital membership cards with QR code
+- iBeacon on the Badger/[iBeacon micropython](https://gist.github.com/N3MIS15/589062360a658a36b9c810fec8bb0c91)
+- Daytickets printed on paper with QR code
 
 [![Lockoff-Testing](https://github.com/jensimik/lockoff/actions/workflows/backend.yml/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/backend.yml) [![CodeQL](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql)
