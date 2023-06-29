@@ -2,7 +2,7 @@
 
 Components:
 
-- Klubmodul sync of member data
+- Sync of member data from [Klubmodul](https://klubmodul.dk)
 - [Opticon USB barcode scanner](https://opticon.shop/scanners/stationary/opticon-m-11-usb/)
 - [Pimoroni Badger 2040 w display](https://shop.pimoroni.com/products/badger-2040-w?variant=40514062188627)
 - [Edatec CM4 nano / raspberry pi](https://www.edatec.cn/en/elpc/cm4-nano.html) ([manual](https://docs.edatec.cn/cm4-nano/))
