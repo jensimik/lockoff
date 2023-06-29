@@ -2,6 +2,7 @@ import calendar
 import hashlib
 import secrets
 import struct
+import logging
 from datetime import datetime
 from enum import Enum
 
@@ -11,6 +12,9 @@ from tinydb.table import Document
 
 from .config import settings
 from .db import DB_dayticket, DB_member
+
+log = logging.getLogger(__name__)
+door_log = logging.getLogger("door")
 
 
 class TokenType(Enum):
@@ -22,6 +26,11 @@ class TokenType(Enum):
 
 class TokenError(Exception):
     pass
+
+
+def log_and_raise_token_error(message, level=logging.WARN):
+    log.log(level=level, message=message)
+    raise TokenError(message)
 
 
 def generate_access_token(
@@ -96,29 +105,29 @@ async def verify_access_token(token: str) -> bool:
         token_type = TokenType(type_)
         expires_datetime = datetime.utcfromtimestamp(expires)
     except Exception as ex:
-        raise TokenError(f"could not unpack data: {ex}")
+        log_and_raise_token_error(f"could not unpack data: {ex}")
 
     if not secrets.compare_digest(
         hashlib.shake_256(data + settings.secret).digest(settings.digest_size),
         signature,
     ):
-        raise TokenError("could not verify signature")
+        log_and_raise_token_error("could not verify signature")
 
     if datetime.utcnow() > expires_datetime:
-        raise TokenError("token is expired")
+        log_and_raise_token_error("token is expired")
 
     # check in database
     if token_type in [TokenType.NORMAL, TokenType.MORNING]:
         async with DB_member as db:
             d = db.get(doc_id=user_id)
             if not d:
-                raise TokenError("did you cancel your membership?")
+                log_and_raise_token_error("did you cancel your membership?")
     # HACK for printed daytickets to expire them the day they are used
     elif token_type == TokenType.DAY_TICKET_HACK:
         async with DB_dayticket as db:
             if d := db.get(doc_id=user_id):
                 if datetime.utcnow() > datetime.utcfromtimestamp(d["expires"]):
-                    raise TokenError("dayticket has expired")
+                    log_and_raise_token_error("dayticket has expired")
             else:
                 expire = datetime.now(tz=settings.tz) + relativedelta(
                     hour=23, minute=59, second=59, microsecond=0
@@ -129,10 +138,10 @@ async def verify_access_token(token: str) -> bool:
                 )
 
     # normal daytickets should not be done any specific things for
-    elif token_type == TokenType.DAY_TICKET:
-        pass
+    # elif token_type == TokenType.DAY_TICKET:
+    #     pass
 
-    # TODO: log the use of this ticket id
+    door_log.info(f"{datetime.utcnow().isoformat()}|{token_type.name}|{user_id}")
 
     return True
 

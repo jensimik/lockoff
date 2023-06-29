@@ -4,15 +4,14 @@ lockoff:
   image:
   container_name: lockoff
   restart: always
-  network_mode: host
   volumes:
     - $PWD/db_member.json:/db_member.json
     - $PWD/db_dayticket.json:/db_dayticket.json
+    - $PWD/door.log:/door.log
   environment:
     - TZ=Europe/Copenhagen
     - klubmodul_username=REPLACE
     - klubmodul_password=REPLACE
-    - database=/db.json
   devices:
     - /dev/serial/by-path/...:/dev/ttyACM0
     - /dev/serial/by-path/...:/dev/ttyACM1
