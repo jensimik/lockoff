@@ -8,8 +8,7 @@ Components:
 - [Edatec CM4 nano / raspberry pi](https://www.edatec.cn/en/elpc/cm4-nano.html) ([manual](https://docs.edatec.cn/cm4-nano/))
 - [Pimoroni Automation hat mini](https://shop.pimoroni.com/products/automation-hat-mini) ([manual](https://github.com/pimoroni/automation-hat))
 - 12/24 volt door deadbolt
-- Apple/Android wallet for digital membership cards with QR code
 - iBeacon on the Badger/[iBeacon micropython](https://gist.github.com/N3MIS15/589062360a658a36b9c810fec8bb0c91)
-- Daytickets printed on paper with QR code
+- _Signed_ QR codes for access (Apple/Android wallet or printed)
 
 [![Lockoff-Testing](https://github.com/jensimik/lockoff/actions/workflows/backend.yml/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/backend.yml) [![CodeQL](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql)
