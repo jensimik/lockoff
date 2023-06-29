@@ -4,7 +4,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from . import db
 from .reader import opticon_reader
 from .config import settings
 from .klubmodul import Klubmodul
@@ -16,7 +15,7 @@ log = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     if settings.prod:
-        # start barcode reader
+        # start opticon reader
         opticon_task = asyncio.create_task(opticon_reader())
         # start klubmodul syncer
         km = Klubmodul()
