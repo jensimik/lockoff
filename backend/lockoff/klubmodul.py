@@ -8,8 +8,9 @@ from tinydb.table import Document
 
 from .config import settings
 from .db import DB_member
+from .access_token import TokenType
 
-TEAMS = {111: "full", 112: "morning"}
+TEAMS = {111: TokenType.NORMAL, 112: TokenType.MORNING}
 
 log = logging.getLogger(__name__)
 
@@ -67,7 +68,8 @@ class Klubmodul:
         async with DB_member as db:
             async for user_id, team_type in self.get_members():
                 db.upsert(
-                    Document({"level": team_type, "batch_id": batch_id}), doc_id=user_id
+                    Document({"level": team_type.value, "batch_id": batch_id}),
+                    doc_id=user_id,
                 )
             # remove old data
             db.remove(where("batch_id") < batch_id)

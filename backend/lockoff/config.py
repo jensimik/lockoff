@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     opticon_url: str = "loop://?logging=debug"
     display_url: str = "loop://?logging=debug"
     db_member: str = "/db_member.json"
+    db_dayticket: str = "/db_dayticket.json"
     prod: bool = False
     tz: tzfile = gettz("Europe/Copenhagen")
 

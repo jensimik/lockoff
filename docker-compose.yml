@@ -6,7 +6,8 @@ lockoff:
   restart: always
   network_mode: host
   volumes:
-    - $PWD/db.json:/db.json
+    - $PWD/db_member.json:/db_member.json
+    - $PWD/db_dayticket.json:/db_dayticket.json
   environment:
     - TZ=Europe/Copenhagen
     - klubmodul_username=REPLACE

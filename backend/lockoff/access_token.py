@@ -1,22 +1,23 @@
 import calendar
+import hashlib
 import secrets
 import struct
-import hashlib
 from datetime import datetime
 from enum import Enum
 
 import base45
 from dateutil.relativedelta import relativedelta
-
-from .db import DB_member
+from tinydb.table import Document
 
 from .config import settings
+from .db import DB_dayticket, DB_member
 
 
 class TokenType(Enum):
     NORMAL = 1
     MORNING = 2
-    DAY_TICKET = 9
+    DAY_TICKET = 3
+    DAY_TICKET_HACK = 4
 
 
 class TokenError(Exception):
@@ -42,10 +43,11 @@ def generate_access_token(
 
     """
 
+    expire = datetime.now(tz=settings.tz) + expire_delta
     data = struct.pack(
         f">IIH",
         user_id,
-        calendar.timegm((datetime.utcnow() + expire_delta).utctimetuple()),
+        calendar.timegm(expire.utctimetuple()),
         token_type.value,
     )
 
@@ -111,8 +113,29 @@ async def verify_access_token(token: str) -> bool:
             d = db.get(doc_id=user_id)
             if not d:
                 raise TokenError("did you cancel your membership?")
+    # HACK for printed daytickets to expire them the day they are used
+    elif token_type == TokenType.DAY_TICKET_HACK:
+        async with DB_dayticket as db:
+            if d := db.get(doc_id=user_id):
+                if datetime.utcnow() > datetime.utcfromtimestamp(d["expires"]):
+                    raise TokenError("dayticket has expired")
+            else:
+                expire = datetime.now(tz=settings.tz) + relativedelta(
+                    hour=23, minute=59, second=59, microsecond=0
+                )
+                db.upsert(
+                    Document({"expires": calendar.timegm(expire.utctimetuple())}),
+                    doc_id=user_id,
+                )
+
+    # normal daytickets should not be done any specific things for
     elif token_type == TokenType.DAY_TICKET:
-        # TODO: could save in db-cache the id of the day-ticket and peg it to today
         pass
 
+    # TODO: log the use of this ticket id
+
     return True
+
+
+if __name__ == "__main__":
+    generate_access_token(1)
