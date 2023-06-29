@@ -5,11 +5,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from . import db
-from .barcode import barcode_reader
+from .reader import opticon_reader
 from .config import settings
-from .display import LCD
 from .klubmodul import Klubmodul
-from .utils import TokenEnum, generate_token
 from .watchdog import Watchdog
 
 log = logging.getLogger(__name__)
@@ -17,36 +15,23 @@ log = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await db.database.connect()
     if settings.prod:
-        # start LCD runner
-        lcd = LCD()
-        await lcd.setup()
-        lcd_task = asyncio.create_task(lcd.runner())
         # start barcode reader
-        barcode_task = asyncio.create_task(barcode_reader(lcd=lcd))
+        opticon_task = asyncio.create_task(opticon_reader())
         # start klubmodul syncer
-        km = Klubmodul(
-            username=settings.klubmodul_username, password=settings.klubmodul_password
-        )
+        km = Klubmodul()
         klubmodul_task = asyncio.create_task(km.runner())
         # start watchdog
-        wd = Watchdog(watch=[lcd_task, barcode_task, klubmodul_task])
+        wd = Watchdog(watch=[opticon_task, klubmodul_task])
         asyncio.create_task(wd.runner())
     yield
     # clear things now at shutdown
     if settings.prod:
-        barcode_task.cancel()
+        opticon_task.cancel()
         try:
-            await barcode_task
+            await opticon_task
         except asyncio.CancelledError:
-            log.info("barcode_reader is canceled now")
-        lcd_task.cancel()
-        try:
-            await lcd_task
-        except asyncio.CancelledError:
-            log.info("lcd is canceled now")
-    await db.database.disconnect()
+            log.info("opticon_reader is canceled now")
 
 
 app = FastAPI(
@@ -58,23 +43,3 @@ app = FastAPI(
 @app.get("/healtz")
 async def healthz():
     return {"everything": "is awesome"}
-
-
-@app.get("/tokens")  # , response_model=list[schemas.Token])
-async def get_tokens():
-    query = db.tokens.select()
-    return await db.database.fetch_all(query)
-
-
-@app.get("/daytickets")
-async def generate_daytickets():
-    num = 100
-    tokens = []
-    while num > 0:
-        token = generate_token(8)
-        # check if token already exist
-        if not await db.token_exist(token=token):
-            await db.token_insert(token=token, token_type=TokenEnum.dayticket)
-            tokens.append(token)
-            num -= 1
-    # TODO: generate pdf from the tokens

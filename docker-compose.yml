@@ -6,12 +6,12 @@ lockoff:
   restart: always
   network_mode: host
   volumes:
-    - $PWD/database:/database
+    - $PWD/db.json:/db.json
   environment:
     - TZ=Europe/Copenhagen
     - klubmodul_username=REPLACE
     - klubmodul_password=REPLACE
-    - database_url=sqlite:///database/data.db
+    - database=/db.json
   devices:
     - /dev/serial/by-path/...:/dev/ttyACM0
     - /dev/serial/by-path/...:/dev/ttyACM1

@@ -1,16 +1,16 @@
 import asyncio
 import logging
+from datetime import datetime
 
 import httpx
+from tinydb import where
+from tinydb.table import Document
 
-from . import db
 from .config import settings
-from .utils import Member, TokenEnum
+from .db import DB_member
 
-TEAMS = {
-    111: TokenEnum.full,
-    112: TokenEnum.morning,
-}
+TEAMS = {111: "full", 112: "morning"}
+
 log = logging.getLogger(__name__)
 
 
@@ -21,8 +21,8 @@ class KlubmodulException(Exception):
 class Klubmodul:
     def __init__(
         self,
-        username: str,
-        password: str,
+        username: str = settings.klubmodul_username,
+        password: str = settings.klubmodul_password,
         country_id: int = settings.klubmodul_country_id,
         club_id: int = settings.klubmodul_club_id,
     ):
@@ -31,7 +31,8 @@ class Klubmodul:
         self.country_id = country_id
         self.club_id = club_id
 
-    async def get_members(self) -> list[Member]:
+    async def get_members(self):
+        """ "async generator which yield valid user_id, team_type"""
         async with httpx.AsyncClient(
             base_url="https://klubmodul-app.dk/admin/KlubModulAPI.asmx"
         ) as client:
@@ -48,8 +49,6 @@ class Klubmodul:
                 raise KlubmodulException("failed to login: " + response.reason_phrase)
             profile_creds = response.json().get("d")
 
-            # get list of users in both teams (morning/full)
-            members = []
             for team_id, team_type in TEAMS.items():
                 post_data = {
                     "profileToken": profile_creds.get("ProfileToken", ""),
@@ -60,17 +59,18 @@ class Klubmodul:
                     raise KlubmodulException(
                         "failed to receive members by team: " + response.reason_phrase
                     )
-                members += [
-                    Member(
-                        name=d["ProfileName"], member_type=team_type, token=""
-                    )  # TODO: find field with birthday and last digits
-                    for d in response.json().get("d")
-                ]
-            return members
+                for d in response.json().get("d"):
+                    yield d["ProfileID_FK"], team_type
 
     async def refresh(self):
-        members = await self.get_members()
-        await db.bulk_upsert_members(members)
+        batch_id = datetime.utcnow().isoformat()
+        async with DB_member as db:
+            async for user_id, team_type in self.get_members():
+                db.upsert(
+                    Document({"level": team_type, "batch_id": batch_id}), doc_id=user_id
+                )
+            # remove old data
+            db.remove(where("batch_id") < batch_id)
 
     async def runner(self):
         while True:

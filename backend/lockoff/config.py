@@ -11,9 +11,12 @@ class Settings(BaseSettings):
     klubmodul_password: str
     klubmodul_country_id: int = 1
     klubmodul_club_id: int = 2002
+    nonce_size: int = 4
+    digest_size: int = 10
+    secret: bytes = "changeme"
     opticon_url: str = "loop://?logging=debug"
     display_url: str = "loop://?logging=debug"
-    database_url: str = "sqlite:///./test.db"
+    db_member: str = "/db_member.json"
     prod: bool = False
     tz: tzfile = gettz("Europe/Copenhagen")
 
