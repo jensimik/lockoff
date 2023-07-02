@@ -3,13 +3,13 @@ name: lockoff-testing
 on:
   push:
     paths:
-      - "backend/**/*"
-      - ".github/workflows/backend.yml"
+      - "controller/**/*"
+      - ".github/workflows/controller.yml"
     branches: ["main"]
   pull_request:
     paths:
-      - "backend/**/*"
-      - ".github/workflows/backend.yml"
+      - "controller/**/*"
+      - ".github/workflows/controller.yml"
     branches: ["main"]
 
 permissions:
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend
+        working-directory: controller
 
     steps:
       - uses: actions/checkout@v3
