@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     display_url: str = "loop://?logging=debug"
     db_member: str = "/db_member.json"
     db_dayticket: str = "/db_dayticket.json"
+    certificate: bytes = ""
+    key: bytes = ""
+    certificate_password: bytes = ""
+    wwdr_certificate: bytes = ""
     prod: bool = False
     tz: tzfile = gettz("Europe/Copenhagen")
 

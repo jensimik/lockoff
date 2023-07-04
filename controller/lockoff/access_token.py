@@ -147,4 +147,4 @@ async def verify_access_token(token: str) -> bool:
 
 
 if __name__ == "__main__":
-    generate_access_token(1)
+    print(generate_access_token(1))
