@@ -1,6 +1,7 @@
 import hashlib
 import io
 import json
+import pathlib
 import zipfile
 from datetime import datetime
 
@@ -9,6 +10,8 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.serialization import pkcs7
 
 from .config import settings
+
+module_directory = pathlib.Path(__file__).resolve().parent
 
 
 def _read_file_bytes(path):
@@ -19,9 +22,9 @@ def _read_file_bytes(path):
 
 class ApplePass:
     FILES = {
-        "logo.png": _read_file_bytes("logo.png"),
-        "icon.png": _read_file_bytes("logo.png"),
-        "icon@2x.png": _read_file_bytes("logo.png"),
+        "logo.png": _read_file_bytes(module_directory / "logo.png"),
+        "icon.png": _read_file_bytes(module_directory / "logo.png"),
+        "icon@2x.png": _read_file_bytes(module_directory / "logo.png"),
     }
     CERT = x509.load_pem_x509_certificate(settings.certificate)
     PRIV_KEY = serialization.load_pem_private_key(
