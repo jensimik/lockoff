@@ -18,4 +18,4 @@ Display:
 - iBeacon on the Pico/[iBeacon micropython](https://gist.github.com/N3MIS15/589062360a658a36b9c810fec8bb0c91)
 - Show status messages from the controller (connected and powered with USB)
 
-[![Lockoff-Testing](https://github.com/jensimik/lockoff/actions/workflows/backend.yml/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/backend.yml) [![CodeQL](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql)
+[![Lockoff-Testing](https://github.com/jensimik/lockoff/actions/workflows/controller.yml/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/controller.yml) [![CodeQL](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql)
