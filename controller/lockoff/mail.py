@@ -3,6 +3,8 @@ from pathlib import Path
 
 import mailtrap as mt
 
+from .config import settings
+
 welcome_image = Path(__file__).parent.joinpath("welcome.png").read_bytes()
 
 mail = mt.Mail(
@@ -50,5 +52,5 @@ mail = mt.Mail(
     custom_variables={"year": 2023},
 )
 
-client = mt.MailtrapClient(token="your-api-key")
+client = mt.MailtrapClient(token=settings.mailtrap_token)
 client.send(mail)

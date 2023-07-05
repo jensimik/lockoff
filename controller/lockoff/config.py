@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     key: bytes = ""
     certificate_password: bytes = ""
     wwdr_certificate: bytes = ""
+    mailtrap_token: str = ""
     prod: bool = False
     tz: tzfile = gettz("Europe/Copenhagen")
 
