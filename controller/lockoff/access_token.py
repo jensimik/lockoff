@@ -129,12 +129,15 @@ async def verify_access_token(token: str) -> bool:
                 if datetime.utcnow() > datetime.utcfromtimestamp(d["expires"]):
                     log_and_raise_token_error("dayticket has expired")
             else:
+                # expire at midnight
                 expire = datetime.now(tz=settings.tz) + relativedelta(
                     hour=23, minute=59, second=59, microsecond=0
                 )
                 db.upsert(
-                    Document({"expires": calendar.timegm(expire.utctimetuple())}),
-                    doc_id=user_id,
+                    Document(
+                        {"expires": calendar.timegm(expire.utctimetuple())},
+                        doc_id=user_id,
+                    )
                 )
 
     # normal daytickets should not be done any specific things for

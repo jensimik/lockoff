@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 
 import httpx
-from tinydb import where
+from tinydb import where, set as tiny_set
 from tinydb.table import Document
 
 from .config import settings
@@ -64,15 +64,31 @@ class Klubmodul:
                     yield d["ProfileID_FK"], team_type
 
     async def refresh(self):
-        batch_id = datetime.utcnow().isoformat()
+        batch_id = datetime.utcnow().isoformat(timespec="seconds")
         async with DB_member as db:
             async for user_id, team_type in self.get_members():
                 db.upsert(
-                    Document({"level": team_type.value, "batch_id": batch_id}),
-                    doc_id=user_id,
+                    Document(
+                        {
+                            "level": team_type.value,
+                            "batch_id": batch_id,
+                            "email": "",  # TODO: get email somehow?
+                            "active": True,
+                        },
+                        doc_id=user_id,
+                    )
                 )
-            # remove old data
-            db.remove(where("batch_id") < batch_id)
+            # mark old data as inactive
+            db.update(tiny_set("active", False), where("batch_id") < batch_id)
+
+            # loop through all and check if we should welcome email out
+            for user in db.search(where("active") == True):
+                if user.get("email_sent", 0) < settings.current_season:
+                    # TODO: invite_mail_user(user_id=user.doc_id, email=user["email"])
+                    db.update(
+                        tiny_set("email_sent", settings.current_season),
+                        doc_ids=[user.doc_id],
+                    )
 
     async def runner(self):
         while True:
