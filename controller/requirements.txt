@@ -1,6 +1,6 @@
 aiofiles==23.1.0
 aiotinydb==2.0.0
-anyio==3.7.0
+anyio==3.7.1
 base45==0.4.4
 Brotli==1.0.9
 certifi==2023.5.7
