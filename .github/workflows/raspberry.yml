@@ -7,33 +7,39 @@ on:
     branches: ["main"]
 
 jobs:
-  pi-gen-nodejs:
+  pi-gen-lockoff:
     runs-on: ubuntu-latest
     steps:
-      # Create a stage 'docker-stage' instructing to add docker repo and install docker as dependency
+      # Create a stage 'install-stage' instructing to add edatec bsp & docker
       - run: |
-          mkdir -p test-stage/package-test &&
+          mkdir -p install-stage/package-test &&
           {
-          cat > test-stage/package-test/00-run-chroot.sh <<-EOF
+          cat > install-stage/package-test/00-run-chroot.sh <<-EOF
           #!/bin/bash
-          apt-get install -y curl
-          curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+          apt-get install -y ca-certificates curl gnupg
+          curl -fsSL https://apt.edatec.cn/pubkey.gpg | sudo apt-key add -
+            echo "deb https://apt.edatec.cn/raspbian stable main" | sudo tee /etc/apt/sources.list.d/edatec.list
+            curl -fsSL https://get.docker.com -o get-docker.sh | sh
           EOF
           } &&
-          chmod +x test-stage/package-test/00-run-chroot.sh &&
-          echo "nodejs" > test-stage/package-test/01-packages &&
+          chmod +x install-stage/package-test/00-run-chroot.sh &&
+          echo "ed-cm4nano-bsp ed-rtc" > install-stage/package-test/01-packages &&
           {
-          cat > test-stage/prerun.sh <<-EOF
+          cat > install-stage/prerun.sh <<-EOF
           #!/bin/bash -e
           if [ ! -d "\${ROOTFS_DIR}" ]; then
             copy_previous
           fi
           EOF
           } &&
-          chmod +x test-stage/prerun.sh
+          chmod +x install-stage/prerun.sh
 
       - uses: usimd/pi-gen-action@v1
+        id: build
         with:
+          # verbose on
+          verbose-output: true
+
           # Compression to apply on final image (either "none", "zip", "xz" or "gz").
           compression: zip
 
@@ -108,7 +114,7 @@ jobs:
           # images in stage2 (lite), stage4 and stage5. You probably want to hook in custom
           # stages before one of the exported stages. Otherwise, the action will make sure
           # any custom stage will include an image export directive.
-          stage-list: stage0 stage1 stage2 ./test-stage
+          stage-list: stage0 stage1 stage2 ./install-stage
 
           # System timezone.
           timezone: Europe/Copenhagen
@@ -130,3 +136,8 @@ jobs:
 
           # Password of default wifi network to connect to.
           wpa-password: ${{ secrets.NKK_WPA_PASSWORD}}
+
+      - uses: actions/upload-artifact@v3
+        with:
+            name: pi-gen-image
+            path: ${{ steps.build.outputs.image-path }}
