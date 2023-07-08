@@ -37,9 +37,6 @@ jobs:
       - uses: usimd/pi-gen-action@v1
         id: build
         with:
-          # verbose on
-          verbose-output: true
-
           # Compression to apply on final image (either "none", "zip", "xz" or "gz").
           compression: zip
 
@@ -126,7 +123,7 @@ jobs:
           username: lockoff
 
           # Print all output from pi-gen.
-          verbose-output: false
+          verbose-output: true
 
           # Wifi country code of default network to connect to.
           wpa-country: "DK"
@@ -139,5 +136,5 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-            name: pi-gen-image
-            path: ${{ steps.build.outputs.image-path }}
+          name: pi-gen-image
+          path: ${{ steps.build.outputs.image-path }}
