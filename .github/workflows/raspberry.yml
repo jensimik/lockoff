@@ -18,10 +18,13 @@ jobs:
           #!/bin/bash
           apt-get install -y ca-certificates curl gnupg
           curl -sSL https://get.docker.com/ | sh
+          curl -sS https://apt.edatec.cn/pubkey.gpg | sudo apt-key add -
+          echo "deb https://apt.edatec.cn/raspbian stable main" | sudo tee /etc/apt/sources.list.d/edatec.list
+          apt-get update -y
+          apt-get install -y ed-cm4nano-bsp ed-rtc
           EOF
           } &&
           chmod +x install-stage/package-test/00-run-chroot.sh &&
-          echo "curl" > install-stage/package-test/01-packages &&
           {
           cat > install-stage/prerun.sh <<-EOF
           #!/bin/bash -e
