@@ -53,6 +53,7 @@ class ApplePass:
                 "teamIdentifier": "LLFSXFW7XK",
                 "description": "Nørrebro klatreklub",
                 "expirationDate": f"{expires:%Y-%m-%d}T{expires:%H:%M:%S}Z",
+                "sharingProhibited": True,
                 "formatVersion": 1,
                 "barcodes": [
                     {
@@ -69,14 +70,15 @@ class ApplePass:
                         "relevantText": "lets climb! 🐒",
                     }
                 ],
-                # "ibeacons": [
-                #     {
-                #         "proximityUUID": None,
-                #         "major": None,
-                #         "minor": None,
-                #         "relevantText": "",
-                #     }
-                # ],
+                "maxDistance": 20,
+                "beacons": [
+                    {
+                        "proximityUUID": "812366E1-4479-404B-B4A1-110FBBA9F625",
+                        "major": 0,
+                        "minor": 0,
+                        "relevantText": "lets climb! 🐒",
+                    }
+                ],
                 "generic": {
                     "backFields": [
                         {
@@ -146,13 +148,13 @@ class ApplePass:
                 zf.writestr(filename, filedata)
 
 
-# if __name__ == "__main__":
-#    with open("test2.pkpass", "wb") as f:
-#        p = ApplePass.create(
-#            zip_file=f,
-#            user_id=100,
-#            name="Jens Davidsen",
-#            level="Normal",
-#            expires=datetime(2024, 1, 1, 12, 0, 0),
-#            barcode_data="test1234",
-#        )
+if __name__ == "__main__":
+   with open("test2.pkpass", "wb") as f:
+       p = ApplePass.create(
+           zip_file=f,
+           user_id=100,
+           name="Jens Davidsen",
+           level="Normal",
+           expires=datetime(2024, 1, 1, 12, 0, 0),
+           barcode_data="test1234",
+       )
