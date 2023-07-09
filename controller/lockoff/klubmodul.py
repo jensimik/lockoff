@@ -3,7 +3,8 @@ import logging
 from datetime import datetime
 
 import httpx
-from tinydb import where, set as tiny_set
+from tinydb import where
+from tinydb import operations
 from tinydb.table import Document
 
 from .config import settings
@@ -79,14 +80,14 @@ class Klubmodul:
                     )
                 )
             # mark old data as inactive
-            db.update(tiny_set("active", False), where("batch_id") < batch_id)
+            db.update(operations.set("active", False), where("batch_id") < batch_id)
 
             # loop through all and check if we should welcome email out
             for user in db.search(where("active") == True):
                 if user.get("email_sent", 0) < settings.current_season:
                     # TODO: invite_mail_user(user_id=user.doc_id, email=user["email"])
                     db.update(
-                        tiny_set("email_sent", settings.current_season),
+                        operations.set("email_sent", settings.current_season),
                         doc_ids=[user.doc_id],
                     )
 
