@@ -51,9 +51,6 @@ jobs:
     name: push to docker hub
     needs: test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: controller
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -69,5 +66,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
+          working-directory: controller
           push: true
           tags: jensimik/lockoff:latest
