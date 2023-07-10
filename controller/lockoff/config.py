@@ -1,9 +1,22 @@
-from typing import Any
+import json
+from typing import Any, Tuple, Type
 
 from dateutil.tz import gettz, tzfile
-from pydantic_settings import BaseSettings
+from pydantic.fields import FieldInfo
+from pydantic_settings import (
+    BaseSettings,
+    EnvSettingsSource,
+    PydanticBaseSettingsSource,
+)
 
-# from pydantic.env_settings import SettingsSourceCallable
+
+class MyCustomSource(EnvSettingsSource):
+    def prepare_field_value(
+        self, field_name: str, field: FieldInfo, value: Any, value_is_complex: bool
+    ) -> Any:
+        if field_name == "tz":
+            return gettz(value)
+        return json.loads(value)
 
 
 class Settings(BaseSettings):
@@ -30,13 +43,16 @@ class Settings(BaseSettings):
     prod: bool = False
     tz: tzfile = gettz("Europe/Copenhagen")
 
-    class Config:
-        # parse tz field as a dateutil.tz
-        @classmethod
-        def parse_env_var(cls, field_name: str, raw_val: str) -> Any:
-            if field_name == "tz":
-                return gettz(raw_val)
-            return cls.json_loads(raw_val)
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: Type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+        return (MyCustomSource(settings_cls),)
 
 
 settings = Settings()
