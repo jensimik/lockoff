@@ -16,7 +16,8 @@ class MyCustomSource(EnvSettingsSource):
     ) -> Any:
         if field_name == "tz":
             return gettz(value)
-        return json.loads(value)
+        return value
+        # return json.loads(value)
 
 
 class Settings(BaseSettings):
@@ -41,23 +42,18 @@ class Settings(BaseSettings):
     basic_auth_password: bytes = ""
     current_season: int = 2023
     prod: bool = False
-    tz_str: str = "Europe/Copenhagen"  # tzfile = gettz("Europe/Copenhagen")
+    tz: tzfile = gettz("Europe/Copenhagen")
 
-    def _get_tz(self):
-        return gettz(self.tz_str)
-
-    tz: tzfile = property(_get_tz)
-
-    # @classmethod
-    # def settings_customise_sources(
-    #     cls,
-    #     settings_cls: Type[BaseSettings],
-    #     init_settings: PydanticBaseSettingsSource,
-    #     env_settings: PydanticBaseSettingsSource,
-    #     dotenv_settings: PydanticBaseSettingsSource,
-    #     file_secret_settings: PydanticBaseSettingsSource,
-    # ) -> Tuple[PydanticBaseSettingsSource, ...]:
-    #     return (MyCustomSource(settings_cls),)
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: Type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+        return (MyCustomSource(settings_cls),)
 
 
 settings = Settings()
