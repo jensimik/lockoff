@@ -8,7 +8,6 @@ formatters:
     "()": uvicorn.logging.AccessFormatter
     format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
   door:
-    "()": lockoff.logging.AccessFormatter
     format: "%(message)s"
 handlers:
   default:

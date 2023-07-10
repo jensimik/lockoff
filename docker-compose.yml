@@ -1,10 +1,33 @@
 version: "3.8"
 
+volumes:
+  caddy_data:
+  caddy_conf:
+
+networks:
+  net:
+    driver: bridge
+
 services:
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: always
+    networks:
+      - net
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - $PWD/Caddyfile:/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_conf:/config
   lockoff:
-    image:
+    image: jensimik/lockoff:latest
     container_name: lockoff
     restart: always
+    networks:
+      - net
     volumes:
       - $PWD/db_member.json:/db_member.json
       - $PWD/db_dayticket.json:/db_dayticket.json
