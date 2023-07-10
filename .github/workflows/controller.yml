@@ -69,4 +69,6 @@ jobs:
           platforms: linux/arm64
           context: "{{defaultContext}}:controller"
           push: true
-          tags: jensimik/lockoff:latest
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/lockoff:${{ steps.vars.outputs.tag }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/lockoff:latest
