@@ -51,6 +51,9 @@ jobs:
     name: push to docker hub
     needs: test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: controller
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
