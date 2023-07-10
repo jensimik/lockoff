@@ -70,5 +70,6 @@ jobs:
           context: "{{defaultContext}}:controller"
           push: true
           tags: |
-            jensimik/lockoff:${{ steps.vars.outputs.tag }}
+            jensimik/lockoff:1
+            jensimik/lockoff:1.0
             jensimik/lockoff:latest
