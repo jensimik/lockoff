@@ -70,5 +70,5 @@ jobs:
           context: "{{defaultContext}}:controller"
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/lockoff:${{ steps.vars.outputs.tag }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/lockoff:latest
+            jensimik/lockoff:${{ steps.vars.outputs.tag }}
+            jensimik/lockoff:latest
