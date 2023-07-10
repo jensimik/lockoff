@@ -1,5 +1,8 @@
 FROM python:3.11-slim-bullseye
 
+# get curl for health check
+RUN apt-get update && apt-get install curl -y
+
 WORKDIR /code
 
 COPY ./requirements.txt log_conf.yaml ./

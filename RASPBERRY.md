@@ -27,7 +27,10 @@ docker-compose up -d
 
 # ibeacon
 
+set beacon and frequency to 100ms
 sudo hciconfig hci0 up
 sudo hciconfig hci0 leadv 3
-sudo hciconfig hci0 noscan
 sudo hcitool -i hci0 cmd 0x08 0x0008 1E 02 01 06 1A FF 4C 00 02 15 81 23 66 E1 44 79 40 4B B4 A1 11 0F BB A9 F6 25 00 00 00 00 C8 00
+sudo hcitool -i hci0 cmd 0x08 0x0006 20 00 A0 00 00 00 00 00 00 00 00 00 00 07 00
+sudo hcitool -i hci0 cmd 0x08 0x000A 01
+sudo hciconfig hci0 noscan
