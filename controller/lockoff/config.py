@@ -1,8 +1,9 @@
 from typing import Any
 
 from dateutil.tz import gettz, tzfile
-from pydantic import BaseSettings
-from pydantic.env_settings import SettingsSourceCallable
+from pydantic_settings import BaseSettings
+
+# from pydantic.env_settings import SettingsSourceCallable
 
 
 class Settings(BaseSettings):
@@ -36,16 +37,6 @@ class Settings(BaseSettings):
             if field_name == "tz":
                 return gettz(raw_val)
             return cls.json_loads(raw_val)
-
-        # do not try to load from file
-        @classmethod
-        def customise_sources(
-            cls,
-            init_settings: SettingsSourceCallable,
-            env_settings: SettingsSourceCallable,
-            file_secret_settings: SettingsSourceCallable,
-        ) -> tuple[SettingsSourceCallable, ...]:
-            return env_settings, init_settings
 
 
 settings = Settings()
