@@ -13,6 +13,13 @@ systemctl disable bluetooth.service
 systemctl stop bluetooth.service
 systemctl disable fake-hwclock.service
 systemctl stop fake-hwclock.service
+
+# setup tailscale
+
+curl -fsSL https://tailscale.com/install.sh | sh
+
+# setup docker
+
 curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker lockoff
 sudo apt-get install libffi-dev libssl-dev
@@ -20,14 +27,13 @@ sudo apt install python3-dev
 sudo apt-get install -y python3 python3-pip
 sudo pip3 install docker-compose
 sudo systemctl enable docker
-
 copy docker-compose.yml
 docker-compose pull
 docker-compose up -d
 
 # ibeacon
 
-set beacon and frequency to 100ms
+set beacon and frequency to 100ms uuid 812366E1-4479-404B-B4A1-110FBBA9F625
 sudo hciconfig hci0 up
 sudo hciconfig hci0 leadv 3
 sudo hcitool -i hci0 cmd 0x08 0x0008 1E 02 01 06 1A FF 4C 00 02 15 81 23 66 E1 44 79 40 4B B4 A1 11 0F BB A9 F6 25 00 00 00 00 C8 00
