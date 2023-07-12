@@ -18,7 +18,7 @@ async def opticon_reader():
         try:
             if user_id := await verify_access_token(token=qrcode):
                 log.info(f"successful verified the qrcode as user_id: {user_id}")
-                # buzz person in
+                # buzz person in test
                 log.info("buzzing relay")
                 # await relay_open()
                 await asyncio.sleep(5)
