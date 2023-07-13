@@ -45,10 +45,10 @@ if __name__ == "__main__":
         wdt.feed()
         if poll.poll(timeout=2000):
             data = sys.stdin.read(1)
+            print("#")  # print ACK back
             # idle watchdog message
             if data == ".":
                 show_message(**MESSAGES.get(data))
-                print("#")  # print ACK back
             else:
                 show_message(**MESSAGES.get(data))
                 time.sleep(1.8)

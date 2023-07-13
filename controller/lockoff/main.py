@@ -10,6 +10,7 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from .config import settings
 from .klubmodul import Klubmodul
 from .reader import opticon_reader
+from .display import GFXDisplay
 from .watchdog import Watchdog
 
 log = logging.getLogger(__name__)
@@ -43,8 +44,13 @@ async def lifespan(app: FastAPI):
     if settings.prod:
         # start watchdog
         asyncio.create_task(watchdog.runner())
+        # start display
+        display = GFXDisplay()
+        await display.setup()
+        display_task = asyncio.create_task(display.runner())
+        watchdog.watch(display_task)
         # start opticon reader
-        opticon_task = asyncio.create_task(opticon_reader())
+        opticon_task = asyncio.create_task(opticon_reader(display=display))
         watchdog.watch(opticon_task)
         # start klubmodul syncer
         km = Klubmodul()
