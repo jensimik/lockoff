@@ -41,10 +41,9 @@ if __name__ == "__main__":
     poll.register(sys.stdin, select.POLLIN)
 
     while True:
-        data_available = poll.poll(timeout=2000)
         # feed watchdog
         wdt.feed()
-        if data_available:
+        if poll.poll(timeout=2000):
             data = sys.stdin.read(1)
             # idle watchdog message
             if data == ".":
@@ -53,7 +52,6 @@ if __name__ == "__main__":
             else:
                 show_message(**MESSAGES.get(data))
                 time.sleep(1.8)
-
         else:
             # system error
             show_message(**MESSAGES["E"])
