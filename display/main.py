@@ -29,8 +29,8 @@ def show_message(header, text, backlight):
     display.set_pen(0)  # Set pen to white
     display.clear()
     display.set_pen(15)  # Set pen to black
-    width = display.measure_text(header, scale=3)
-    display.text(header, (WIDTH - width) // 2, 10, scale=3)
+    width = display.measure_text(header, scale=4)
+    display.text(header, (WIDTH - width) // 2, 4, scale=4)
     width = display.measure_text(text, scale=2)
     display.text(text, (WIDTH - width) // 2, 44, scale=2)
     display.update()
