@@ -19,7 +19,7 @@ const update = async(e) => {
   <div>
     <p id="mobileemoji">📱</p>
     <div class="flex one">
-      <label for="mobile">Mobile number</label>
+      <label for="mobile">Verify mobile number</label>
       <otp :digit-count="8" :placeholder="0" :nameid="mobile" @update:otp="update"></otp>
     </div>
     <div v-show="show_pin">
