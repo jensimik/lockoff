@@ -40,3 +40,8 @@ sudo hcitool -i hci0 cmd 0x08 0x0008 1E 02 01 06 1A FF 4C 00 02 15 81 23 66 E1 4
 sudo hcitool -i hci0 cmd 0x08 0x0006 20 00 A0 00 00 00 00 00 00 00 00 00 00 07 00
 sudo hcitool -i hci0 cmd 0x08 0x000A 01
 sudo hciconfig hci0 noscan
+
+# make udev rules for opticon
+
+/etc/udev/rules.d/99_opticon.rules
+KERNEL=="ttyACM[0-9]", ATTRS{idVendor}=="065a", ATTRS{idProduct}=="a002", SYMLINK+="OPTICON"

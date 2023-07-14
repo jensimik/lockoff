@@ -122,6 +122,8 @@ async def verify_access_token(token: str) -> bool:
             d = db.get(doc_id=user_id)
             if not d:
                 log_and_raise_token_error("did you cancel your membership?")
+            if not d["active"]:
+                log_and_raise_token_error("did you cancel your membership?")
     # HACK for printed daytickets to expire them the day they are used
     elif token_type == TokenType.DAY_TICKET_HACK:
         async with DB_dayticket as db:

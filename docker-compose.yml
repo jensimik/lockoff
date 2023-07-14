@@ -37,8 +37,8 @@ services:
       - klubmodul_username=REPLACE
       - klubmodul_password=REPLACE
     devices:
-      - /dev/serial/by-path/...:/dev/ttyACM0
-      - /dev/serial/by-path/...:/dev/ttyACM1
+      - /dev/OPTICON:/dev/ttyACM0
+      - /dev/DISPLAY:/dev/ttyACM1
     healthcheck:
       test: "curl --fail http://localhost:80/healtz || exit 1"
       interval: 60s
