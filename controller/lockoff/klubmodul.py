@@ -21,7 +21,7 @@ U = typing.TypeVar("U", bound="KMClient")
 class KMClient:
     def __init__(self):
         self.client = httpx.AsyncClient(
-            base_url="https://nkk.klub-modul.dk", default_encoding="utf-8-sig"
+            base_url=settings.klubmodul_base_url, default_encoding="utf-8-sig"
         )
 
     async def _km_login(self) -> None:
@@ -162,12 +162,11 @@ class KMClient:
             raise KlubmodulException("send sms server error: " + response.reason_phrase)
         save_id = response.json()["savedId"]
         # cleanup after ourself again by removing the sms in klubmodul mail/sms overview
-        data = {"rowId": f"sms-{save_id}"}
         try:
             response = await self.client.request(
                 method="DELETE",
                 url="/Adminv2/Newsmail/__Delete",
-                json=data,
+                json={"rowId": f"sms-{save_id}"},
                 timeout=10.0,
             )
         except httpx.TimeoutException:
