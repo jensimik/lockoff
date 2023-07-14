@@ -1,7 +1,7 @@
 <template>
     <div ref="otpCont">
       <input
-        type="text"
+        type="number"
         class="digit-box"
         v-for="(el, ind) in digits"
         :key="el+ind"
@@ -90,8 +90,19 @@
   
   </script>
   
-  <style scoped>
-  .digit-box {
+<style scoped>
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+.digit-box {
       height: 4rem;
       width: 2rem;
       border: 2px solid black;
