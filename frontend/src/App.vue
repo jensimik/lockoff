@@ -1,22 +1,27 @@
 <script setup>
 import otp from './components/OTP.vue';
-import { ref } from 'vue';
+import mobile from './components/Mobile.vue';
+import { ref, nextTick } from 'vue'
 
-
-var phone = ref();
 var show_pin = ref(false);
+var show_login = ref(true);
+var show_custom = ref(false);
 
-const update = async(e) => {
+const mobile_update = async(e) => {
   console.log(e);
   show_pin.value = true;
-
+  await nextTick();
+  document.getElementById("otc1").focus();
 }
-
+const pin_update = async(e) => {
+  show_login.value = false;
+  show_custom.value = true;
+}
 
 </script>
 
 <template>
-  <div>
+  <div v-show="show_login">
     <div class="flex one">
       <svg id="logo" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 512 511" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
         <g><path style="opacity:1" fill="#fefefe" d="M 231.5,1.5 C 147.452,12.266 82.6184,53.266 37,124.5C 17.1801,159.453 5.34675,196.786 1.5,236.5C 1.5,158.167 1.5,79.8333 1.5,1.5C 78.1667,1.5 154.833,1.5 231.5,1.5 Z"/></g>
@@ -30,22 +35,30 @@ const update = async(e) => {
     </div>
     <div class="flex one">
       <label for="mobile">Verify mobile number</label>
-      <otp :digit-count="8" :placeholder="0" :nameid="mobile" @update:otp="update"></otp>
+      <mobile :digit-count="8" :placeholder="0" @update:otp="mobile_update"></mobile>
     </div>
     <div v-show="show_pin">
       <div class="flex one">
         <label for="pin">SMS code</label>
      </div>
      <div class="flex one">
-       <otp :digit-count="6" :placeholder="1" :nameid="pin" @update:otp="update"></otp>
+       <otp ref="o" :digit-count="6" :placeholder="1" @update:otp="pin_update"></otp>
      </div>
+    </div>
+  </div>
+  <div v-show="show_custom">
+    <p>customise your membership card now</p>
+    <div style="width: 200px"> <!-- this div just for demo display -->
+      <label class="dropimage">
+        <input title="Drop image or click me" type="file">
+      </label>
     </div>
   </div>
 </template>
 
 <style scoped>
 #logo {
-  width: 20%;
+  width: 70%;
   margin: 0;
   padding:0 0 3em 0;
   margin-right: auto;

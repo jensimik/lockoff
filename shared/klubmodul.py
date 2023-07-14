@@ -239,11 +239,11 @@ async def runner():
 async def tester():
     async with KMClient() as client:
         await client.send_sms(user_id=3587, message="123456")
-        results = [item async for item in client.get_members()]
-    pprint(results)
-    print(len(results))
-    print(len([i for i in results if i[1] == "MORN"]))
-    print(len([i for i in results if i[1] == "FULL"]))
+    #     results = [item async for item in client.get_members()]
+    # pprint(results)
+    # print(len(results))
+    # print(len([i for i in results if i[1] == "MORN"]))
+    # print(len([i for i in results if i[1] == "FULL"]))
 
 
 if __name__ == "__main__":

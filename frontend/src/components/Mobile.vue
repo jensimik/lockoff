@@ -10,12 +10,9 @@
         class="digit-box"
         v-for="(el, ind) in digits"
         :key="el+ind"
-        :id="'otc' + (ind + 1).toString()"
         v-model="digits[ind]"
-        :placeholder="ind+1"
-        :autocomplete="ind === 0 ? 'one-time-code' : ''"
-        :tabindex="ind+9"
-        required
+        :autofocus="ind === 0"
+        :tabindex="ind+1"
         @keydown="handleKeyDown($event, ind)"
         :class="{bounce: digits[ind] !== null}"
       >
