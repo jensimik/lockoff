@@ -19,7 +19,9 @@ async def opticon_reader(display: GFXDisplay):
         try:
             if user_id := await verify_access_token(token=qrcode):
                 log.info(f"successful verified the qrcode as user_id: {user_id}")
-                asyncio.create_task(display.send_message(message="K"))  # send OK signal
+                asyncio.create_task(
+                    display.send_message(message=b"K")
+                )  # send OK signal
                 # buzz person in test
                 log.info("buzzing relay")
                 # await relay_open()
@@ -28,4 +30,4 @@ async def opticon_reader(display: GFXDisplay):
         except TokenError as ex:
             async with asyncio.TaskGroup() as tg:
                 # TODO: show correct error message on display?
-                tg.create_task(display.send_message("Q"))
+                tg.create_task(display.send_message(b"Q"))
