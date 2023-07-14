@@ -18,15 +18,15 @@ const update = async(e) => {
 <template>
   <div>
     <p id="mobileemoji">📱</p>
-    <div class="flex off-third third">
+    <div class="flex one">
       <label for="mobile">Mobile number</label>
       <otp :digit-count="8" :placeholder="0" :nameid="mobile" @update:otp="update"></otp>
     </div>
     <div v-show="show_pin">
-      <div class="flex off-third third">
+      <div class="flex one">
         <label for="pin">SMS code</label>
      </div>
-     <div class="flex off-third third">
+     <div class="flex one">
        <otp :digit-count="6" :placeholder="1" :nameid="pin" @update:otp="update"></otp>
      </div>
     </div>
