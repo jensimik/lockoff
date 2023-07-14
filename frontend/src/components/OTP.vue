@@ -103,14 +103,14 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 .digit-box {
-      height: 4rem;
-      width: 2rem;
+      height: 3.8rem;
+      width: 1.8rem;
       border: 2px solid black;
       display: inline-block;
       border-radius: 5px;
       margin: 5px;
-      padding: 5px;
-      font-size: 2rem;
+      padding: 4px;
+      font-size: 1.8rem;
   }
   .digit-box:focus {
     outline: 3px solid black;
