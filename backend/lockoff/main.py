@@ -6,7 +6,8 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .klubmodul import klubmodul_runner
+
+# from .klubmodul import klubmodul_runner
 
 log = logging.getLogger(__name__)
 
