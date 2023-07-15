@@ -8,7 +8,6 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 from .config import settings
-from .klubmodul import Klubmodul
 from .reader import opticon_reader
 from .display import GFXDisplay
 from .watchdog import Watchdog
@@ -52,10 +51,6 @@ async def lifespan(app: FastAPI):
         # start opticon reader
         opticon_task = asyncio.create_task(opticon_reader(display=display))
         watchdog.watch(opticon_task)
-        # start klubmodul syncer
-        # km = Klubmodul()
-        # klubmodul_task = asyncio.create_task(km.runner())
-        # watchdog.watch(klubmodul_task)
     yield
     # clear things now at shutdown
     # nothing really have to be cleared
