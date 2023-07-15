@@ -3,15 +3,11 @@ import csv
 import logging
 import typing
 from datetime import datetime
-from pprint import pprint
 from types import TracebackType
 
 import httpx
-from tinydb import operations, where
-from tinydb.table import Document
 
 from .config import settings
-from .db import DB_member
 
 log = logging.getLogger(__name__)
 
@@ -194,46 +190,46 @@ class KlubmodulException(Exception):
     pass
 
 
-async def refresh():
-    batch_id = datetime.utcnow().isoformat(timespec="seconds")
-    async with DB_member as db, KMClient() as client:
-        async for user_id, member_type, email, mobile in client.get_members():
-            db.upsert(
-                Document(
-                    {
-                        "level": member_type,
-                        "batch_id": batch_id,
-                        "active": True,
-                    },
-                    doc_id=user_id,
-                )
-            )
-            # get user and check if email sent?
-            user = db.get(doc_id=user_id)
-        # mark old data as inactive
-        db.update(operations.set("active", False), where("batch_id") < batch_id)
+# async def refresh():
+#     batch_id = datetime.utcnow().isoformat(timespec="seconds")
+#     async with DB_member as db, KMClient() as client:
+#         async for user_id, member_type, email, mobile in client.get_members():
+#             db.upsert(
+#                 Document(
+#                     {
+#                         "level": member_type,
+#                         "batch_id": batch_id,
+#                         "active": True,
+#                     },
+#                     doc_id=user_id,
+#                 )
+#             )
+#             # get user and check if email sent?
+#             user = db.get(doc_id=user_id)
+#         # mark old data as inactive
+#         db.update(operations.set("active", False), where("batch_id") < batch_id)
 
-        # loop through all and check if we should welcome email out
-        for user in db.search(where("active") == True):
-            if user.get("email_sent", 0) < settings.current_season:
-                # TODO: invite_mail_user(user_id=user.doc_id, email=user["email"])
-                db.update(
-                    operations.set("email_sent", settings.current_season),
-                    doc_ids=[user.doc_id],
-                )
+#         # loop through all and check if we should welcome email out
+#         for user in db.search(where("active") == True):
+#             if user.get("email_sent", 0) < settings.current_season:
+#                 # TODO: invite_mail_user(user_id=user.doc_id, email=user["email"])
+#                 db.update(
+#                     operations.set("email_sent", settings.current_season),
+#                     doc_ids=[user.doc_id],
+#                 )
 
 
-async def klubmodul_runner():
-    while True:
-        try:
-            log.info("klubmodul refreshing data")
-            await refresh()
-            log.info("klubmodul refresh done")
-            # sleep until tomorrow
-            asyncio.sleep(24 * 60 * 60)
-        except KlubmodulException:
-            log.error("failed to fetch klubmodul data retry in an hour")
-            asyncio.sleep(60 * 60)
+# async def klubmodul_runner():
+#     while True:
+#         try:
+#             log.info("klubmodul refreshing data")
+#             await refresh()
+#             log.info("klubmodul refresh done")
+#             # sleep until tomorrow
+#             asyncio.sleep(24 * 60 * 60)
+#         except KlubmodulException:
+#             log.error("failed to fetch klubmodul data retry in an hour")
+#             asyncio.sleep(60 * 60)
 
 
 async def tester():
