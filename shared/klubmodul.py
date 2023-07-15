@@ -223,7 +223,7 @@ async def refresh():
                 )
 
 
-async def runner():
+async def klubmodul_runner():
     while True:
         try:
             log.info("klubmodul refreshing data")

@@ -18,6 +18,29 @@ const pin_update = async(e) => {
   show_custom.value = true;
 }
 
+const preview = ref(null);
+const image = ref(null);
+const image_size = ref({ width: 0, height: 0 });
+
+const onFileChange = async(event) => {
+  var input = event.target;
+  if (input.files) {
+    var reader = new FileReader();
+    reader.onload = (e) => {
+      let img = new Image();
+      img.onload = () => {
+        image_size.value.width = img.width;
+        image_size.value.height = img.height;
+      }
+      img.src = e.target.result;
+
+      preview.value = e.target.result;
+    }
+    image.value = input.files[0];
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
 </script>
 
 <template>
@@ -47,11 +70,21 @@ const pin_update = async(e) => {
     </div>
   </div>
   <div v-show="show_custom">
-    <p>customise your membership card now</p>
-    <div style="width: 200px"> <!-- this div just for demo display -->
-      <label class="dropimage">
-        <input title="Drop image or click me" type="file">
-      </label>
+    <h1>Profile photo</h1>
+    <div class="flex one">
+      <div style="width: 100%; margin-right:auto; margin-left:auto;">
+        <div v-if="preview">
+          <img :src="preview" class="preview"/>
+          <div class="flex two">
+            <button class="warning">Retry</button><button class="success">Confirm</button>
+          </div>
+        </div>
+        <div v-else>
+          <label class="dropimage">
+            <input title="Drop image or click me" type="file" accept="image/*;capture=camera" @change="onFileChange">
+          </label>
+        </div>
+    </div>
     </div>
   </div>
 </template>
@@ -63,5 +96,8 @@ const pin_update = async(e) => {
   padding:0 0 3em 0;
   margin-right: auto;
   margin-left: auto;
+}
+.preview {
+  width: 70%;
 }
 </style>
