@@ -19,4 +19,4 @@ class Watchdog:
             if self.healthy():
                 # TODO: write to /dev/watchdog
                 pass
-            asyncio.sleep(30)
+            await asyncio.sleep(30)
