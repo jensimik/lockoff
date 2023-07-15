@@ -3,13 +3,13 @@ import asyncio
 
 class Watchdog:
     def __init__(self):
-        self.watch = []
+        self._watch = []
 
     def watch(self, watch: asyncio.Task):
-        self.watch.append(watch)
+        self._watch.append(watch)
 
     def healthy(self):
-        if any([w.done() for w in self.watch]):
+        if any([w.done() for w in self._watch]):
             return False
         return True
 
