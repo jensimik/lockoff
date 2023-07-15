@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 @pytest.mark.parametrize(
     ["url", "expected_status_code"],
     (
-        ("/healthz", 200),
+        ("/healtz", 200),
         ("/some_random_url", 404),
     ),
 )
