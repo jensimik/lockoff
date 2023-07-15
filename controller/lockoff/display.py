@@ -24,7 +24,7 @@ class GFXDisplay:
         async with lock:
             log.info("display send idle message")
         #     self.display_w.write(b".")
-        asyncio.sleep(2)
+        await asyncio.sleep(2)
 
     async def send_message(self, message: bytes):
         async with lock:
