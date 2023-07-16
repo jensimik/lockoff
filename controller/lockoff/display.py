@@ -21,10 +21,11 @@ class GFXDisplay:
 
     async def runner(self):
         # send idle
-        async with lock:
-            log.info("display send idle message")
-        #     self.display_w.write(b".")
-        await asyncio.sleep(2)
+        while True:
+            async with lock:
+                log.info("display send idle message")
+            #     self.display_w.write(b".")
+            await asyncio.sleep(2)
 
     async def send_message(self, message: bytes):
         async with lock:
