@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     display_url: str = "loop://?logging=debug"
     db_member: str = "/db_member.json"
     db_dayticket: str = "/db_dayticket.json"
+    redis_url: str = ""
     certificate: bytes = ""
     key: bytes = ""
     certificate_password: bytes = ""

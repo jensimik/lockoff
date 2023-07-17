@@ -1,41 +1,20 @@
 import asyncio
 import logging
-import secrets
 from contextlib import asynccontextmanager
-from typing import Annotated
 
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+import redis.asyncio as redis
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi_limiter import FastAPILimiter
+from fastapi_limiter.depends import RateLimiter
 
 from .config import settings
-from .reader import opticon_reader
 from .display import GFXDisplay
+from .reader import opticon_reader
+from .routers import auth, card
 from .watchdog import Watchdog
 
 log = logging.getLogger(__name__)
-security = HTTPBasic()
 watchdog = Watchdog()
-
-
-# http basic auth as simple auth for api endpoints
-def get_current_username(
-    credentials: Annotated[HTTPBasicCredentials, Depends(security)]
-):
-    current_username_bytes = credentials.username.encode("utf8")
-    is_correct_username = secrets.compare_digest(
-        current_username_bytes, settings.basic_auth_username
-    )
-    current_password_bytes = credentials.password.encode("utf8")
-    is_correct_password = secrets.compare_digest(
-        current_password_bytes, settings.basic_auth_password
-    )
-    if not (is_correct_username and is_correct_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    return credentials.username
 
 
 @asynccontextmanager
@@ -51,6 +30,10 @@ async def lifespan(app: FastAPI):
         # start opticon reader
         opticon_task = asyncio.create_task(opticon_reader(display=display))
         watchdog.watch(opticon_task)
+        redis = redis.from_url(
+            settings.redis_url, encoding="utf-8", decode_responses=True
+        )
+        await FastAPILimiter.init(redis)
     yield
     # clear things now at shutdown
     # nothing really have to be cleared
@@ -61,16 +44,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.include_router(auth.router)
+app.include_router(card.router)
 
-@app.get("/healtz")
+
+@app.get("/healtz", dependencies=[Depends(RateLimiter(times=2, seconds=5))])
 async def healthz():
     if not watchdog.healthy():
         raise HTTPException(
             status_code=500, detail="watchdog report a process not running"
         )
     return {"everything": "is awesome"}
-
-
-@app.get("/dayticket")
-async def get_dayticket_sheets(username: Annotated[str, Depends(get_current_username)]):
-    pass

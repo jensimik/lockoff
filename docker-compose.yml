@@ -8,6 +8,17 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - AUTOHEAL_CONTAINER_LABEL=all
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    command: >
+      --requirepass ${REDIS_PASSWORD}
+    healthcheck:
+      test: redis-cli -a ${REDIS_PASSWORD} ping | grep PONG
+      interval: 10s
+      timeout: 3s
+      retries: 5
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
@@ -29,6 +40,7 @@ services:
       - klubmodul_username=${KLUBMODUL_USERNAME}
       - klubmodul_password=${KLUBMODUL_PASSWORD}
       - opticon_url=/dev/OPTICON
+      - redis_url=redis://${REDIS_PASSWORD}@redis:6379
     group_add:
       - dialout
     devices:
