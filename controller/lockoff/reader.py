@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 
 
 async def opticon_reader(display: GFXDisplay):
-    opticon_r, _ = await serial_asyncio.open_serial_connection(settings.opticon_url)
+    opticon_r, _ = await serial_asyncio.open_serial_connection(url=settings.opticon_url)
     while True:
         # read a scan from the barcode reader read until carriage return CR
         qrcode = (await opticon_r.readuntil(separator=b"\r")).decode("utf-8").strip()
