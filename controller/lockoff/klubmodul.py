@@ -195,22 +195,24 @@ class KlubmodulException(Exception):
 
 async def refresh():
     batch_id = datetime.utcnow().isoformat(timespec="seconds")
-    async with DB_member as db, KMClient() as client:
+    async with KMClient() as client:
         async for user_id, member_type, email, mobile in client.get_members():
-            db.upsert(
-                Document(
-                    {
-                        "level": member_type,
-                        "mobile": mobile,
-                        "email": email,
-                        "batch_id": batch_id,
-                        "active": True,
-                    },
-                    doc_id=user_id,
+            async with DB_member as db:
+                db.upsert(
+                    Document(
+                        {
+                            "level": member_type,
+                            "mobile": mobile,
+                            "email": email,
+                            "batch_id": batch_id,
+                            "active": True,
+                        },
+                        doc_id=user_id,
+                    )
                 )
-            )
         # mark old data as inactive
-        db.update(operations.set("active", False), where("batch_id") < batch_id)
+        async with DB_member as db:
+            db.update(operations.set("active", False), where("batch_id") < batch_id)
 
 
 async def klubmodul_runner():
