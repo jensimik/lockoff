@@ -19,6 +19,8 @@ watchdog = Watchdog()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    _redis = redis.from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
+    await FastAPILimiter.init(_redis)
     if settings.prod:
         # start watchdog
         asyncio.create_task(watchdog.runner())
@@ -39,13 +41,6 @@ app = FastAPI(
     title=settings.app_name,
     lifespan=lifespan,
 )
-
-
-@app.on_event("startup")
-async def startup():
-    _redis = redis.from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
-    await FastAPILimiter.init(_redis)
-
 
 app.include_router(auth.router)
 app.include_router(card.router)
