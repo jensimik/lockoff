@@ -10,6 +10,7 @@ from fastapi_limiter.depends import RateLimiter
 from .config import settings
 from .display import GFXDisplay
 from .reader import opticon_reader
+from .klubmodul import klubmodul_runner
 from .routers import auth, card
 from .watchdog import Watchdog
 
@@ -30,6 +31,9 @@ async def lifespan(app: FastAPI):
         # start opticon reader
         opticon_task = asyncio.create_task(opticon_reader(display=display))
         watchdog.watch(opticon_task)
+        # start klubmodul runner
+        klubmodul_task = asyncio.create_task(klubmodul_runner())
+        watchdog.watch(klubmodul_task)
     yield
     # clear things now at shutdown
     # nothing really have to be cleared
