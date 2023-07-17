@@ -5,6 +5,8 @@ import hashlib
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
 from fastapi_limiter.depends import RateLimiter
 
+from pydantic import BaseModel
+
 from ..klubmodul import KMClient
 from ..config import settings
 from ..db import DB_member
@@ -14,15 +16,24 @@ router = APIRouter(tags=["auth"])
 log = logging.getLogger(__name__)
 
 
+class RAC(BaseModel):
+    mobile: str
+
+
 @router.post(
     "/request-auth-code", dependencies=[Depends(RateLimiter(times=5, seconds=300))]
 )
-async def request_auth_code(mobile: int):
-    # with DB_member as db:
-    #     for db.search(where("mobile") == mobile)
-    # # TODO: lookup mobile if it exists in database?
-    # with KMClient() as km:
-    #     await km.send_sms(user_id=1, message=)
+async def request_auth_code(rac: RAC):
+    with DB_member as db:
+        user_ids = [
+            user.doc_id
+            for user in db.search(
+                (where("mobile") == rac.mobile) & where("active") == True
+            )
+        ]
+    if user_ids:
+        with KMClient() as km:
+            await km.send_sms(user_id=user_ids[0], message="123456")
     return {"status": "sms sent"}
 
 
