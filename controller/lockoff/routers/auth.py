@@ -28,7 +28,7 @@ async def request_auth_code(rac: RAC):
         user_ids = [
             user.doc_id
             for user in db.search(
-                (where("mobile") == rac.mobile) & where("active") == True
+                (where("mobile") == rac.mobile) & (where("active") == True)
             )
         ]
     if user_ids:
