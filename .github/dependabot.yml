@@ -4,10 +4,6 @@ updates:
     directory: "/controller"
     schedule:
       interval: "daily"
-  - package-ecosystem: "pip"
-    directory: "/backend"
-    schedule:
-      interval: "daily"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
