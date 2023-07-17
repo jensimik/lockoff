@@ -30,10 +30,10 @@ async def lifespan(app: FastAPI):
         # start opticon reader
         opticon_task = asyncio.create_task(opticon_reader(display=display))
         watchdog.watch(opticon_task)
-        redis = redis.from_url(
+        _redis = redis.from_url(
             settings.redis_url, encoding="utf-8", decode_responses=True
         )
-        await FastAPILimiter.init(redis)
+        await FastAPILimiter.init(_redis)
     yield
     # clear things now at shutdown
     # nothing really have to be cleared
