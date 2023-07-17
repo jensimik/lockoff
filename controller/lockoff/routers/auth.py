@@ -24,7 +24,7 @@ class RAC(BaseModel):
     "/request-auth-code", dependencies=[Depends(RateLimiter(times=5, seconds=300))]
 )
 async def request_auth_code(rac: RAC):
-    with DB_member as db:
+    async with DB_member as db:
         user_ids = [
             user.doc_id
             for user in db.search(
