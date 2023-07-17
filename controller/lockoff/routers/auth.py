@@ -31,6 +31,7 @@ async def request_auth_code(rac: RAC):
                 (where("mobile") == rac.mobile) & (where("active") == True)
             )
         ]
+    log.info(f"user_ids: {user_ids}")
     if user_ids:
         async with KMClient() as km:
             #
