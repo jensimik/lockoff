@@ -221,8 +221,8 @@ async def klubmodul_runner():
             log.info("klubmodul refresh done")
             # sleep until tomorrow
             asyncio.sleep(24 * 60 * 60)
-        except KlubmodulException:
-            log.error("failed to fetch klubmodul data retry in an hour")
+        except (KlubmodulException, Exception) as ex:
+            log.error(f"failed to fetch klubmodul data retry in an hour {ex}")
             asyncio.sleep(60 * 60)
 
 
