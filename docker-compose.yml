@@ -37,6 +37,7 @@ services:
     environment:
       - prod=1
       - tz=Europe/Copenhagen
+      - klubmodul_base_url=${KLUBMODUL_BASE_URL}
       - klubmodul_username=${KLUBMODUL_USERNAME}
       - klubmodul_password=${KLUBMODUL_PASSWORD}
       - opticon_url=/dev/OPTICON
