@@ -1,16 +1,16 @@
+import hashlib
 import logging
 from datetime import datetime, timedelta
-import hashlib
 
+import pyotp
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
 from fastapi_limiter.depends import RateLimiter
-
 from pydantic import BaseModel
+from tinydb import where, operations
 
-from ..klubmodul import KMClient
 from ..config import settings
 from ..db import DB_member
-from tinydb import where
+from ..klubmodul import KMClient
 
 router = APIRouter(tags=["auth"])
 log = logging.getLogger(__name__)
@@ -33,9 +33,13 @@ async def request_auth_code(rac: RAC):
         ]
     log.info(f"user_ids: {user_ids}")
     if user_ids:
+        hotp_secret = pyotp.random_base32()
+        hotp = pyotp.HOTP(hotp_secret)
+        async with DB_member as db:
+            db.update(operations.set("hotp_secret", hotp_secret), doc_ids=user_ids)
         async with KMClient() as km:
-            await km.send_sms(user_id=user_ids[0], message="123456")
-            log.info(f"km.send_sms(user_id={user_ids[0]}, message=123456)")
+            # await km.send_sms(user_id=user_ids[0], message="123456")
+            log.info(f"km.send_sms(user_id={user_ids[0]}, message={hotp.now()})")
     return {"status": "sms sent"}
 
 
