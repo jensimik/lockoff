@@ -14,9 +14,9 @@ class Watchdog:
         return True
 
     # check if watched asyncio.Task's are still running every 30 seconds
-    async def runner(self):
-        while True:
-            if self.healthy():
-                # TODO: write to /dev/watchdog
-                pass
-            await asyncio.sleep(30)
+    # async def runner(self):
+    #     while True:
+    #         if self.healthy():
+    #             # TODO: write to /dev/watchdog
+    #             pass
+    #         await asyncio.sleep(30)

@@ -40,11 +40,13 @@ services:
       - klubmodul_username=${KLUBMODUL_USERNAME}
       - klubmodul_password=${KLUBMODUL_PASSWORD}
       - opticon_url=/dev/OPTICON
-      - redis_url=redis://${REDIS_PASSWORD}@redis:6379
+      - redis_url=redis://:${REDIS_PASSWORD}@redis
     group_add:
       - dialout
     devices:
       - /dev/OPTICON:/dev/OPTICON
+    depends_on:
+      - redis
     healthcheck:
       test: "curl --fail http://localhost:80/healtz || exit 1"
       interval: 60s

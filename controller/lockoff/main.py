@@ -22,8 +22,6 @@ async def lifespan(app: FastAPI):
     _redis = redis.from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
     await FastAPILimiter.init(_redis)
     if settings.prod:
-        # start watchdog
-        asyncio.create_task(watchdog.runner())
         # start display
         display = GFXDisplay()
         await display.setup()
