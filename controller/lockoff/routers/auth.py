@@ -20,6 +20,11 @@ class RAC(BaseModel):
     mobile: str
 
 
+class Login(BaseModel):
+    mobile: str
+    totp: str
+
+
 @router.post(
     "/request-auth-code", dependencies=[Depends(RateLimiter(times=5, seconds=300))]
 )
@@ -33,19 +38,25 @@ async def request_auth_code(rac: RAC):
         ]
     log.info(f"user_ids: {user_ids}")
     if user_ids:
-        hotp_secret = pyotp.random_base32()
-        hotp = pyotp.HOTP(hotp_secret)
+        totp_secret = pyotp.random_base32()
+        totp = pyotp.TOTP(totp_secret)
         async with DB_member as db:
-            db.update(operations.set("hotp_secret", hotp_secret), doc_ids=user_ids)
+            db.update(operations.set("totp_secret", totp_secret), doc_ids=user_ids)
         async with KMClient() as km:
             # await km.send_sms(user_id=user_ids[0], message="123456")
-            log.info(f"km.send_sms(user_id={user_ids[0]}, message={hotp.now()})")
+            log.info(f"km.send_sms(user_id={user_ids[0]}, message={totp.now()})")
     return {"status": "sms sent"}
 
 
 @router.post("/login", dependencies=[Depends(RateLimiter(times=5, seconds=300))])
-async def login():
-    pass
+async def login(login: Login):
+    async with DB_member as db:
+        users = db.search((where("mobile") == login.mobile) & (where("active") == True))
+    totp = pyotp.TOTP(users[0]["totp_secret"])
+    if not totp.verify(otp=login.totp, valid_window=2):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    # TODO: generate and send jwt token?
+    return {"OK": "OK"}
 
 
 @router.post(
