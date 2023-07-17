@@ -44,6 +44,3 @@ async def get_download_urls():
     )
     hashlib.sha256("{user_id}{url_expire}{secret}".encode("utf-8")).hexdigest()
     return {"pkpass": "", "pdf": ""}
-
-
-https://lockoff-api.gnerd.dk/card/1/ab45dc5413ccdd113ac88990ac0d0e00ffee.pkpass
