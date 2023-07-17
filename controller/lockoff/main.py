@@ -48,6 +48,6 @@ app.include_router(card.router)
 async def healthz():
     if not watchdog.healthy():
         raise HTTPException(
-            status_code=500, detail="watchdog report a process not running"
+            status_code=500, detail="watchdog report a task is not running"
         )
     return {"everything": "is awesome"}

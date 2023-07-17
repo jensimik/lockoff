@@ -14,7 +14,7 @@ async def opticon_reader(display: GFXDisplay):
     opticon_r, _ = await serial_asyncio.open_serial_connection(settings.opticon_url)
     while True:
         # read a scan from the barcode reader read until carriage return CR
-        qrcode = (await opticon_r.readuntil(seperator=b"\r")).decode("utf-8").strip()
+        qrcode = (await opticon_r.readuntil(separator=b"\r")).decode("utf-8").strip()
         log.info(f"opticon got a qrcode with the data {qrcode}")
         # try:
         #     if user_id := await verify_access_token(token=qrcode):
