@@ -32,7 +32,7 @@ async def request_auth_code(rac: RAC):
             )
         ]
     if user_ids:
-        with KMClient() as km:
+        async with KMClient() as km:
             #
             # await km.send_sms(user_id=user_ids[0], message="123456")
             log.info(f"km.send_sms(user_id={user_ids[0]}, message=123456)")
