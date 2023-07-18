@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     nonce_size: int = 4
     digest_size: int = 10
     secret: bytes = "changeme"
+    jwt_secret: str = ""
     opticon_url: str = "loop://?logging=debug"
     display_url: str = "loop://?logging=debug"
     db_member: str = "/db_member.json"
