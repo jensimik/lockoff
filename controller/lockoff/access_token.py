@@ -31,7 +31,7 @@ class TokenError(Exception):
 
 
 def log_and_raise_token_error(message, code=b"Q", level=logging.WARN):
-    log.log(level=level, message=message)
+    log.log(level=level, msg=message)
     raise TokenError(message, code=code)
 
 
