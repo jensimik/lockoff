@@ -29,7 +29,6 @@ async def request_totp(rac: schemas.RequestTOTP) -> schemas.StatusReply:
                 (where("mobile") == rac.mobile) & (where("active") == True)
             )
         ]
-    log.info(f"user_ids: {user_ids}")
     if user_ids:
         totp_secret = pyotp.random_base32()
         totp = pyotp.TOTP(totp_secret)

@@ -16,23 +16,22 @@ display.set_font("bitmap8")
 wdt = WDT(timeout=5000)
 
 MESSAGES = {
-    "K": ("OK", "ACCESS GRANTED", (0, 125, 0)),
-    "Q": ("ERROR", "ERROR IN YOUR QR CODE", (125, 0, 0)),
-    "C": ("ERROR", "MEMBERSHIP CANCELED", (125, 0, 0)),
-    ".": ("READY", "READY TO SCAN", (125, 125, 125)),
-    "E": ("ERROR", "SYSTEM ERROR", (255, 0, 0)),
+    "K": ("OK", "ACCESS GRANTED"),
+    "Q": ("ERROR", "ERROR IN YOUR QR CODE"),
+    "C": ("ERROR", "MEMBERSHIP CANCELED"),
+    ".": ("READY", "READY TO SCAN"),
+    "E": ("ERROR", "SYSTEM ERROR"),
 }
 
 
-def show_message(header, text, backlight):
-    gp.set_backlight(backlight)
+def show_message(header, text):
     display.set_pen(0)  # Set pen to white
     display.clear()
     display.set_pen(15)  # Set pen to black
     width = display.measure_text(header, scale=4)
     display.text(header, (WIDTH - width) // 2, 4, scale=4)
-    width = display.measure_text(text, scale=2)
-    display.text(text, (WIDTH - width) // 2, 44, scale=2)
+    width = display.measure_text(text, scale=1.5)
+    display.text(text, (WIDTH - width) // 2, 44, scale=1.5)
     display.update()
 
 
@@ -46,10 +45,10 @@ if __name__ == "__main__":
         if poll.poll(timeout=2000):
             data = sys.stdin.read(1)
             # print("#")  # print ACK back
-            show_message(**MESSAGES.get(data))
+            show_message(*MESSAGES.get(data))
             # sleep a little before next message
             if not data == ".":
                 time.sleep(1.8)
         else:
             # system error
-            show_message(**MESSAGES["E"])
+            show_message(*MESSAGES["E"])
