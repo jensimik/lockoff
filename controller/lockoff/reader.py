@@ -16,6 +16,7 @@ async def opticon_reader(display: GFXDisplay):
         # read a scan from the barcode reader read until carriage return CR
         qrcode = (await opticon_r.readuntil(separator=b"\r")).decode("utf-8").strip()
         log.info(f"opticon got a qrcode with the data {qrcode}")
+        asyncio.create_task(display.send_message(message=b"K"))
         # try:
         #     if user_id := await verify_access_token(token=qrcode):
         #         log.info(f"successful verified the qrcode as user_id: {user_id}")

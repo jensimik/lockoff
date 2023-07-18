@@ -46,3 +46,8 @@ sudo hciconfig hci0 noscan
 
 /etc/udev/rules.d/99_opticon.rules
 KERNEL=="ttyACM[0-9]", ATTRS{idVendor}=="065a", ATTRS{idProduct}=="a002", SYMLINK+="OPTICON"
+
+# make udev rules for display/picow
+
+/etc/udev/rules.d/99_display.rules
+KERNEL=="ttyACM[0-9]", ATTRS{idVendor}=="2e8a", ATTRS{idProduct}=="0005", SYMLINK+="DISPLAY"

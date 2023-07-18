@@ -29,7 +29,6 @@ async def request_totp(rac: schemas.RequestTOTP) -> schemas.StatusReply:
                 (where("mobile") == rac.mobile) & (where("active") == True)
             )
         ]
-    log.info(f"user_ids: {user_ids}")
     if user_ids:
         totp_secret = pyotp.random_base32()
         totp = pyotp.TOTP(totp_secret)
@@ -69,4 +68,4 @@ async def login(
         settings.jwt_secret,
         algorithm="HS256",
     )
-    return schemas.JWTToken(token=encoded_jwt, token_type="bearer")
+    return schemas.JWTToken(access_token=encoded_jwt, token_type="bearer")
