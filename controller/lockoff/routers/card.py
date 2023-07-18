@@ -9,7 +9,7 @@ from lockoff import depends
 
 from ..access_token import TokenType, generate_access_token
 
-# from ..apple_pass import ApplePass
+from ..apple_pass import ApplePass
 from ..config import settings
 from ..db import DB_member
 from ..paper_pass import generate_pdf
