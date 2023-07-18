@@ -13,7 +13,7 @@ from .display import GFXDisplay
 log = logging.getLogger(__name__)
 
 factory = NativeFactory()
-relay = LED(13, pin_factory=factory)
+relay = LED(16, pin_factory=factory)
 
 
 async def opticon_reader(display: GFXDisplay):
