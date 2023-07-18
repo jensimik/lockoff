@@ -25,14 +25,14 @@ class TokenType(Enum):
 
 
 class TokenError(Exception):
-    def __init__(self, message, code=b"Q"):
-        self.code = code
+    def __init__(self, message, code):
         super().__init__(message)
+        self.code = code
 
 
-def log_and_raise_token_error(message, level=logging.WARN):
+def log_and_raise_token_error(message, code=b"Q", level=logging.WARN):
     log.log(level=level, message=message)
-    raise TokenError(message)
+    raise TokenError(message, code=code)
 
 
 def generate_access_token(
