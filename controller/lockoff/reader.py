@@ -35,10 +35,10 @@ async def opticon_reader(display: GFXDisplay):
     while True:
         # read a scan from the barcode reader read until carriage return CR
         qrcode = (await opticon_r.readuntil(separator=b"\r")).decode("utf-8").strip()
-        log.info(f"opticon got a qrcode with the data {qrcode}")
         async with asyncio.TaskGroup() as tg:
             try:
                 user_id, token_type = verify_access_token(token=qrcode)
+                log.info(f"checking user {user_id} {token_type}")
                 # check in database
                 if token_type in [TokenType.NORMAL, TokenType.MORNING]:
                     async with DB_member as db:
@@ -72,6 +72,7 @@ async def opticon_reader(display: GFXDisplay):
                                 doc_id=user_id,
                             )
                         )
+                log.info(f"{user_id} {token_type} access granted")
                 # show OK on display
                 tg.create_task(display.send_message(message=b"K"))
                 # buzz in

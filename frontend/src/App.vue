@@ -1,50 +1,42 @@
 <script setup>
 import otp from './components/OTP.vue';
 import mobile from './components/Mobile.vue';
+import controllerAPI from './api/resources/allMethods';
 import { ref, nextTick } from 'vue'
 
-var show_pin = ref(false);
-var show_login = ref(true);
-var show_custom = ref(false);
+var step = ref(1);
+var mob = ref("");
+var token = ref("");
+var user_data = ref([]);
 
-const mobile_update = async(e) => {
-  console.log(e);
-  show_pin.value = true;
-  await nextTick();
-  document.getElementById("otc1").focus();
+
+const mobile_update = async(val) => {
+  controllerAPI.request_totp(val).then(() => {
+    step.value = 2;
+    document.getElementById("otc1").focus();
+    mob.value = val;
+  })
+//  await nextTick();
 }
-const pin_update = async(e) => {
-  show_login.value = false;
-  show_custom.value = true;
+const pin_update = async(val) => {
+  controllerAPI.login(mob.value, val).then((token_data) => {
+    token.value = token_data.access_token;
+    step.value = 3;
+    controllerAPI.get_me(token.value).then((me_data) => {
+      user_data.value = me_data;
+    }).catch((error) => {
+      console.log(error);
+    })
+  }).catch(() => {
+    console.log("failed to login");
+    step.value = 1;
+    // TODO: clear and set focus on first element again?
+  })
 }
-
-const preview = ref(null);
-const image = ref(null);
-const image_size = ref({ width: 0, height: 0 });
-
-const onFileChange = async(event) => {
-  var input = event.target;
-  if (input.files) {
-    var reader = new FileReader();
-    reader.onload = (e) => {
-      let img = new Image();
-      img.onload = () => {
-        image_size.value.width = img.width;
-        image_size.value.height = img.height;
-      }
-      img.src = e.target.result;
-
-      preview.value = e.target.result;
-    }
-    image.value = input.files[0];
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
 </script>
 
 <template>
-  <div v-show="show_login">
+  <div v-show="step == 1 | step == 2">
     <div class="flex one">
       <svg id="logo" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 512 511" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
         <g><path style="opacity:1" fill="#fefefe" d="M 231.5,1.5 C 147.452,12.266 82.6184,53.266 37,124.5C 17.1801,159.453 5.34675,196.786 1.5,236.5C 1.5,158.167 1.5,79.8333 1.5,1.5C 78.1667,1.5 154.833,1.5 231.5,1.5 Z"/></g>
@@ -60,7 +52,7 @@ const onFileChange = async(event) => {
       <label for="mobile">Verify mobile number</label>
       <mobile :digit-count="8" :placeholder="0" @update:otp="mobile_update"></mobile>
     </div>
-    <div v-show="show_pin">
+    <div v-show="step == 2">
       <div class="flex one">
         <label for="pin">SMS code</label>
      </div>
@@ -69,22 +61,11 @@ const onFileChange = async(event) => {
      </div>
     </div>
   </div>
-  <div v-show="show_custom">
-    <h1>Profile photo</h1>
-    <div class="flex one">
-      <div style="width: 100%; margin-right:auto; margin-left:auto;">
-        <div v-if="preview">
-          <img :src="preview" class="preview"/>
-          <div class="flex two">
-            <button class="warning">Retry</button><button class="success">Confirm</button>
-          </div>
-        </div>
-        <div v-else>
-          <label class="dropimage">
-            <input title="Drop image or click me" type="file" accept="image/*;capture=camera" @change="onFileChange">
-          </label>
-        </div>
-    </div>
+  <div v-show="step == 3">
+    <div v-for="user in user_data" :key="user.user_id">
+      <p>{{ user.name }}</p>
+      <a :href="'https://lockoff-api.gnerd.dk/membership-card-' + user.user_id + '.pdf?token=' + token">pdf</a>
+      <a :href="'https://lockoff-api.gnerd.dk/membership-card-' + user.user_id + '.pkpass?token=' + token">pkpass</a>
     </div>
   </div>
 </template>
@@ -96,8 +77,5 @@ const onFileChange = async(event) => {
   padding:0 0 3em 0;
   margin-right: auto;
   margin-left: auto;
-}
-.preview {
-  width: 70%;
 }
 </style>

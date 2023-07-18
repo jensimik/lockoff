@@ -20,7 +20,9 @@ router = APIRouter(tags=["auth"])
 log = logging.getLogger(__name__)
 
 
-@router.post("/request-totp", dependencies=[Depends(RateLimiter(times=5, seconds=300))])
+@router.post(
+    "/request-totp", dependencies=[Depends(RateLimiter(times=105, seconds=300))]
+)
 async def request_totp(rac: schemas.RequestTOTP) -> schemas.StatusReply:
     async with DB_member as db:
         user_ids = [
@@ -34,15 +36,15 @@ async def request_totp(rac: schemas.RequestTOTP) -> schemas.StatusReply:
         totp = pyotp.TOTP(totp_secret)
         async with DB_member as db:
             db.update(operations.set("totp_secret", totp_secret), doc_ids=user_ids)
-        # async with KMClient() as km:
-        #     await km.send_sms(user_id=user_ids[0], message=f"{totp.now()}")
+        async with KMClient() as km:
+            await km.send_sms(user_id=user_ids[0], message=f"{totp.now()}")
         log.info(f"km.send_sms(user_id={user_ids[0]}, message={totp.now()})")
     else:
         await asyncio.sleep(4)
     return schemas.StatusReply(status="sms sent")
 
 
-@router.post("/login", dependencies=[Depends(RateLimiter(times=5, seconds=300))])
+@router.post("/login", dependencies=[Depends(RateLimiter(times=105, seconds=300))])
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> schemas.JWTToken:

@@ -4,18 +4,24 @@ from contextlib import asynccontextmanager
 
 import redis.asyncio as redis
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
 
 from .config import settings
 from .display import GFXDisplay
-from .reader import opticon_reader
 from .klubmodul import klubmodul_runner
+from .reader import opticon_reader
 from .routers import auth, card
 from .watchdog import Watchdog
 
 log = logging.getLogger(__name__)
 watchdog = Watchdog()
+
+origins = [
+    "https://lockoff.nkk.dk",
+    "http://localhost:5173",
+]
 
 
 @asynccontextmanager
@@ -42,6 +48,15 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.app_name,
     lifespan=lifespan,
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth.router)
