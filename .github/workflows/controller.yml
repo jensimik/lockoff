@@ -5,12 +5,10 @@ on:
     paths:
       - "controller/**/*"
       - ".github/workflows/controller.yml"
-    branches: ["main"]
   pull_request:
     paths:
       - "controller/**/*"
       - ".github/workflows/controller.yml"
-    branches: ["main"]
 
 permissions:
   contents: read
