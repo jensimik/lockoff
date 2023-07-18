@@ -36,8 +36,8 @@ async def request_totp(rac: schemas.RequestTOTP) -> schemas.StatusReply:
         totp = pyotp.TOTP(totp_secret)
         async with DB_member as db:
             db.update(operations.set("totp_secret", totp_secret), doc_ids=user_ids)
-        # async with KMClient() as km:
-        #     await km.send_sms(user_id=user_ids[0], message=f"{totp.now()}")
+        async with KMClient() as km:
+            await km.send_sms(user_id=user_ids[0], message=f"{totp.now()}")
         log.info(f"km.send_sms(user_id={user_ids[0]}, message={totp.now()})")
     else:
         await asyncio.sleep(4)

@@ -15,10 +15,13 @@ export default {
         }
     },
     async login(mobile, code) {
+        let formData = new FormData();
+        formData.append('username', mobile);
+        formData.append('password', code);
         const response = await fetch(APISettings.baseURL + '/login', {
             method: 'POST',
-            headers: { ...APISettings.headers, 'Content-Type': 'Application/json' },
-            body: JSON.stringify({mobile: mobile, code: code})
+            headers: APISettings.headers,
+            body: formData
         });
         if (response.status != 200) {
             throw response.status;

@@ -6,10 +6,12 @@ import { ref, nextTick } from 'vue'
 
 var step = ref(1);
 var mob = ref("");
+var token = ref("");
+var user_data = ref([]);
 
 
 const mobile_update = async(val) => {
-  controllerAPI.request_totp(val).then((response) => {
+  controllerAPI.request_totp(val).then(() => {
     step.value = 2;
     document.getElementById("otc1").focus();
     mob.value = val;
@@ -17,9 +19,18 @@ const mobile_update = async(val) => {
 //  await nextTick();
 }
 const pin_update = async(val) => {
-  controllerAPI.login(mob, val).then((response) => {
-    console.log(response);
+  controllerAPI.login(mob.value, val).then((token_data) => {
+    token.value = token_data.access_token;
     step.value = 3;
+    controllerAPI.get_me(token.value).then((me_data) => {
+      user_data.value = me_data;
+    }).catch((error) => {
+      console.log(error);
+    })
+  }).catch(() => {
+    console.log("failed to login");
+    step.value = 1;
+    // TODO: clear and set focus on first element again?
   })
 }
 </script>
@@ -49,8 +60,12 @@ const pin_update = async(val) => {
        <otp ref="o" :digit-count="6" :placeholder="1" @update:otp="pin_update"></otp>
      </div>
     </div>
-    <div v-show="step == 3">
-    
+  </div>
+  <div v-show="step == 3">
+    <div v-for="user in user_data" :key="user.user_id">
+      <p>{{ user.name }}</p>
+      <a :href="'https://lockoff-api.gnerd.dk/membership-card-' + user.user_id + '.pdf?token=' + token">pdf</a>
+      <a :href="'https://lockoff-api.gnerd.dk/membership-card-' + user.user_id + '.pkpass?token=' + token">pkpass</a>
     </div>
   </div>
 </template>
