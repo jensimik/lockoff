@@ -1,6 +1,7 @@
 import hashlib
 import io
 import json
+import logging
 import pathlib
 import zipfile
 from datetime import datetime
@@ -12,6 +13,7 @@ from cryptography.hazmat.primitives.serialization import pkcs7
 from .config import settings
 
 module_directory = pathlib.Path(__file__).resolve().parent
+log = logging.getLogger(__name__)
 
 
 def _read_file_bytes(path):
@@ -36,13 +38,13 @@ class ApplePass:
     @classmethod
     def create(
         self,
-        zip_file: io.BufferedIOBase,
         user_id: int,
         name: str,
         level: str,
         expires: datetime,
-        barcode_data: str,
+        qr_code_data: str,
     ):
+        zip_file = io.BytesIO()
         pass_json = json.dumps(
             {
                 "logoText": "Nørrebro klatreklub",
@@ -58,7 +60,7 @@ class ApplePass:
                 "barcodes": [
                     {
                         "format": "PKBarcodeFormatQR",
-                        "message": barcode_data,
+                        "message": qr_code_data,
                         "messageEncoding": "iso-8859-1",
                     }
                 ],
@@ -146,15 +148,14 @@ class ApplePass:
             zf.writestr("pass.json", pass_json)
             for filename, filedata in self.FILES.items():
                 zf.writestr(filename, filedata)
+        return zip_file
 
 
 if __name__ == "__main__":
-   with open("test2.pkpass", "wb") as f:
-       p = ApplePass.create(
-           zip_file=f,
-           user_id=100,
-           name="Jens Davidsen",
-           level="Normal",
-           expires=datetime(2024, 1, 1, 12, 0, 0),
-           barcode_data="test1234",
-       )
+    pkpass = ApplePass.create(
+        user_id=100,
+        name="Jens Davidsen",
+        level="Normal",
+        expires=datetime(2024, 1, 1, 12, 0, 0),
+        barcode_data="test1234",
+    )

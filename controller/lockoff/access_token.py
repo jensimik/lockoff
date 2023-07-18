@@ -25,12 +25,14 @@ class TokenType(Enum):
 
 
 class TokenError(Exception):
-    pass
+    def __init__(self, message, code=b"Q"):
+        super().__init__(message)
+        self.code = code
 
 
-def log_and_raise_token_error(message, level=logging.WARN):
+def log_and_raise_token_error(message, code=b"Q", level=logging.WARN):
     log.log(level=level, message=message)
-    raise TokenError(message)
+    raise TokenError(message, code=code)
 
 
 def generate_access_token(
@@ -78,7 +80,7 @@ def generate_dayticket_access_token() -> bytes:
     )
 
 
-async def verify_access_token(token: str) -> bool:
+def verify_access_token(token: str) -> tuple[int, TokenType]:
     """verify the access token if possible to parse, 'signed' correct and is not expired
 
     Raises
@@ -86,16 +88,11 @@ async def verify_access_token(token: str) -> bool:
     TokenError
         if not able to parse, signature wrong or expired
 
-    Returns
-    -------
-    int
-        user_id of the valid token
-
     """
     try:
         raw_token = base45.b45decode(token)
     except Exception as ex:
-        raise TokenError(f"could not base45 decode token data: {ex}")
+        raise TokenError(f"could not base45 decode token data: {ex}", code=b"Q")
 
     try:
         user_id, expires, type_, _, signature = struct.unpack(
@@ -105,50 +102,18 @@ async def verify_access_token(token: str) -> bool:
         token_type = TokenType(type_)
         expires_datetime = datetime.utcfromtimestamp(expires)
     except Exception as ex:
-        log_and_raise_token_error(f"could not unpack data: {ex}")
+        log_and_raise_token_error(f"could not unpack data: {ex}", code=b"Q")
 
     if not secrets.compare_digest(
         hashlib.shake_256(data + settings.secret).digest(settings.digest_size),
         signature,
     ):
-        log_and_raise_token_error("could not verify signature")
+        log_and_raise_token_error("could not verify signature", code=b"S")
 
     if datetime.utcnow() > expires_datetime:
-        log_and_raise_token_error("token is expired")
+        log_and_raise_token_error("token is expired", code=b"X")
 
-    # check in database
-    if token_type in [TokenType.NORMAL, TokenType.MORNING]:
-        async with DB_member as db:
-            d = db.get(doc_id=user_id)
-            if not d:
-                log_and_raise_token_error("did you cancel your membership?")
-            if not d["active"]:
-                log_and_raise_token_error("did you cancel your membership?")
-    # HACK for printed daytickets to expire them the day they are used
-    elif token_type == TokenType.DAY_TICKET_HACK:
-        async with DB_dayticket as db:
-            if d := db.get(doc_id=user_id):
-                if datetime.utcnow() > datetime.utcfromtimestamp(d["expires"]):
-                    log_and_raise_token_error("dayticket has expired")
-            else:
-                # expire at midnight
-                expire = datetime.now(tz=settings.tz) + relativedelta(
-                    hour=23, minute=59, second=59, microsecond=0
-                )
-                db.upsert(
-                    Document(
-                        {"expires": calendar.timegm(expire.utctimetuple())},
-                        doc_id=user_id,
-                    )
-                )
-
-    # normal daytickets should not be done any specific things for
-    # elif token_type == TokenType.DAY_TICKET:
-    #     pass
-
-    door_log.info(f"{datetime.utcnow().isoformat()}|{token_type.name}|{user_id}")
-
-    return True
+    return user_id, token_type
 
 
 if __name__ == "__main__":

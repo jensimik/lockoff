@@ -41,11 +41,14 @@ services:
       - klubmodul_username=${KLUBMODUL_USERNAME}
       - klubmodul_password=${KLUBMODUL_PASSWORD}
       - opticon_url=/dev/OPTICON
+      - display_url=/dev/DISPLAY
       - redis_url=redis://:${REDIS_PASSWORD}@redis
     group_add:
       - dialout
     devices:
       - /dev/OPTICON:/dev/OPTICON
+      - /dev/DISPLAY:/dev/DISPLAY
+      - /dev/gpiomem:/dev/gpiomem
     depends_on:
       - redis
     healthcheck:

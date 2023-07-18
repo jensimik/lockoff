@@ -13,7 +13,6 @@ from .reader import opticon_reader
 from .klubmodul import klubmodul_runner
 from .routers import auth, card
 from .watchdog import Watchdog
-from .automationhat import tester
 
 log = logging.getLogger(__name__)
 watchdog = Watchdog()
@@ -32,7 +31,6 @@ async def lifespan(app: FastAPI):
         # start opticon reader
         opticon_task = asyncio.create_task(opticon_reader(display=display))
         watchdog.watch(opticon_task)
-        tester_task = asyncio.to_thread(tester)
         # start klubmodul runner
         # klubmodul_task = asyncio.create_task(klubmodul_runner())
         # watchdog.watch(klubmodul_task)

@@ -85,10 +85,11 @@ class KMClient:
             member_type = (
                 "FULL" if "1" in row["Hold"] else "MORN" if "2" in row["Hold"] else None
             )
+            name = row["Fornavn"] + " " + row["Efternavn"]
             email = row["Email"]
             mobile = row["Mobil"]
             if member_type:
-                yield user_id, member_type, email, mobile
+                yield user_id, name, member_type, email, mobile
 
     async def send_sms(self, user_id: int, message: str) -> None:
         data = {
@@ -196,11 +197,12 @@ class KlubmodulException(Exception):
 async def refresh():
     batch_id = datetime.utcnow().isoformat(timespec="seconds")
     async with KMClient() as client:
-        async for user_id, member_type, email, mobile in client.get_members():
+        async for user_id, name, member_type, email, mobile in client.get_members():
             async with DB_member as db:
                 db.upsert(
                     Document(
                         {
+                            "name": name,
                             "level": member_type,
                             "mobile": mobile,
                             "email": email,
