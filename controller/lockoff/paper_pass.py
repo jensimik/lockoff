@@ -8,7 +8,8 @@ from .paper_template import template
 from .access_token import generate_dayticket_access_token
 
 
-def generate_pdf(pdf_file: io.BufferedIOBase, name: str, level: str, qr_code_data: str):
+def generate_pdf(name: str, level: str, qr_code_data: str):
+    pdf_file = io.BytesIO()
     # generate qr code
     qr = qrcode.QRCode(
         version=None, error_correction=qrcode.constants.ERROR_CORRECT_M, border=0
@@ -27,11 +28,9 @@ def generate_pdf(pdf_file: io.BufferedIOBase, name: str, level: str, qr_code_dat
     )
     # make the pdf from html
     HTML(string=html, base_url="").write_pdf(pdf_file)
+    return pdf_file
 
 
 if __name__ == "__main__":
-    with open("test.pdf", "wb") as f:
-        token = generate_dayticket_access_token()
-        generate_pdf(
-            pdf_file=f, name="Jens Hansen", level="Normal 2023", qr_code_data=token
-        )
+    token = generate_dayticket_access_token()
+    pdf_file = generate_pdf(name="Jens Hansen", level="Normal 2023", qr_code_data=token)
