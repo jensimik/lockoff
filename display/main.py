@@ -4,6 +4,8 @@ import time
 from machine import WDT
 from gfx_pack import GfxPack
 
+# TODO: invert colors once a while to avoid lcd burn in?
+
 
 # setup display
 gp = GfxPack()
