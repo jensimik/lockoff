@@ -41,13 +41,15 @@ async def get_card_pdf(
     token_type = TokenType.MORNING if user["level"] == "MORN" else TokenType.NORMAL
     access_token = generate_access_token(user_id=user.doc_id, token_type=token_type)
     pdf_file = generate_pdf(
-        name=user["name"], level=token_type.name.capitalize(), qr_code_data=access_token
+        name=user["name"],
+        level=f"{token_type.name.capitalize()} {settings.current_season}",
+        qr_code_data=access_token,
     )
     return Response(
         content=pdf_file.getvalue(),
         media_type="application/pdf",
         headers={
-            "Content-Disposition": 'attachment; filename="filename.pdf"',
+            "Content-Disposition": f'attachment; filename="nkk-card-{user_id}.pdf"',
             "Cache-Control": "no-cache",
             "CDN-Cache-Control": "no-store",
         },
