@@ -46,7 +46,7 @@ async def get_card_pdf(
     return Response(
         content=pdf_file.getvalue(),
         media_type="application/pdf",
-        headers={"Content-Disposition": f'attachment; filename="nkk-{user_id}.pdf"'},
+        headers={"Content-Disposition": 'attachment; filename="filename.pdf"'},
     )
 
 
