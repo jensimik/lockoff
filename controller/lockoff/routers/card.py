@@ -46,7 +46,11 @@ async def get_card_pdf(
     return Response(
         content=pdf_file.getvalue(),
         media_type="application/pdf",
-        headers={"Content-Disposition": 'attachment; filename="filename.pdf"'},
+        headers={
+            "Content-Disposition": 'attachment; filename="filename.pdf"',
+            "Cache-Control": "no-cache",
+            "CDN-Cache-Control": "no-store",
+        },
     )
 
 
