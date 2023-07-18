@@ -24,7 +24,7 @@ async def me(mobile: Annotated[str, Depends(depends.get_current_mobile)]):
     return [{"user_id": user.doc_id, "name": user["name"]} for user in users]
 
 
-@router.get("/card-{user_id}.pdf")
+@router.get("/card-{user_id}.pdf", response_class=Response)
 async def get_card_pdf(
     user_id: int, mobile: Annotated[str, Depends(depends.get_current_mobile)]
 ):
