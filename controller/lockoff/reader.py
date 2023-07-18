@@ -2,7 +2,9 @@ import asyncio
 import logging
 
 import serial_asyncio
+from gpiozero.pins.native import NativeFactory
 from gpiozero import LED
+
 
 from .access_token import TokenError, verify_access_token
 from .config import settings
@@ -10,7 +12,8 @@ from .display import GFXDisplay
 
 log = logging.getLogger(__name__)
 
-relay = LED(13)
+factory = NativeFactory()
+relay = LED(13, pin_factory=factory)
 
 
 async def opticon_reader(display: GFXDisplay):
