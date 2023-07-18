@@ -1,6 +1,7 @@
 import hashlib
 import io
 import json
+import logging
 import pathlib
 import zipfile
 from datetime import datetime
@@ -12,6 +13,7 @@ from cryptography.hazmat.primitives.serialization import pkcs7
 from .config import settings
 
 module_directory = pathlib.Path(__file__).resolve().parent
+log = logging.getLogger(__name__)
 
 
 def _read_file_bytes(path):
@@ -26,6 +28,8 @@ class ApplePass:
         "icon.png": _read_file_bytes(module_directory / "logo.png"),
         "icon@2x.png": _read_file_bytes(module_directory / "logo.png"),
     }
+    log.info(settings.certificate)
+    exit()
     CERT = x509.load_pem_x509_certificate(settings.certificate)
     PRIV_KEY = serialization.load_pem_private_key(
         settings.key, password=settings.certificate_password
