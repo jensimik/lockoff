@@ -92,7 +92,7 @@ def verify_access_token(token: str) -> tuple[int, TokenType]:
     try:
         raw_token = base45.b45decode(token)
     except Exception as ex:
-        raise TokenError(f"could not base45 decode token data: {ex}")
+        raise TokenError(f"could not base45 decode token data: {ex}", code=b"Q")
 
     try:
         user_id, expires, type_, _, signature = struct.unpack(
@@ -102,7 +102,7 @@ def verify_access_token(token: str) -> tuple[int, TokenType]:
         token_type = TokenType(type_)
         expires_datetime = datetime.utcfromtimestamp(expires)
     except Exception as ex:
-        log_and_raise_token_error(f"could not unpack data: {ex}", code=b"U")
+        log_and_raise_token_error(f"could not unpack data: {ex}", code=b"Q")
 
     if not secrets.compare_digest(
         hashlib.shake_256(data + settings.secret).digest(settings.digest_size),
