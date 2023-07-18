@@ -92,7 +92,9 @@ def verify_access_token(token: str) -> tuple[int, TokenType]:
     try:
         raw_token = base45.b45decode(token)
     except Exception as ex:
-        raise TokenError(f"could not base45 decode token data: {ex}", code=b"Q")
+        log_and_raise_token_error(
+            f"could not base45 decode token data: {ex}", code=b"Q"
+        )
 
     try:
         user_id, expires, type_, _, signature = struct.unpack(
