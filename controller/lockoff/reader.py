@@ -78,5 +78,6 @@ async def opticon_reader(display: GFXDisplay):
 
             except TokenError as ex:
                 log.error(ex)
+                log.error(ex.code)
                 # show error message on display
                 tg.create_task(display.send_message(ex.code))
