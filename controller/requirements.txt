@@ -36,6 +36,7 @@ pyserial-asyncio==0.6
 python-dateutil==2.8.2
 python-dotenv==1.0.0
 python-jose==3.3.0
+python-multipart==0.0.6
 PyYAML==6.0.1
 qrcode==7.4.2
 redis==4.6.0

@@ -2,17 +2,19 @@ import asyncio
 import hashlib
 import logging
 from datetime import datetime, timedelta
+from typing import Annotated
 
 import pyotp
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_limiter.depends import RateLimiter
 from jose import JWTError, jwt
 from tinydb import operations, where
 
+from .. import schemas
 from ..config import settings
 from ..db import DB_member
 from ..klubmodul import KMClient
-from .. import schemas
 
 router = APIRouter(tags=["auth"])
 log = logging.getLogger(__name__)
@@ -42,35 +44,29 @@ async def request_totp(rac: schemas.RequestTOTP) -> schemas.StatusReply:
 
 
 @router.post("/login", dependencies=[Depends(RateLimiter(times=5, seconds=300))])
-async def login(login: schemas.Login) -> schemas.JWTToken:
+async def login(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+) -> schemas.JWTToken:
     async with DB_member as db:
-        users = db.search((where("mobile") == login.mobile) & (where("active") == True))
+        users = db.search(
+            (where("mobile") == form_data.username) & (where("active") == True)
+        )
+    if not users:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="mobile not found or code expired or not valid",
+        )
     totp = pyotp.TOTP(users[0]["totp_secret"])
-    if not totp.verify(otp=login.totp, valid_window=2):
+    if not totp.verify(otp=form_data.password, valid_window=2):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="code is expired or not valid"
         )
     encoded_jwt = jwt.encode(
         {
-            "sub": [u.doc_id for u in users],
+            "sub": form_data.username,
             "exp": datetime.utcnow() + timedelta(hours=2),
         },
         settings.jwt_secret,
         algorithm="HS256",
     )
     return schemas.JWTToken(token=encoded_jwt, token_type="bearer")
-
-
-@router.post(
-    "/get-download-urls", dependencies=[Depends(RateLimiter(times=5, seconds=300))]
-)
-async def get_download_urls():
-    # valid
-    user_id = 1
-    member_type = "full"
-    expire = datetime(2024, 1, 1, 12, 0, 0).isoformat(timespec="seconds")
-    url_expire = (datetime.datetime.utcnow() + timedelta(hours=24)).isoformat(
-        timespec="seconds"
-    )
-    hashlib.sha256("{user_id}{url_expire}{secret}".encode("utf-8")).hexdigest()
-    return {"pkpass": "", "pdf": ""}
