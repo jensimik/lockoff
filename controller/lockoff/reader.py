@@ -7,7 +7,6 @@ from tinydb.table import Document
 import calendar
 import serial_asyncio
 from gpiozero import LED
-from gpiozero.pins.native import NativeFactory
 
 from .access_token import (
     TokenError,
@@ -22,8 +21,7 @@ from .display import GFXDisplay
 log = logging.getLogger(__name__)
 
 # automation hat mini relay 1 is on gpio pin 16
-factory = NativeFactory()
-relay = LED(16, pin_factory=factory)
+relay = LED(16)
 
 
 async def buzz_in():
