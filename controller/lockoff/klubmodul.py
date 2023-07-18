@@ -85,7 +85,7 @@ class KMClient:
             member_type = (
                 "FULL" if "1" in row["Hold"] else "MORN" if "2" in row["Hold"] else None
             )
-            name = row["Fornavn"]
+            name = row["Fornavn"] + " " + row["Efternavn"]
             email = row["Email"]
             mobile = row["Mobil"]
             if member_type:
