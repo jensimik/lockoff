@@ -1,14 +1,13 @@
 from datetime import datetime
 from typing import Annotated
 
-from dateutil import relativedelta
+from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from tinydb import where
 
 from lockoff import depends
 
 from ..access_token import TokenType, generate_access_token
-
 from ..apple_pass import ApplePass
 from ..config import settings
 from ..db import DB_member
