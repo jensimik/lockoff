@@ -11,7 +11,7 @@ class Login(BaseModel):
 
 
 class JWTToken(BaseModel):
-    token: str
+    access_token: str
     token_type: str
 
 

@@ -69,4 +69,4 @@ async def login(
         settings.jwt_secret,
         algorithm="HS256",
     )
-    return schemas.JWTToken(token=encoded_jwt, token_type="bearer")
+    return schemas.JWTToken(access_token=encoded_jwt, token_type="bearer")
