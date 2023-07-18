@@ -5,17 +5,22 @@ import controllerAPI from './api/resources/allMethods';
 import { ref, nextTick } from 'vue'
 
 var step = ref(1);
+var mob = ref("");
 
-const mobile_update = async(mobile) => {
-  controllerAPI.request_totp(mobile).then((response) => {
-    console.log(response);
+
+const mobile_update = async(val) => {
+  controllerAPI.request_totp(val).then((response) => {
+    step.value = 2;
+    document.getElementById("otc1").focus();
+    mob.value = val;
   })
-  step.value = 2;
-  await nextTick();
-  document.getElementById("otc1").focus();
+//  await nextTick();
 }
-const pin_update = async(e) => {
-  step.value = 3;
+const pin_update = async(val) => {
+  controllerAPI.login(mob, val).then((response) => {
+    console.log(response);
+    step.value = 3;
+  })
 }
 </script>
 

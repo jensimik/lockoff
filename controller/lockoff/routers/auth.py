@@ -20,7 +20,9 @@ router = APIRouter(tags=["auth"])
 log = logging.getLogger(__name__)
 
 
-@router.post("/request-totp", dependencies=[Depends(RateLimiter(times=5, seconds=300))])
+@router.post(
+    "/request-totp", dependencies=[Depends(RateLimiter(times=105, seconds=300))]
+)
 async def request_totp(rac: schemas.RequestTOTP) -> schemas.StatusReply:
     async with DB_member as db:
         user_ids = [
@@ -42,7 +44,7 @@ async def request_totp(rac: schemas.RequestTOTP) -> schemas.StatusReply:
     return schemas.StatusReply(status="sms sent")
 
 
-@router.post("/login", dependencies=[Depends(RateLimiter(times=5, seconds=300))])
+@router.post("/login", dependencies=[Depends(RateLimiter(times=105, seconds=300))])
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> schemas.JWTToken:

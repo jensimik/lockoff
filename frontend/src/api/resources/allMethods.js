@@ -2,11 +2,11 @@ import { APISettings } from '../config.js';
 
 export default {
 
-    async request_totp(data) {
-        const response = await fetch(APISettings.baseURL + '/request_totp', {
+    async request_totp(mobile) {
+        const response = await fetch(APISettings.baseURL + '/request-totp', {
             method: 'POST',
-            headers: APISettings.headers,
-            body: JSON.stringify(data)
+            headers: { ...APISettings.headers, 'Content-Type': 'Application/json' },
+            body: JSON.stringify({mobile: mobile})
         });
         if (response.status != 200) {
             throw response.status;
@@ -14,11 +14,11 @@ export default {
             return response.json();
         }
     },
-    async login(data) {
+    async login(mobile, code) {
         const response = await fetch(APISettings.baseURL + '/login', {
             method: 'POST',
-            headers: APISettings.headers,
-            body: JSON.stringify(data)
+            headers: { ...APISettings.headers, 'Content-Type': 'Application/json' },
+            body: JSON.stringify({mobile: mobile, code: code})
         });
         if (response.status != 200) {
             throw response.status;
