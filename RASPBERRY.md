@@ -15,6 +15,10 @@ sudo systemctl disable fake-hwclock.service
 sudo systemctl stop fake-hwclock.service
 sudo systemctl stop bluetooth.service
 
+# install automation hat and enable spi
+
+curl https://get.pimoroni.com/automationhat | bash
+
 # setup tailscale
 
 curl -fsSL https://tailscale.com/install.sh | sh
