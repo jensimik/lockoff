@@ -11,6 +11,14 @@ from ..db import DB_member
 router = APIRouter(tags=["card"])
 
 
+@router.get("/me")
+async def me(mobile: Annotated[str, Depends(depends.get_current_mobile)]):
+    async with DB_member as db:
+        users = db.search((where("mobile") == mobile) & (where("active") == True))
+
+    pass
+
+
 @router.get("/card.pdf")
 async def get_card_pdf(mobile: Annotated[str, Depends(depends.get_current_mobile)]):
     return mobile
