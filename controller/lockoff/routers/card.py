@@ -37,7 +37,11 @@ async def get_card_pdf(
     pdf_file = generate_pdf(
         name=user["name"], level=token_type.name.capitalize(), qr_code_data=access_token
     )
-    return Response(content=pdf_file.getvalue(), media_type="application/pdf")
+    return Response(
+        content=pdf_file.getvalue(),
+        media_type="application/pdf",
+        filename=f"nkk-{user_id}.pdf",
+    )
 
 
 # @router.get("/card-{user_id}.pkpass")
