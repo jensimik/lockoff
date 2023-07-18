@@ -79,7 +79,7 @@ async def get_pkpass(
         name=user["name"],
         level=token_type.name.capitalize(),
         expires=expires_display,
-        qr_code_data=access_token,
+        qr_code_data=access_token.encode("utf-8"),
     )
     return Response(
         content=pkpass_file.getvalue(),
