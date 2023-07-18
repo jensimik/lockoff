@@ -59,18 +59,3 @@ async def login(login: schemas.Login) -> schemas.JWTToken:
         algorithm="HS256",
     )
     return schemas.JWTToken(token=encoded_jwt, token_type="bearer")
-
-
-@router.post(
-    "/get-download-urls", dependencies=[Depends(RateLimiter(times=5, seconds=300))]
-)
-async def get_download_urls():
-    # valid
-    user_id = 1
-    member_type = "full"
-    expire = datetime(2024, 1, 1, 12, 0, 0).isoformat(timespec="seconds")
-    url_expire = (datetime.datetime.utcnow() + timedelta(hours=24)).isoformat(
-        timespec="seconds"
-    )
-    hashlib.sha256("{user_id}{url_expire}{secret}".encode("utf-8")).hexdigest()
-    return {"pkpass": "", "pdf": ""}
