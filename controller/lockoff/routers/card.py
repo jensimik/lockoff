@@ -25,7 +25,7 @@ async def me(mobile: Annotated[str, Depends(depends.get_current_mobile)]):
 
 
 @router.get(
-    "/card-{user_id}.pdf",
+    "/nkk-{user_id}.pdf",
     response_class=Response,
     responses={
         200: {"content": {"application/pdf": {}}},
