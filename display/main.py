@@ -19,14 +19,15 @@ display.set_font("bitmap8")
 wdt = WDT(timeout=8000)
 
 MESSAGES = {
+    ".": ("READY", "READY TO SCAN"),
     "K": ("OK", "ACCESS GRANTED"),
     "Q": ("ERROR", "ERROR IN YOUR QR CODE"),
     "C": ("ERROR", "MEMBERSHIP CANCELED"),
     "F": ("ERROR", "COULD NOT FIND USER IN DB"),
     "D": ("ERROR", "YOUR DAYTICKET IS EXPIRED"),
+    "X": ("ERROR", "YOUR QR CODE IS EXPIRED"),
     "U": ("ERROR", "COULD NOT UNPACK DATA IN QR CODE"),
     "S": ("ERROR", "WRONG SIGNATURE IN QR CODE"),
-    ".": ("READY", "READY TO SCAN"),
     "E": ("ERROR", "SYSTEM ERROR"),
 }
 

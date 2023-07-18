@@ -25,7 +25,7 @@ class TokenType(Enum):
 
 
 class TokenError(Exception):
-    def __init__(self, message, code):
+    def __init__(self, message, code=b"Q"):
         super().__init__(message)
         self.code = code
 
@@ -111,7 +111,7 @@ def verify_access_token(token: str) -> tuple[int, TokenType]:
         log_and_raise_token_error("could not verify signature", code=b"S")
 
     if datetime.utcnow() > expires_datetime:
-        log_and_raise_token_error("token is expired")
+        log_and_raise_token_error("token is expired", code=b"X")
 
     return user_id, token_type
 
