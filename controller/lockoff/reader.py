@@ -21,7 +21,7 @@ from .display import GFXDisplay
 
 log = logging.getLogger(__name__)
 
-# automation hat mini relay 1 is on gpio 16
+# automation hat mini relay 1 is on gpio pin 16
 factory = NativeFactory()
 relay = LED(16, pin_factory=factory)
 
@@ -53,6 +53,9 @@ async def opticon_reader(display: GFXDisplay):
                         log_and_raise_token_error(
                             "did you cancel your membership?", code=b"C"
                         )
+                if token_type == TokenType.MORNING:
+                    # TODO: check if morning member can still get in?
+                    pass
 
                 elif token_type == TokenType.DAY_TICKET_HACK:
                     async with DB_dayticket as db:
@@ -77,7 +80,6 @@ async def opticon_reader(display: GFXDisplay):
                 tg.create_task(buzz_in())
 
             except TokenError as ex:
-                log.error(ex)
-                log.error(ex.code)
                 # show error message on display
+                log.error(ex)
                 tg.create_task(display.send_message(ex.code))

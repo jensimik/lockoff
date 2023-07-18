@@ -52,7 +52,7 @@ if __name__ == "__main__":
         if poll.poll(2000):
             data = sys.stdin.read(1)
             # print("#")  # print ACK back
-            show_message(*MESSAGES.get(data))
+            show_message(*MESSAGES.get(data, MESSAGES["E"]))
             # sleep a little before next message
             if not data == ".":
                 time.sleep(1.8)

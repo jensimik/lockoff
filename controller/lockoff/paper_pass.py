@@ -5,6 +5,7 @@ import qrcode
 from weasyprint import HTML
 
 from .paper_template import template
+from .access_token import generate_dayticket_access_token
 
 
 def generate_pdf(pdf_file: io.BufferedIOBase, name: str, level: str, qr_code_data: str):
@@ -30,6 +31,7 @@ def generate_pdf(pdf_file: io.BufferedIOBase, name: str, level: str, qr_code_dat
 
 if __name__ == "__main__":
     with open("test.pdf", "wb") as f:
+        token = generate_dayticket_access_token()
         generate_pdf(
-            pdf_file=f, name="Jens Hansen", level="Normal 2023", qr_code_data="ASDF1234"
+            pdf_file=f, name="Jens Hansen", level="Normal 2023", qr_code_data=token
         )
