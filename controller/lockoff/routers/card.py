@@ -2,7 +2,8 @@ from datetime import datetime
 from typing import Annotated
 
 from dateutil import relativedelta
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, Depends, HTTPException, status
 from tinydb import where
 
 from lockoff import depends
@@ -37,10 +38,10 @@ async def get_card_pdf(
     pdf_file = generate_pdf(
         name=user["name"], level=token_type.name.capitalize(), qr_code_data=access_token
     )
-    return Response(
+    return StreamingResponse(
         content=pdf_file.getvalue(),
         media_type="application/pdf",
-        filename=f"nkk-{user_id}.pdf",
+        headers={"Content-Disposition": f'inline; filename="nkk-{user_id}.pdf"'},
     )
 
 
