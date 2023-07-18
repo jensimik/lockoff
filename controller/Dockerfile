@@ -1,7 +1,7 @@
 FROM python:3.11-slim-bullseye
 
 # get curl for health check
-RUN apt-get update && apt-get install curl gcc -y
+RUN apt-get update && apt-get install curl -y
 
 WORKDIR /code
 
