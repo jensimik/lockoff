@@ -2,12 +2,15 @@ import asyncio
 import logging
 
 import serial_asyncio
+from gpiozero import LED
 
 from .access_token import TokenError, verify_access_token
 from .config import settings
 from .display import GFXDisplay
 
 log = logging.getLogger(__name__)
+
+relay = LED(13)
 
 
 async def opticon_reader(display: GFXDisplay):
@@ -17,6 +20,10 @@ async def opticon_reader(display: GFXDisplay):
         qrcode = (await opticon_r.readuntil(separator=b"\r")).decode("utf-8").strip()
         log.info(f"opticon got a qrcode with the data {qrcode}")
         asyncio.create_task(display.send_message(message=b"K"))
+        relay.on()
+        await asyncio.sleep(5)
+        relay.off()
+
         # try:
         #     if user_id := await verify_access_token(token=qrcode):
         #         log.info(f"successful verified the qrcode as user_id: {user_id}")
