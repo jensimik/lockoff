@@ -1,6 +1,4 @@
-from typing import Annotated
-
-from fastapi import Depends, HTTPException, status
+from fastapi import HTTPException, status
 from fastapi.security import APIKeyQuery, OAuth2PasswordBearer
 from jose import JWTError, jwt
 

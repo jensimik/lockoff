@@ -1,14 +1,13 @@
 import asyncio
-import hashlib
 import logging
 from datetime import datetime, timedelta
 from typing import Annotated
 
 import pyotp
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_limiter.depends import RateLimiter
-from jose import JWTError, jwt
+from jose import jwt
 from tinydb import operations, where
 
 from .. import schemas

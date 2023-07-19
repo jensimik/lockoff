@@ -8,10 +8,8 @@ from enum import Enum
 
 import base45
 from dateutil.relativedelta import relativedelta
-from tinydb.table import Document
 
 from .config import settings
-from .db import DB_dayticket, DB_member
 
 log = logging.getLogger(__name__)
 door_log = logging.getLogger("door")
@@ -56,7 +54,7 @@ def generate_access_token(
 
     expire = datetime.now(tz=settings.tz) + expire_delta
     data = struct.pack(
-        f">IIH",
+        ">IIH",
         user_id,
         calendar.timegm(expire.utctimetuple()),
         token_type.value,

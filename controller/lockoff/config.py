@@ -1,4 +1,3 @@
-import json
 from typing import Any, Tuple, Type
 
 from dateutil.tz import gettz, tzfile
