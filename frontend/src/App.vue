@@ -64,8 +64,8 @@ const pin_update = async(val) => {
   <div v-show="step == 3">
     <div v-for="user in user_data" :key="user.user_id">
       <p>{{ user.name }}</p>
-      <a :href="'https://lockoff-api.gnerd.dk/membership-card-' + user.user_id + '.pdf?token=' + token">pdf</a>
-      <a :href="'https://lockoff-api.gnerd.dk/membership-card-' + user.user_id + '.pkpass?token=' + token">pkpass</a>
+      <a :href="'https://lockoff-api.gnerd.dk/membership-card-' + user.user_id + '.pdf?token=' + token"><span style="font-size: 4em;">🖨️</span> download pdf for print</a>
+      <a :href="'https://lockoff-api.gnerd.dk/membership-card-' + user.user_id + '.pkpass?token=' + token"><span style="font-size: 4em;">📱</span> download digital membership card for wallet</a>
     </div>
   </div>
 </template>
