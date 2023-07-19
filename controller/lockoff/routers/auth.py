@@ -24,6 +24,10 @@ async def test():
     async with DB_member as db:
         users = db.search(where("active") == True)
 
+    # fixup 45
+    for u in users:
+        if len(u["mobile"]) == 10 and u["mobile"].startswith("45"):
+            u["mobile"] = u["mobile"][:-8]
     eight_digits = len([u for u in users if len(u["mobile"]) == 8])
     other = len(users) - eight_digits
 
