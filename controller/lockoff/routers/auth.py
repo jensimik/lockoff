@@ -30,6 +30,7 @@ async def test():
             u["mobile"].startswith("45")
             or u["mobile"].startswith("0045")
             or u["mobile"].startswith("+45")
+            or u["mobile"].startswith("045")
         ):
             u["mobile"] = u["mobile"][-8:]
     eight_digits = len([u for u in users if len(u["mobile"]) == 8])
