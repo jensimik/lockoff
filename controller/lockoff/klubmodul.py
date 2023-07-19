@@ -92,22 +92,6 @@ class KMClient:
                 yield user_id, name, member_type, email, mobile
 
     async def send_sms(self, user_id: int, message: str) -> None:
-        async def cleanup(message_id):
-            await asyncio.sleep(30)
-            try:
-                response = await self.client.request(
-                    method="DELETE",
-                    url="/Adminv2/Newsmail/__Delete",
-                    json={"rowId": f"sms-{save_id}"},
-                    timeout=10.0,
-                )
-            except httpx.TimeoutException:
-                raise KlubmodulException("send sms remove trail timeout")
-            if response.is_error:
-                raise KlubmodulException(
-                    "send sms remove trail: " + response.reason_phrase
-                )
-
         data = {
             "rowData": [
                 {"columnName": "broadcast_media", "value": "sms"},
@@ -179,7 +163,18 @@ class KMClient:
         save_id = response.json()["savedId"]
 
         # cleanup after ourself again by removing the sms in klubmodul mail/sms overview
-        asyncio.create_task(cleanup(save_id))
+        await asyncio.sleep(5)
+        try:
+            response = await self.client.request(
+                method="DELETE",
+                url="/Adminv2/Newsmail/__Delete",
+                json={"rowId": f"sms-{save_id}"},
+                timeout=10.0,
+            )
+        except httpx.TimeoutException:
+            raise KlubmodulException("send sms remove trail timeout")
+        if response.is_error:
+            raise KlubmodulException("send sms remove trail: " + response.reason_phrase)
 
     async def __aenter__(self: U) -> U:
         await self._km_login()
