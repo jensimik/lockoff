@@ -28,11 +28,12 @@ class ApplePass:
         "icon.png": _read_file_bytes(module_directory / "logo.png"),
         "icon@2x.png": _read_file_bytes(module_directory / "logo.png"),
     }
-    CERT = x509.load_pem_x509_certificate(settings.certificate)
-    PRIV_KEY = serialization.load_pem_private_key(
-        settings.key, password=settings.certificate_password
-    )
-    WWDR_CERT = x509.load_pem_x509_certificate(settings.wwdr_certificate)
+    if settings.key:
+        CERT = x509.load_pem_x509_certificate(settings.certificate)
+        PRIV_KEY = serialization.load_pem_private_key(
+            settings.key, password=settings.certificate_password
+        )
+        WWDR_CERT = x509.load_pem_x509_certificate(settings.wwdr_certificate)
     OPTIONS = [pkcs7.PKCS7Options.DetachedSignature]
 
     @classmethod
