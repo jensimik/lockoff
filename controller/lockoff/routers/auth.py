@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import Annotated
 
 import pyotp
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_limiter.depends import RateLimiter
 from jose import jwt
@@ -19,15 +19,44 @@ router = APIRouter(tags=["auth"])
 log = logging.getLogger(__name__)
 
 
+# @router.get("/test")
+# async def test():
+#     async with DB_member as db:
+#         users = db.search(where("active") == True)
+
+#     # fixup 45
+#     for u in users:
+#         if (
+#             u["mobile"].startswith("45")
+#             or u["mobile"].startswith("0045")
+#             or u["mobile"].startswith("+45")
+#             or u["mobile"].startswith("045")
+#         ):
+#             u["mobile"] = u["mobile"][-8:]
+#     eight_digits = len([u for u in users if len(u["mobile"]) == 8])
+#     other = len(users) - eight_digits
+
+#     others = [u for u in users if len(u["mobile"]) != 8]
+
+#     return {"eight_digits": eight_digits, "other": other, "others": others}
+
+
+async def send_sms(user_id: int, message: str):
+    async with KMClient() as km:
+        await km.send_sms(user_id=user_id, message=message)
+
+
 @router.post(
     "/request-totp", dependencies=[Depends(RateLimiter(times=105, seconds=300))]
 )
-async def request_totp(rac: schemas.RequestTOTP) -> schemas.StatusReply:
+async def request_totp(
+    rt: schemas.RequestTOTP, background_tasks: BackgroundTasks
+) -> schemas.StatusReply:
     async with DB_member as db:
         user_ids = [
             user.doc_id
             for user in db.search(
-                (where("mobile") == rac.mobile) & (where("active") == True)
+                (where("mobile") == rt.mobile) & (where("active") == True)
             )
         ]
     if user_ids:
@@ -35,11 +64,10 @@ async def request_totp(rac: schemas.RequestTOTP) -> schemas.StatusReply:
         totp = pyotp.TOTP(totp_secret)
         async with DB_member as db:
             db.update(operations.set("totp_secret", totp_secret), doc_ids=user_ids)
-        async with KMClient() as km:
-            await km.send_sms(user_id=user_ids[0], message=f"{totp.now()}")
-        log.info(f"km.send_sms(user_id={user_ids[0]}, message={totp.now()})")
-    else:
-        await asyncio.sleep(4)
+        log.info(f"send_sms(user_id={user_ids[0]}, message={totp.now()})")
+        background_tasks.add_task(
+            send_sms, user_id=user_ids[0], message=f"{totp.now()}"
+        )
     return schemas.StatusReply(status="sms sent")
 
 

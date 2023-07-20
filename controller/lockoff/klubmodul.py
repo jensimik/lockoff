@@ -161,7 +161,9 @@ class KMClient:
         if response.is_error:
             raise KlubmodulException("send sms server error: " + response.reason_phrase)
         save_id = response.json()["savedId"]
+
         # cleanup after ourself again by removing the sms in klubmodul mail/sms overview
+        await asyncio.sleep(5)
         try:
             response = await self.client.request(
                 method="DELETE",
