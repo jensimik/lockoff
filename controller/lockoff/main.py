@@ -2,6 +2,7 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
+import aiosqlite
 import redis.asyncio as redis
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +10,8 @@ from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
 
 from .config import settings
+from .db import queries
+from .depends import get_db
 from .display import GFXDisplay
 from .klubmodul import klubmodul_runner
 from .reader import opticon_reader
@@ -28,6 +31,8 @@ origins = [
 async def lifespan(app: FastAPI):
     _redis = redis.from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
     await FastAPILimiter.init(_redis)
+    async with aiosqlite.connect(settings.db_file) as connection:
+        await queries.init_db(connection)
     if settings.prod:
         # start display
         display = GFXDisplay()

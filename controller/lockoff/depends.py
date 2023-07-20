@@ -1,3 +1,4 @@
+import aiosqlite
 from fastapi import HTTPException, status
 from fastapi.security import APIKeyQuery, OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -23,6 +24,21 @@ async def get_current_mobile(token: str):
     except JWTError:
         raise credentials_exception
     return mobile
+
+
+async def get_db():
+    """Return a database connection for use as a dependency.
+    This connection has the Row row factory automatically attached."""
+
+    db = await aiosqlite.connect(settings.db_file)
+    # Provide a smarter version of the results. This keeps from having to unpack
+    # tuples manually.
+    db.row_factory = aiosqlite.Row
+
+    try:
+        yield db
+    finally:
+        await db.close()
 
 
 # async def get_current_mobile(token: Annotated[str, Depends(oauth2_scheme)]):
