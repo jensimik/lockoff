@@ -48,7 +48,7 @@ const pin_update = async(val) => {
         <g><path style="opacity:1" fill="#fefefe" d="M 508.5,278.5 C 508.5,355.167 508.5,431.833 508.5,508.5C 430.167,508.5 351.833,508.5 273.5,508.5C 301.743,505.838 329.076,499.005 355.5,488C 444.413,445.912 495.413,376.079 508.5,278.5 Z"/></g>
       </svg>
     </div>
-    <div class="flex one">
+    <div v-show="step == 1" class="flex one">
       <label for="mobile">Verify mobile number</label>
       <mobile :digit-count="8" :placeholder="0" @update:otp="mobile_update"></mobile>
     </div>
@@ -56,7 +56,7 @@ const pin_update = async(val) => {
       <div class="flex one">
         <label for="pin">SMS code</label>
      </div>
-     <div class="flex one">
+     <div v-show="step == 2" class="flex one">
        <otp ref="o" :digit-count="6" :placeholder="1" @update:otp="pin_update"></otp>
      </div>
     </div>

@@ -50,13 +50,13 @@ async def send_sms(user_id: int, message: str):
     "/request-totp", dependencies=[Depends(RateLimiter(times=105, seconds=300))]
 )
 async def request_totp(
-    rac: schemas.RequestTOTP, background_tasks: BackgroundTasks
+    rt: schemas.RequestTOTP, background_tasks: BackgroundTasks
 ) -> schemas.StatusReply:
     async with DB_member as db:
         user_ids = [
             user.doc_id
             for user in db.search(
-                (where("mobile") == rac.mobile) & (where("active") == True)
+                (where("mobile") == rt.mobile) & (where("active") == True)
             )
         ]
     if user_ids:
@@ -64,12 +64,10 @@ async def request_totp(
         totp = pyotp.TOTP(totp_secret)
         async with DB_member as db:
             db.update(operations.set("totp_secret", totp_secret), doc_ids=user_ids)
-        log.info(f"km.send_sms(user_id={user_ids[0]}, message={totp.now()})")
+        log.info(f"send_sms(user_id={user_ids[0]}, message={totp.now()})")
         background_tasks.add_task(
             send_sms, user_id=user_ids[0], message=f"{totp.now()}"
         )
-    else:
-        await asyncio.sleep(4)
     return schemas.StatusReply(status="sms sent")
 
 
