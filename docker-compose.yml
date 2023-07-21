@@ -31,7 +31,7 @@ services:
     container_name: lockoff
     restart: always
     volumes:
-      - $PWD/lockoff.db:/lockoff.db
+      - $PWD/lockoff.db3:/lockoff.db3
     environment:
       - prod=1
       - tz=Europe/Copenhagen
