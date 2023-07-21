@@ -5,6 +5,7 @@ import typing
 from datetime import datetime
 from types import TracebackType
 
+import aiosqlite
 import httpx
 from tinydb import operations, where
 from tinydb.table import Document
@@ -197,9 +198,9 @@ class KlubmodulException(Exception):
     pass
 
 
-async def refresh(conn: DBcon):
+async def refresh():
     batch_id = datetime.utcnow().isoformat(timespec="seconds")
-    async with KMClient() as client:
+    async with KMClient() as client, aiosqlite.connect(settings.db_file) as conn:
         async for user_id, name, member_type, email, mobile in client.get_members():
             await queries.upsert_user(
                 conn,
