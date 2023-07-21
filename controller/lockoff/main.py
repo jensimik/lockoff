@@ -14,7 +14,7 @@ from .db import queries
 from .display import GFXDisplay
 from .klubmodul import klubmodul_runner
 from .reader import opticon_reader
-from .routers import auth, card
+from .routers import admin, auth, card
 from .watchdog import Watchdog
 
 log = logging.getLogger(__name__)
@@ -66,6 +66,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(card.router)
+app.include_router(admin.router)
 
 
 @app.get("/healtz", dependencies=[Depends(RateLimiter(times=2, seconds=5))])
