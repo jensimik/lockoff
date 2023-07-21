@@ -46,8 +46,6 @@ async def opticon_reader(display: GFXDisplay):
                     # check in database
                     if token_type in [TokenType.NORMAL, TokenType.MORNING]:
                         user = await queries.get_user_by_user_id(conn, user_id=user_id)
-                        log.info(f"user {user}")
-                        log.info(type(user))
                         if not user:
                             log_and_raise_token_error(
                                 "could not find user in db", code=b"F"
