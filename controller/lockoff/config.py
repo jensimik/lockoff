@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     klubmodul_base_url: str = ""
     nonce_size: int = 4
     digest_size: int = 10
+    dl_digest_size: int = 5
     secret: bytes = "changeme"
     jwt_secret: str = ""
     opticon_url: str = "loop://?logging=debug"

@@ -28,7 +28,7 @@ def generate_token(
     data = struct.pack(">II", user_id, expires)
     nonce = secrets.token_bytes(settings.nonce_size)
     signature = hashlib.shake_256(data + nonce + settings.secret).digest(
-        settings.digest_size
+        settings.dl_digest_size
     )
     return base64.urlsafe_b64encode(data + nonce + signature).decode("utf-8")
 
@@ -39,23 +39,17 @@ def verify_token(token: str) -> int:
     )
     try:
         raw_token = base64.urlsafe_b64decode(token)
-        print(f"raw token {raw_token}")
         user_id, expires, _, signature = struct.unpack(
-            f">II{settings.nonce_size}s{settings.digest_size}s", raw_token
+            f">II{settings.nonce_size}s{settings.dl_digest_size}s", raw_token
         )
-        print(f"user_id {user_id} expires {expires}")
-        data = raw_token[: -settings.digest_size]
+        data = raw_token[: -settings.dl_digest_size]
         expires_datetime = datetime.fromtimestamp(expires, tz=settings.tz)
-        print(f"expires datetime {expires_datetime}")
-        print(f"tznow {datetime.now(tz=settings.tz)}")
         if not secrets.compare_digest(
-            hashlib.shake_256(data + settings.secret).digest(settings.digest_size),
+            hashlib.shake_256(data + settings.secret).digest(settings.dl_digest_size),
             signature,
         ):
-            print("signature wrong?")
             raise token_exception
         if datetime.now(tz=settings.tz) > expires_datetime:
-            print("expired")
             raise token_exception
     except Exception:
         raise token_exception
