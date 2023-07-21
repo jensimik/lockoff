@@ -2,7 +2,6 @@ import hashlib
 import struct
 import secrets
 import base45
-import calendar
 from datetime import datetime
 from typing import Annotated
 
@@ -25,8 +24,8 @@ def generate_token(
     user_id: int,
     expire_delta: relativedelta = relativedelta(hour=2),
 ) -> str:
-    expires = datetime.utcnow() + expire_delta
-    data = struct.pack(">II", user_id, calendar.timegm(expires.utctimetuple()))
+    expires = int((datetime.utcnow() + expire_delta).timestamp())
+    data = struct.pack(">II", user_id, expires)
     nonce = secrets.token_bytes(settings.nonce_size)
     signature = hashlib.shake_256(data + nonce + settings.secret).digest(
         settings.digest_size
