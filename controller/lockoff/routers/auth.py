@@ -86,10 +86,10 @@ async def login(
             detail="code is expired or not valid",
         )
     # give basic scope to all
-    scopes = "basic"
+    scopes = ["basic"]
     # or basic+admin if in the special admin_user_ids list
     if set(settings.admin_user_ids) & set(user_ids):
-        scopes = "basic admin"
+        scopes = ["basic", "admin"]
     encoded_jwt = jwt.encode(
         {
             "sub": form_data.username,

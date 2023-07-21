@@ -54,6 +54,7 @@ async def get_current_mobile(
         if mobile is None:
             raise credentials_exception
         token_scopes = payload.get("scopes", [])
+        print(f"mobile {mobile} scopes {token_scopes}")
         token_data = schemas.TokenData(mobile=mobile, scopes=token_scopes)
     except (JWTError, ValidationError, ValidationError):
         raise credentials_exception
