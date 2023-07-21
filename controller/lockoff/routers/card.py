@@ -1,11 +1,10 @@
 import hashlib
-import struct
 import secrets
-import base45
-from datetime import datetime
+import struct
+from datetime import datetime, timedelta
 from typing import Annotated
 
-from dateutil.relativedelta import relativedelta
+import base45
 from fastapi import APIRouter, Depends, HTTPException, Response, Security, status
 
 from lockoff import depends
@@ -22,9 +21,9 @@ router = APIRouter(tags=["card"])
 
 def generate_token(
     user_id: int,
-    expire_delta: relativedelta = relativedelta(hour=2),
+    expire_delta: timedelta = timedelta(hours=2),
 ) -> str:
-    expires = int((datetime.utcnow() + expire_delta).timestamp())
+    expires = int((datetime.now(tz=settings.tz) + expire_delta).timestamp())
     data = struct.pack(">II", user_id, expires)
     nonce = secrets.token_bytes(settings.nonce_size)
     signature = hashlib.shake_256(data + nonce + settings.secret).digest(
@@ -45,9 +44,9 @@ def verify_token(token: str) -> int:
         )
         print(f"user_id {user_id} expires {expires}")
         data = raw_token[: -settings.digest_size]
-        expires_datetime = datetime.utcfromtimestamp(expires)
+        expires_datetime = datetime.fromtimestamp(expires, tz=settings.tz)
         print(f"expires datetime {expires_datetime}")
-        print(f"utcnow {datetime.utcnow()}")
+        print(f"tznow {datetime.now(tz=settings.tz)}")
         if not secrets.compare_digest(
             hashlib.shake_256(data + settings.secret).digest(settings.digest_size),
             signature,

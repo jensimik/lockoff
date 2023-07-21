@@ -1,4 +1,3 @@
-import calendar
 import hashlib
 import secrets
 import struct
@@ -56,7 +55,7 @@ def generate_access_token(
     data = struct.pack(
         ">IIH",
         user_id,
-        calendar.timegm(expire.utctimetuple()),
+        int(expire.timestamp()),
         token_type.value,
     )
 
@@ -100,7 +99,7 @@ def verify_access_token(token: str) -> tuple[int, TokenType]:
         )
         data = raw_token[: -settings.digest_size]
         token_type = TokenType(type_)
-        expires_datetime = datetime.utcfromtimestamp(expires)
+        expires_datetime = datetime.fromtimestamp(expires, tz=settings.tz)
     except Exception as ex:
         log_and_raise_token_error(f"could not unpack data: {ex}", code=b"Q")
 
@@ -110,7 +109,7 @@ def verify_access_token(token: str) -> tuple[int, TokenType]:
     ):
         log_and_raise_token_error("could not verify signature", code=b"S")
 
-    if datetime.utcnow() > expires_datetime:
+    if datetime.now(tz=settings.tz) > expires_datetime:
         log_and_raise_token_error("token is expired", code=b"X")
 
     return user_id, token_type
