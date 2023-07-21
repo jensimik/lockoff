@@ -4,7 +4,7 @@ import struct
 from datetime import datetime, timedelta
 from typing import Annotated
 
-import base45
+import base64
 from fastapi import APIRouter, Depends, HTTPException, Response, Security, status
 
 from lockoff import depends
@@ -29,7 +29,7 @@ def generate_token(
     signature = hashlib.shake_256(data + nonce + settings.secret).digest(
         settings.digest_size
     )
-    return base45.b45encode(data + nonce + signature).decode("utf-8")
+    return base64.urlsafe_b64encode(data + nonce + signature).decode("utf-8")
 
 
 def verify_token(token: str) -> int:
@@ -37,7 +37,7 @@ def verify_token(token: str) -> int:
         status_code=status.HTTP_400_BAD_REQUEST, detail="could not verify signature"
     )
     try:
-        raw_token = base45.b45decode(token)
+        raw_token = base64.urlsafe_b64decode(token)
         print(f"raw token {raw_token}")
         user_id, expires, _, signature = struct.unpack(
             f">II{settings.nonce_size}s{settings.digest_size}s", raw_token
