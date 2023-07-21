@@ -71,15 +71,15 @@ async def request_totp(
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], conn: DBcon
 ) -> schemas.JWTToken:
-    totp_secret = await queries.get_active_user_totp_secret_by_mobile(
-        conn, mobile=form_data.username
-    )
-    if not totp_secret:
+    users = await queries.get_active_users_by_mobile(conn, mobile=form_data.username)
+    totp_secrets = [u["totp_secret"] for u in users]
+    user_ids = [u["user_id"] for u in users]
+    if not totp_secrets:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="mobile not found or code expired or not valid",
         )
-    totp = pyotp.TOTP(totp_secret)
+    totp = pyotp.TOTP(totp_secrets[0])
     if not totp.verify(otp=form_data.password, valid_window=2):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -87,10 +87,8 @@ async def login(
         )
     # give basic scope to all
     scopes = "basic"
-    print(form_data.username)
-    print(settings.admin_user_ids)
     # or basic+admin if in the special admin_user_ids list
-    if int(form_data.username) in settings.admin_user_ids:
+    if set(settings.admin_user_ids) & set(user_ids):
         scopes = "basic admin"
         print("gave admin scope")
     encoded_jwt = jwt.encode(

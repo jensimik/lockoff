@@ -26,7 +26,7 @@ async def get_card_pdf(
     user_id: Annotated[int, Depends(verify_dl_token)],
     conn: DBcon,
 ):
-    user = await queries.get_active_users_by_user_id(conn, user_id=user_id)
+    user = await queries.get_active_user_by_user_id(conn, user_id=user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     token_type = (
@@ -61,7 +61,7 @@ async def get_pkpass(
     user_id: Annotated[int, Depends(verify_dl_token)],
     conn: DBcon,
 ):
-    user = await queries.get_active_users_by_user_id(conn, user_id=user_id)
+    user = await queries.get_active_user_by_user_id(conn, user_id=user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     token_type = (
