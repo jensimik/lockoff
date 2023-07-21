@@ -40,11 +40,14 @@ def verify_token(token: str) -> int:
     )
     try:
         raw_token = base45.b45decode(token)
+        print(f"raw token {raw_token}")
         user_id, expires, _, signature = struct.unpack(
             f">II{settings.nonce_size}s{settings.digest_size}s", raw_token
         )
+        print(f"user_id {user_id} expires {expires}")
         data = raw_token[: -settings.digest_size]
         expires_datetime = datetime.utcfromtimestamp(expires)
+        print(f"expires datetime {expires_datetime}")
         if not secrets.compare_digest(
             hashlib.shake_256(data + settings.secret).digest(settings.digest_size),
             signature,
