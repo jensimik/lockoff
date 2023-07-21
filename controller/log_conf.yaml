@@ -34,6 +34,10 @@ loggers:
     handlers:
       - access
     propagate: no
+  aiosqlite:
+    level: DEBUG
+    handlers:
+      - default
   lockoff:
     level: INFO
     handlers:
