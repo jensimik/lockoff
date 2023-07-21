@@ -53,7 +53,7 @@ async def send_sms(user_id: int, message: str):
 async def request_totp(
     rt: schemas.RequestTOTP, conn: DBcon, background_tasks: BackgroundTasks
 ) -> schemas.StatusReply:
-    users = await queries.get_active_users_by_mobile(conn, mobile=rt.mobile)
+    users = await queries.get_all_users(conn)
     log.info(users)
     async with DB_member as db:
         user_ids = [
