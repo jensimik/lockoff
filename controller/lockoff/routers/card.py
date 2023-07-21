@@ -52,8 +52,10 @@ def verify_token(token: str) -> int:
             hashlib.shake_256(data + settings.secret).digest(settings.digest_size),
             signature,
         ):
+            print("signature wrong?")
             raise token_exception
         if datetime.utcnow() > expires_datetime:
+            print("expired")
             raise token_exception
     except Exception:
         raise token_exception
