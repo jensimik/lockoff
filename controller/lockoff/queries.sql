@@ -22,11 +22,11 @@ select totp_secret
  where mobile = :mobile and active = true;
 
 
--- name: get_active_users_by_user_id_mobile^
+-- name: get_active_users_by_user_id^
 -- get active users by mobile number
 select user_id, name, member_type, mobile, email, batch_id, active
   from users
- where user_id = :user_id and mobile = :mobile and active = true;
+ where user_id = :user_id and active = true;
 
 
 -- name: update_user_set_totp_secret!
