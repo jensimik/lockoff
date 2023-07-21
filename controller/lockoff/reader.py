@@ -17,7 +17,6 @@ from .access_token import (
 from .config import settings
 from .db import queries
 
-# from .db import DB_dayticket, DB_member
 from .display import GFXDisplay
 
 log = logging.getLogger(__name__)
