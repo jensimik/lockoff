@@ -73,6 +73,7 @@ async def login(
 ) -> schemas.JWTToken:
     users = await queries.get_active_users_by_mobile(conn, mobile=form_data.username)
     log.info(users)
+    log.info(users[0])
     if not users:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
