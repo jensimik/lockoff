@@ -65,6 +65,13 @@ where ticket_id = :ticket_id;
 insert into access_log(user_id, token_type, timestamp)
 values (:user_id, :token_type, :timestamp);
 
+-- name: last_log_entries
+-- get last :limit log entries
+select log_id, user_id, token_type, timestamp
+from access_log
+order by timestamp desc
+limit :limit;
+
 -- name: create_schema#
 -- initialize the databases
 create table if not exists users (

@@ -17,6 +17,7 @@ router = APIRouter(tags=["admin"])
 
 @router.get("/access_log")
 async def access_log(
-    mobile: Annotated[str, Security(depends.get_current_mobile, scopes=["admin"])]
+    mobile: Annotated[str, Security(depends.get_current_mobile, scopes=["admin"])],
+    conn: DBcon,
 ):
-    pass
+    return await queries.last_log_entries(conn, limit=30)
