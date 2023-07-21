@@ -75,8 +75,8 @@ create table if not exists users (
     mobile text not null,
     email text not null,
     batch_id text not null,
-    totp_secret text not null default ""
-    active bool not null
+    totp_secret text not null default "",
+    active bool not null,
 );
 create table if not exists access_log (
     log_id integer not null primary key,
@@ -86,5 +86,5 @@ create table if not exists access_log (
 );
 create table if not exists dayticket (
     ticket_id integer not null primary key,
-    expires integer nul null
+    expires integer nul null,
 );
