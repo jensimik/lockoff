@@ -53,7 +53,7 @@ def verify_token(token: str) -> int:
         ):
             print("signature wrong?")
             raise token_exception
-        if datetime.utcnow() > expires_datetime:
+        if datetime.now(tz=settings.tz) > expires_datetime:
             print("expired")
             raise token_exception
     except Exception:
