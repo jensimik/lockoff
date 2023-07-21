@@ -12,7 +12,8 @@ from tinydb import operations, where
 
 from .. import schemas
 from ..config import settings
-from ..db import DB_member
+from ..db import DB_member, queries
+from ..depends import DBcon
 from ..klubmodul import KMClient
 
 router = APIRouter(tags=["auth"])
@@ -50,8 +51,10 @@ async def send_sms(user_id: int, message: str):
     "/request-totp", dependencies=[Depends(RateLimiter(times=105, seconds=300))]
 )
 async def request_totp(
-    rt: schemas.RequestTOTP, background_tasks: BackgroundTasks
+    rt: schemas.RequestTOTP, conn: DBcon, background_tasks: BackgroundTasks
 ) -> schemas.StatusReply:
+    users = await queries.get_active_users_by_mobile(conn, mobile=rt.mobile)
+    log.info(users)
     async with DB_member as db:
         user_ids = [
             user.doc_id

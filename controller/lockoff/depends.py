@@ -1,5 +1,7 @@
+from typing import Annotated
+
 import aiosqlite
-from fastapi import HTTPException, status
+from fastapi import Depends, HTTPException, status
 from fastapi.security import APIKeyQuery, OAuth2PasswordBearer
 from jose import JWTError, jwt
 
@@ -39,6 +41,9 @@ async def get_db():
         yield db
     finally:
         await db.close()
+
+
+DBcon = Annotated[aiosqlite.Connection, Depends(get_db)]
 
 
 # async def get_current_mobile(token: Annotated[str, Depends(oauth2_scheme)]):
