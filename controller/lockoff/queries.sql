@@ -35,7 +35,7 @@ update set name=excluded.name, member_type=excluded.member_type, mobile=excluded
 -- inactivate old batches
 update users 
 set active = false
-where batch_id < :batch_id
+where batch_id != :batch_id
 
 -- name: init_db#
 -- initialize the databases

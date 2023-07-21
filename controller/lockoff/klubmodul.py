@@ -228,6 +228,7 @@ async def refresh():
             #     )
         # mark old data as inactive
         await queries.inactivate_old_batch(conn, batch_id=batch_id)
+        await conn.commit()
         # async with DB_member as db:
         #     db.update(operations.set("active", False), where("batch_id") < batch_id)
 
