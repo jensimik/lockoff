@@ -21,3 +21,18 @@ async def access_log(
     conn: DBcon,
 ):
     return await queries.last_log_entries(conn, limit=30)
+
+
+@router.post("/klubmodul-force-resync")
+async def access_log(
+    mobile: Annotated[str, Security(depends.get_current_mobile, scopes=["admin"])],
+):
+    pass
+
+
+@router.get("/system-status")
+async def system_status():
+    pass
+    # return all alive?
+    # last x access_log
+    # estimated number of day-tickets left in reception?
