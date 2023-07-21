@@ -17,7 +17,7 @@ oauth2_scheme = OAuth2PasswordBearer(
     },
 )
 
-query_token = APIKeyQuery(name="token")
+# query_token = APIKeyQuery(name="token")
 
 
 # async def get_current_mobile(token: str):
@@ -57,6 +57,8 @@ async def get_current_mobile(
         token_data = schemas.TokenData(mobile=mobile, scopes=token_scopes)
     except (JWTError, ValidationError, ValidationError):
         raise credentials_exception
+    print(f"token_data.scopes {token_data.scopes}")
+    print(f"security_scopes.scopes {security_scopes.scopes}")
     for scope in security_scopes.scopes:
         if scope not in token_data.scopes:
             raise HTTPException(
