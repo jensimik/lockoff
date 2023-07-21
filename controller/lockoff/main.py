@@ -11,7 +11,6 @@ from fastapi_limiter.depends import RateLimiter
 
 from .config import settings
 from .db import queries
-from .depends import get_db
 from .display import GFXDisplay
 from .klubmodul import klubmodul_runner
 from .reader import opticon_reader
