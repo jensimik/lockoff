@@ -43,8 +43,8 @@ async def lifespan(app: FastAPI):
         opticon_task = asyncio.create_task(opticon_reader(display=display))
         watchdog.watch(opticon_task)
         # start klubmodul runner
-        klubmodul_task = asyncio.create_task(klubmodul_runner())
-        watchdog.watch(klubmodul_task)
+        # klubmodul_task = asyncio.create_task(klubmodul_runner())
+        # watchdog.watch(klubmodul_task)
     yield
     # clear things now at shutdown
     # nothing really have to be cleared
