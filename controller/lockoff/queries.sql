@@ -66,7 +66,7 @@ where ticket_id = :ticket_id;
 insert into access_log(user_id, token_type, timestamp)
 values (:user_id, :token_type, :timestamp);
 
--- name: init_db#
+-- name: create_schema#
 -- initialize the databases
 create table if not exists users (
     user_id integer not null primary key,
@@ -78,13 +78,13 @@ create table if not exists users (
     totp_secret text not null default ""
     active bool not null
 );
--- create table if not exists access_log (
---     log_id integer not null primary key,
---     user_id integer not null,
---     token_type text not null,
---     timestamp text not null,
--- );
--- create table if not exists dayticket (
---     ticket_id integer not null primary key,
---     expires integer nul null
--- );
+create table if not exists access_log (
+    log_id integer not null primary key,
+    user_id integer not null,
+    token_type text not null,
+    timestamp text not null,
+);
+create table if not exists dayticket (
+    ticket_id integer not null primary key,
+    expires integer nul null
+);
