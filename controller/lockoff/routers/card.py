@@ -25,7 +25,7 @@ def generate_token(
     user_id: int,
     expire_delta: relativedelta = relativedelta(hour=2),
 ) -> str:
-    expires = datetime.now(tz=settings.tz) + expire_delta
+    expires = datetime.utcnow() + expire_delta
     data = struct.pack(">II", user_id, calendar.timegm(expires.utctimetuple()))
     nonce = secrets.token_bytes(settings.nonce_size)
     signature = hashlib.shake_256(data + nonce + settings.secret).digest(
