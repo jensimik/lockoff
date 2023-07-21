@@ -31,9 +31,7 @@ services:
     container_name: lockoff
     restart: always
     volumes:
-      - $PWD/db_member.json:/db_member.json
-      - $PWD/db_dayticket.json:/db_dayticket.json
-      - $PWD/door.log:/door.log
+      - $PWD/lockoff.db:/lockoff.db
     environment:
       - prod=1
       - tz=Europe/Copenhagen

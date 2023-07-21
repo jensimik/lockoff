@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from datetime import datetime, timedelta
 from typing import Annotated
@@ -8,11 +7,10 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_limiter.depends import RateLimiter
 from jose import jwt
-from tinydb import operations, where
 
 from .. import schemas
 from ..config import settings
-from ..db import DB_member, queries
+from ..db import queries
 from ..depends import DBcon
 from ..klubmodul import KMClient
 
@@ -53,20 +51,15 @@ async def send_sms(user_id: int, message: str):
 async def request_totp(
     rt: schemas.RequestTOTP, conn: DBcon, background_tasks: BackgroundTasks
 ) -> schemas.StatusReply:
-    users = await queries.get_all_users(conn)
-    log.info(users)
-    async with DB_member as db:
-        user_ids = [
-            user.doc_id
-            for user in db.search(
-                (where("mobile") == rt.mobile) & (where("active") == True)
-            )
-        ]
+    users = await queries.get_active_users_by_mobile(conn, mobile=rt.mobile)
+    user_ids = [u["user_id"] for u in users]
     if user_ids:
         totp_secret = pyotp.random_base32()
         totp = pyotp.TOTP(totp_secret)
-        async with DB_member as db:
-            db.update(operations.set("totp_secret", totp_secret), doc_ids=user_ids)
+        await queries.update_user_set_totp_secret(
+            conn, mobile=rt.mobile, totp_secret=totp_secret
+        )
+        await conn.commit()
         log.info(f"send_sms(user_id={user_ids[0]}, message={totp.now()})")
         background_tasks.add_task(
             send_sms, user_id=user_ids[0], message=f"{totp.now()}"
@@ -76,12 +69,9 @@ async def request_totp(
 
 @router.post("/login", dependencies=[Depends(RateLimiter(times=105, seconds=300))])
 async def login(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], conn: DBcon
 ) -> schemas.JWTToken:
-    async with DB_member as db:
-        users = db.search(
-            (where("mobile") == form_data.username) & (where("active") == True)
-        )
+    users = await queries.get_active_users_by_mobile(conn, mobile=rt.mobile)
     if not users:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

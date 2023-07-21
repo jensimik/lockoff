@@ -30,8 +30,6 @@ class Settings(BaseSettings):
     jwt_secret: str = ""
     opticon_url: str = "loop://?logging=debug"
     display_url: str = "loop://?logging=debug"
-    db_member: str = "/db_member.json"
-    db_dayticket: str = "/db_dayticket.json"
     db_file: str = "/lockoff.db"
     redis_url: str = "redis://localhost"
     certificate: bytes = ""

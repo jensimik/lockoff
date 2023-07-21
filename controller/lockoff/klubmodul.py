@@ -7,12 +7,9 @@ from types import TracebackType
 
 import aiosqlite
 import httpx
-from tinydb import operations, where
-from tinydb.table import Document
 
 from .config import settings
-from .db import DB_member, queries
-from .depends import DBcon
+from .db import queries
 
 log = logging.getLogger(__name__)
 
@@ -212,25 +209,9 @@ async def refresh():
                 batch_id=batch_id,
                 active=True,
             )
-            # async with DB_member as db:
-            #     db.upsert(
-            #         Document(
-            #             {
-            #                 "name": name,
-            #                 "level": member_type,
-            #                 "mobile": mobile,
-            #                 "email": email,
-            #                 "batch_id": batch_id,
-            #                 "active": True,
-            #             },
-            #             doc_id=user_id,
-            #         )
-            #     )
         # mark old data as inactive
         await queries.inactivate_old_batch(conn, batch_id=batch_id)
         await conn.commit()
-        # async with DB_member as db:
-        #     db.update(operations.set("active", False), where("batch_id") < batch_id)
 
 
 async def klubmodul_runner():
