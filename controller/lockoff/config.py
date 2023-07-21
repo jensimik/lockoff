@@ -15,6 +15,8 @@ class MyCustomSource(EnvSettingsSource):
     ) -> Any:
         if field_name == "tz":
             return gettz(value)
+        elif field_name == "admin_user_ids":
+            return [int(v) for v in value.split(",")]
         return value
         # return json.loads(value)
 
@@ -30,6 +32,7 @@ class Settings(BaseSettings):
     jwt_secret: str = ""
     opticon_url: str = "loop://?logging=debug"
     display_url: str = "loop://?logging=debug"
+    admin_user_ids: list[int] = []
     db_file: str = "/db/lockoff.db3"
     redis_url: str = "redis://localhost"
     certificate: bytes = ""

@@ -76,17 +76,27 @@ async def login(
     )
     if not totp_secret:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="mobile not found or code expired or not valid",
         )
     totp = pyotp.TOTP(totp_secret)
     if not totp.verify(otp=form_data.password, valid_window=2):
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="code is expired or not valid"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="code is expired or not valid",
+        )
+    if (
+        "admin" in form_data.scopes
+        and int(form_data.username) not in settings.admin_user_ids
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="you have no access to the admin scope",
         )
     encoded_jwt = jwt.encode(
         {
             "sub": form_data.username,
+            "scopes": form_data.scopes,
             "exp": datetime.utcnow() + timedelta(hours=2),
         },
         settings.jwt_secret,
