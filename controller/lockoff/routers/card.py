@@ -1,10 +1,11 @@
+import base64
 import hashlib
 import secrets
 import struct
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Annotated
 
-import base64
+from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, Security, status
 
 from lockoff import depends
@@ -21,7 +22,7 @@ router = APIRouter(tags=["card"])
 
 def generate_token(
     user_id: int,
-    expire_delta: timedelta = timedelta(hours=2),
+    expire_delta: relativedelta = relativedelta(hours=2),
 ) -> str:
     expires = int((datetime.now(tz=settings.tz) + expire_delta).timestamp())
     data = struct.pack(">II", user_id, expires)
@@ -78,7 +79,7 @@ async def me(
 
 
 @router.get(
-    "/membership-card-{token}.pdf",
+    "/{token}/membership-card.pdf",
     response_class=Response,
     responses={
         200: {"content": {"application/pdf": {}}},
@@ -112,7 +113,7 @@ async def get_card_pdf(
 
 
 @router.get(
-    "/membership-card-{token}.pkpass",
+    "/{token}/membership-card.pkpass",
     response_class=Response,
     responses={
         200: {"content": {"application/vnd.apple.pkpass": {}}},
