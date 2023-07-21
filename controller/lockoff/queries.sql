@@ -76,7 +76,7 @@ create table if not exists users (
     email text not null,
     batch_id text not null,
     totp_secret text not null default "",
-    active bool not null,
+    active integer not null,
 );
 create table if not exists access_log (
     log_id integer not null primary key,
