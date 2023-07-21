@@ -76,15 +76,15 @@ create table if not exists users (
     email text not null,
     batch_id text not null,
     totp_secret text not null default "",
-    active integer not null,
+    active integer not null
 );
 create table if not exists access_log (
     log_id integer not null primary key,
     user_id integer not null,
     token_type text not null,
-    timestamp text not null,
+    timestamp text not null
 );
 create table if not exists dayticket (
     ticket_id integer not null primary key,
-    expires integer nul null,
+    expires integer nul null
 );
