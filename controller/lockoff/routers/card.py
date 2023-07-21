@@ -3,7 +3,6 @@ from typing import Annotated
 
 from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from tinydb import where
 
 from lockoff import depends
 
