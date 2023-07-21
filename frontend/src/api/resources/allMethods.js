@@ -18,7 +18,6 @@ export default {
         let formData = new FormData();
         formData.append('username', mobile);
         formData.append('password', code);
-        formData.append('scope', 'basic');
         const response = await fetch(APISettings.baseURL + '/login', {
             method: 'POST',
             headers: APISettings.headers,

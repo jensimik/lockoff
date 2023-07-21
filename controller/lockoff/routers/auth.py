@@ -85,18 +85,15 @@ async def login(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="code is expired or not valid",
         )
-    if (
-        "admin" in form_data.scopes
-        and int(form_data.username) not in settings.admin_user_ids
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="you have no access to the admin scope",
-        )
+    # give basic scope to all
+    scopes = "basic"
+    # or basic+admin if in the special admin_user_ids list
+    if int(form_data.username) in settings.admin_user_ids:
+        scopes = "basic admin"
     encoded_jwt = jwt.encode(
         {
             "sub": form_data.username,
-            "scopes": form_data.scopes,
+            "scopes": scopes,
             "exp": datetime.utcnow() + timedelta(hours=2),
         },
         settings.jwt_secret,

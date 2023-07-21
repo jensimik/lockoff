@@ -1,16 +1,10 @@
-import base64
-import hashlib
-import secrets
-import struct
 from datetime import datetime
 from typing import Annotated
 
 from dateutil.relativedelta import relativedelta
-from fastapi import APIRouter, Depends, HTTPException, Response, Security, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
-from lockoff import depends
-
-from ..access_token import TokenType, generate_access_token
+from ..access_token import TokenType, generate_access_token, verify_dl_token
 from ..apple_pass import ApplePass
 from ..config import settings
 from ..db import queries
@@ -20,58 +14,7 @@ from ..paper_pass import generate_pdf
 router = APIRouter(tags=["card"])
 
 
-def generate_token(
-    user_id: int,
-    expire_delta: relativedelta = relativedelta(hours=2),
-) -> str:
-    expires = int((datetime.now(tz=settings.tz) + expire_delta).timestamp())
-    data = struct.pack(">II", user_id, expires)
-    nonce = secrets.token_bytes(settings.nonce_size)
-    signature = hashlib.shake_256(data + nonce + settings.secret).digest(
-        settings.dl_digest_size
-    )
-    return base64.urlsafe_b64encode(data + nonce + signature).decode("utf-8")
-
-
-def verify_token(token: str) -> int:
-    token_exception = HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST, detail="could not verify signature"
-    )
-    try:
-        raw_token = base64.urlsafe_b64decode(token)
-        user_id, expires, _, signature = struct.unpack(
-            f">II{settings.nonce_size}s{settings.dl_digest_size}s", raw_token
-        )
-        data = raw_token[: -settings.dl_digest_size]
-        expires_datetime = datetime.fromtimestamp(expires, tz=settings.tz)
-        if not secrets.compare_digest(
-            hashlib.shake_256(data + settings.secret).digest(settings.dl_digest_size),
-            signature,
-        ):
-            raise token_exception
-        if datetime.now(tz=settings.tz) > expires_datetime:
-            raise token_exception
-    except Exception:
-        raise token_exception
-    return user_id
-
-
-@router.get("/me")
-async def me(
-    mobile: Annotated[str, Security(depends.get_current_mobile, scopes=["basic"])],
-    conn: DBcon,
-):
-    users = await queries.get_active_users_by_mobile(conn, mobile=mobile)
-    return [
-        {
-            "user_id": user["user_id"],
-            "name": user["name"],
-            "token": generate_token(user["user_id"]),
-        }
-        for user in users
-    ]
-
-
+# pdf membership card ready to print
 @router.get(
     "/{token}/membership-card.pdf",
     response_class=Response,
@@ -80,7 +23,7 @@ async def me(
     },
 )
 async def get_card_pdf(
-    user_id: Annotated[int, Depends(verify_token)],
+    user_id: Annotated[int, Depends(verify_dl_token)],
     conn: DBcon,
 ):
     user = await queries.get_active_users_by_user_id(conn, user_id=user_id)
@@ -106,6 +49,7 @@ async def get_card_pdf(
     )
 
 
+# pkpass is for apple wallet direct (and mobilewallet on android)
 @router.get(
     "/{token}/membership-card.pkpass",
     response_class=Response,
@@ -114,7 +58,7 @@ async def get_card_pdf(
     },
 )
 async def get_pkpass(
-    user_id: Annotated[int, Depends(verify_token)],
+    user_id: Annotated[int, Depends(verify_dl_token)],
     conn: DBcon,
 ):
     user = await queries.get_active_users_by_user_id(conn, user_id=user_id)

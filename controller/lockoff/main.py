@@ -14,7 +14,7 @@ from .db import queries
 from .display import GFXDisplay
 from .klubmodul import klubmodul_runner
 from .reader import opticon_reader
-from .routers import admin, auth, card
+from .routers import admin, auth, card, me
 from .watchdog import Watchdog
 
 log = logging.getLogger(__name__)
@@ -43,8 +43,8 @@ async def lifespan(app: FastAPI):
         opticon_task = asyncio.create_task(opticon_reader(display=display))
         watchdog.watch(opticon_task)
         # start klubmodul runner
-        # klubmodul_task = asyncio.create_task(klubmodul_runner())
-        # watchdog.watch(klubmodul_task)
+        klubmodul_task = asyncio.create_task(klubmodul_runner())
+        watchdog.watch(klubmodul_task)
     yield
     # clear things now at shutdown
     # nothing really have to be cleared
@@ -66,6 +66,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(card.router)
+app.include_router(me.router)
 app.include_router(admin.router)
 
 

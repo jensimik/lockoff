@@ -1,12 +1,14 @@
+import base64
 import hashlib
+import logging
 import secrets
 import struct
-import logging
 from datetime import datetime
 from enum import Enum
 
 import base45
 from dateutil.relativedelta import relativedelta
+from fastapi import HTTPException, status
 
 from .config import settings
 
@@ -113,6 +115,44 @@ def verify_access_token(token: str) -> tuple[int, TokenType]:
         log_and_raise_token_error("token is expired", code=b"X")
 
     return user_id, token_type
+
+
+# this token is only for download of pdf/pkpass files - signed with user and expire time set to two hours
+def generate_dl_token(
+    user_id: int,
+    expire_delta: relativedelta = relativedelta(hours=2),
+) -> str:
+    expires = int((datetime.now(tz=settings.tz) + expire_delta).timestamp())
+    data = struct.pack(">II", user_id, expires)
+    nonce = secrets.token_bytes(settings.nonce_size)
+    signature = hashlib.shake_256(data + nonce + settings.secret).digest(
+        settings.dl_digest_size
+    )
+    return base64.urlsafe_b64encode(data + nonce + signature).decode("utf-8")
+
+
+# depends for download files - see below
+def verify_dl_token(token: str) -> int:
+    token_exception = HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST, detail="could not verify signature"
+    )
+    try:
+        raw_token = base64.urlsafe_b64decode(token)
+        user_id, expires, _, signature = struct.unpack(
+            f">II{settings.nonce_size}s{settings.dl_digest_size}s", raw_token
+        )
+        data = raw_token[: -settings.dl_digest_size]
+        expires_datetime = datetime.fromtimestamp(expires, tz=settings.tz)
+        if not secrets.compare_digest(
+            hashlib.shake_256(data + settings.secret).digest(settings.dl_digest_size),
+            signature,
+        ):
+            raise token_exception
+        if datetime.now(tz=settings.tz) > expires_datetime:
+            raise token_exception
+    except Exception:
+        raise token_exception
+    return user_id
 
 
 if __name__ == "__main__":
