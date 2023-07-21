@@ -1,6 +1,7 @@
 import asyncio
 import calendar
 import logging
+import sqlite3
 from datetime import datetime
 
 import aiosqlite
@@ -16,7 +17,6 @@ from .access_token import (
 )
 from .config import settings
 from .db import queries
-
 from .display import GFXDisplay
 
 log = logging.getLogger(__name__)
@@ -35,6 +35,7 @@ async def opticon_reader(display: GFXDisplay):
     opticon_r, _ = await serial_asyncio.open_serial_connection(url=settings.opticon_url)
     while True:
         async with aiosqlite.connect(settings.db_file) as conn:
+            conn.row_factory = sqlite3.Row
             # read a scan from the barcode reader read until carriage return CR
             qrcode = (
                 (await opticon_r.readuntil(separator=b"\r")).decode("utf-8").strip()
