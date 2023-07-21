@@ -22,3 +22,14 @@ class TokenData(BaseModel):
 
 class StatusReply(BaseModel):
     status: str
+
+
+class MeReplyUser(BaseModel):
+    user_id: int
+    name: str
+    token: str
+
+
+class MeReply(BaseModel):
+    is_admin: bool
+    users: list[MeReplyUser]
