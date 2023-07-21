@@ -12,7 +12,7 @@ select user_id, name, member_type, mobile, email, batch_id, active
 
 -- name: get_active_users_by_mobile
 -- get active users by mobile number
-select user_id, name, member_type, mobile, email, batch_id, active
+select user_id, name, member_type, mobile, email, batch_id, totp_secret, active
   from users
  where mobile = :mobile and active = true;
 
@@ -22,7 +22,7 @@ select totp_secret
  where mobile = :mobile and active = true;
 
 
--- name: get_active_users_by_user_id^
+-- name: get_active_user_by_user_id^
 -- get active users by mobile number
 select user_id, name, member_type, mobile, email, batch_id, active
   from users
