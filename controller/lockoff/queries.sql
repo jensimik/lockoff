@@ -42,13 +42,6 @@ values (:user_id, :name, :member_type, :mobile, :email, :batch_id, :active)
 on conflict(user_id) do 
 update set name=excluded.name, member_type=excluded.member_type, mobile=excluded.mobile, email=excluded.email, batch_id=excluded.batch_id, active=excluded.active;
 
--- name: bulk_upsert_user*!
--- upsert a user in the database
-insert into users(user_id, name, member_type, mobile, email, batch_id, active)
-values (:user_id, :name, :member_type, :mobile, :email, :batch_id, :active)
-on conflict(user_id) do 
-update set name=excluded.name, member_type=excluded.member_type, mobile=excluded.mobile, email=excluded.email, batch_id=excluded.batch_id, active=excluded.active;
-
 -- name: inactivate_old_batch!
 -- inactivate old batches
 update users 
