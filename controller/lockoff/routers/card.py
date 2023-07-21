@@ -42,7 +42,7 @@ async def get_card_pdf(
     token_type = (
         TokenType.MORNING if user["member_type"] == "MORN" else TokenType.NORMAL
     )
-    access_token = generate_access_token(user_id=user.doc_id, token_type=token_type)
+    access_token = generate_access_token(user_id=user["user_id"], token_type=token_type)
     pdf_file = generate_pdf(
         name=user["name"],
         level=f"{token_type.name.capitalize()} {settings.current_season}",
@@ -79,7 +79,7 @@ async def get_pkpass(
     token_type = (
         TokenType.MORNING if user["member_type"] == "MORN" else TokenType.NORMAL
     )
-    access_token = generate_access_token(user_id=user.doc_id, token_type=token_type)
+    access_token = generate_access_token(user_id=user["user_id"], token_type=token_type)
     expires_display = datetime.utcnow() + relativedelta(
         day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
     )
