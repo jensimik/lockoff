@@ -71,15 +71,15 @@ async def request_totp(
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], conn: DBcon
 ) -> schemas.JWTToken:
-    users = await queries.get_active_users_by_mobile(conn, mobile=form_data.username)
-    log.info(users)
-    log.info(users[0])
-    if not users:
+    totp_secret = await queries.get_active_user_totp_secret_by_mobile(
+        conn, mobile=form_data.username
+    )
+    if not totp_secret:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="mobile not found or code expired or not valid",
         )
-    totp = pyotp.TOTP(users[0]["totp_secret"])
+    totp = pyotp.TOTP(totp_secret)
     if not totp.verify(otp=form_data.password, valid_window=2):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="code is expired or not valid"
