@@ -30,8 +30,8 @@ origins = [
 async def lifespan(app: FastAPI):
     _redis = redis.from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
     await FastAPILimiter.init(_redis)
-    async with aiosqlite.connect(settings.db_file) as connection:
-        await queries.init_db(connection)
+    async with aiosqlite.connect(settings.db_file) as conn:
+        await queries.init_db(conn)
     if settings.prod:
         # start display
         display = GFXDisplay()

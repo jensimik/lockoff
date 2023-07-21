@@ -27,7 +27,7 @@ select user_id, name, member_type, mobile, email, batch_id, active
 -- update users by mobile and set totp_secret
 update users
 set totp_secret = :totp_secret
-where mobile = :mobile
+where mobile = :mobile;
 
 -- name: upsert_user!
 -- upsert a user in the database
@@ -35,7 +35,6 @@ insert into users(user_id, name, member_type, mobile, email, batch_id, active)
 values (:user_id, :name, :member_type, :mobile, :email, :batch_id, :active)
 on conflict(user_id) do 
 update set name=excluded.name, member_type=excluded.member_type, mobile=excluded.mobile, email=excluded.email, batch_id=excluded.batch_id, active=excluded.active;
-
 
 -- name: bulk_upsert_user*!
 -- upsert a user in the database
@@ -48,24 +47,24 @@ update set name=excluded.name, member_type=excluded.member_type, mobile=excluded
 -- inactivate old batches
 update users 
 set active = false
-where batch_id != :batch_id
+where batch_id != :batch_id;
 
 -- name: get_dayticket_by_id^
 -- get a dayticket by id
 select ticket_id, expires
 from dayticket
-where ticket_id = :ticket_id
+where ticket_id = :ticket_id;
 
 -- name: update_dayticket_expire!
 -- update a dayticket to expire at x time
 update dayticket
 set expires = :expires
-where ticket_id = :ticket_id
+where ticket_id = :ticket_id;
 
 -- name: log_entry!
 -- log an entry on the door
 insert into access_log(user_id, token_type, timestamp)
-values (:user_id, :token_type, :timestamp)
+values (:user_id, :token_type, :timestamp);
 
 -- name: init_db#
 -- initialize the databases
@@ -88,4 +87,4 @@ create table if not exists access_log (
 create table if not exists dayticket (
     ticket_id integer not null primary key,
     expires integer nul null
-)
+);
