@@ -17,7 +17,7 @@ class MyCustomSource(EnvSettingsSource):
             return gettz(value)
         elif field_name == "admin_user_ids":
             if value:
-                return [int(v) for v in value.split(",")]
+                return [int(v) for v in value.split()]
         return value
         # return json.loads(value)
 
