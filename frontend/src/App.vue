@@ -2,7 +2,7 @@
 import otp from './components/OTP.vue';
 import mobile from './components/Mobile.vue';
 import controllerAPI from './api/resources/allMethods';
-import { ref, nextTick } from 'vue'
+import { ref, nextTick } from 'vue';
 
 var step = ref(1);
 var mob = ref("");
@@ -64,8 +64,8 @@ const pin_update = async(val) => {
   <div v-show="step == 3">
     <div v-for="user in user_data" :key="user.user_id">
       <p>{{ user.name }}</p>
-      <a :href="'https://lockoff-api.gnerd.dk/membership-card-' + user.user_id + '.pdf?token=' + token"><span style="font-size: 4em;">🖨️</span> download pdf for print</a>
-      <a :href="'https://lockoff-api.gnerd.dk/membership-card-' + user.user_id + '.pkpass?token=' + token"><span style="font-size: 4em;">📱</span> download digital membership card for wallet</a>
+      <a v-auth-href="{ token: token }" :href="'https://lockoff-api.gnerd.dk/membership-card-' + user.user_id + '.pdf'"><span style="font-size: 4em;">🖨️</span> download pdf for print</a>
+      <a v-auth-href="{ token: token }" :href="'https://lockoff-api.gnerd.dk/membership-card-' + user.user_id + '.pkpass'"><span style="font-size: 4em;">📱</span> download digital membership card for wallet</a>
     </div>
   </div>
 </template>

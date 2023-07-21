@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "picnic": "^7.1.0",
-    "vue": "^3.3.4"
+    "vue": "^3.3.4",
+    "vue-auth-href": "^1.5.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
