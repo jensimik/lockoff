@@ -47,11 +47,11 @@ async def opticon_reader(display: GFXDisplay):
                     # check in database
                     if token_type in [TokenType.NORMAL, TokenType.MORNING]:
                         user = await queries.get_user_by_user_id(conn, user_id=user_id)
-                        if not d:
+                        if not user:
                             log_and_raise_token_error(
                                 "could not find user in db", code=b"F"
                             )
-                        if not d["active"]:
+                        if not user["active"]:
                             log_and_raise_token_error(
                                 "did you cancel your membership?", code=b"C"
                             )
