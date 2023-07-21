@@ -87,6 +87,8 @@ async def login(
         )
     # give basic scope to all
     scopes = "basic"
+    print(form_data.username)
+    print(settings.admin_user_ids)
     # or basic+admin if in the special admin_user_ids list
     if int(form_data.username) in settings.admin_user_ids:
         scopes = "basic admin"
