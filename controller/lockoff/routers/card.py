@@ -48,6 +48,7 @@ def verify_token(token: str) -> int:
         data = raw_token[: -settings.digest_size]
         expires_datetime = datetime.utcfromtimestamp(expires)
         print(f"expires datetime {expires_datetime}")
+        print(f"utcnow {datetime.utcnow()}")
         if not secrets.compare_digest(
             hashlib.shake_256(data + settings.secret).digest(settings.digest_size),
             signature,
