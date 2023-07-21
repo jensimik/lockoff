@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated
 
 from dateutil.relativedelta import relativedelta
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, HTTPException, Response, Security, status
 
 from lockoff import depends
 
@@ -17,7 +17,10 @@ router = APIRouter(tags=["card"])
 
 
 @router.get("/me")
-async def me(mobile: Annotated[str, Depends(depends.get_current_mobile)], conn: DBcon):
+async def me(
+    mobile: Annotated[str, Security(depends.get_current_mobile, scopes=["basic"])],
+    conn: DBcon,
+):
     users = await queries.get_active_users_by_mobile(conn, mobile=mobile)
     return [{"user_id": user["user_id"], "name": user["name"]} for user in users]
 
@@ -31,7 +34,7 @@ async def me(mobile: Annotated[str, Depends(depends.get_current_mobile)], conn: 
 )
 async def get_card_pdf(
     user_id: int,
-    mobile: Annotated[str, Depends(depends.get_current_mobile)],
+    mobile: Annotated[str, Security(depends.get_current_mobile, scopes=["basic"])],
     conn: DBcon,
 ):
     user = await queries.get_active_users_by_user_id_mobile(
@@ -68,7 +71,7 @@ async def get_card_pdf(
 )
 async def get_pkpass(
     user_id: int,
-    mobile: Annotated[str, Depends(depends.get_current_mobile)],
+    mobile: Annotated[str, Security(depends.get_current_mobile, scopes=["basic"])],
     conn: DBcon,
 ):
     user = await queries.get_active_users_by_user_id_mobile(

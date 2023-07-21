@@ -15,5 +15,10 @@ class JWTToken(BaseModel):
     token_type: str
 
 
+class TokenData(BaseModel):
+    mobile: str | None = None
+    scopes: list[str] = []
+
+
 class StatusReply(BaseModel):
     status: str
