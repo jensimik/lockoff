@@ -67,7 +67,7 @@ async def me(
         {
             "user_id": user["user_id"],
             "name": user["name"],
-            "token": generate_token(user.user_id),
+            "token": generate_token(user["user_id"]),
         }
         for user in users
     ]
