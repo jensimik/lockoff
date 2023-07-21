@@ -36,7 +36,7 @@ def generate_token(
 
 def verify_token(token: str) -> int:
     token_exception = HTTPException(
-        status=status.HTTP_400_BAD_REQUEST, detail="could not verify signature"
+        status_code=status.HTTP_400_BAD_REQUEST, detail="could not verify signature"
     )
     try:
         raw_token = base45.b45decode(token)
