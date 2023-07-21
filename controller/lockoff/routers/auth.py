@@ -72,6 +72,7 @@ async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], conn: DBcon
 ) -> schemas.JWTToken:
     users = await queries.get_active_users_by_mobile(conn, mobile=form_data.username)
+    log.info(users)
     if not users:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
