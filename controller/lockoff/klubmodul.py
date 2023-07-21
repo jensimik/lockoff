@@ -6,12 +6,12 @@ from datetime import datetime
 from types import TracebackType
 
 import httpx
-from fastapi import Depends
 from tinydb import operations, where
 from tinydb.table import Document
 
 from .config import settings
 from .db import DB_member
+from .depends import DBcon
 
 log = logging.getLogger(__name__)
 
@@ -197,7 +197,7 @@ class KlubmodulException(Exception):
     pass
 
 
-async def refresh(conn: typing.Annotated[dict, Depends(common_parameters)]):
+async def refresh(conn: DBcon):
     batch_id = datetime.utcnow().isoformat(timespec="seconds")
     async with KMClient() as client:
         async for user_id, name, member_type, email, mobile in client.get_members():
