@@ -12,7 +12,7 @@ from ..config import settings
 from ..db import queries
 from ..depends import DBcon
 
-router = APIRouter(tags=["admin"])
+router = APIRouter(prefix="/admin", tags=["admin"])
 
 
 @router.get("/access_log")
