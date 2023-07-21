@@ -10,7 +10,7 @@ from tinydb import operations, where
 from tinydb.table import Document
 
 from .config import settings
-from .db import DB_member
+from .db import DB_member, queries
 from .depends import DBcon
 
 log = logging.getLogger(__name__)
@@ -201,23 +201,34 @@ async def refresh(conn: DBcon):
     batch_id = datetime.utcnow().isoformat(timespec="seconds")
     async with KMClient() as client:
         async for user_id, name, member_type, email, mobile in client.get_members():
-            async with DB_member as db:
-                db.upsert(
-                    Document(
-                        {
-                            "name": name,
-                            "level": member_type,
-                            "mobile": mobile,
-                            "email": email,
-                            "batch_id": batch_id,
-                            "active": True,
-                        },
-                        doc_id=user_id,
-                    )
-                )
+            await queries.upsert_user(
+                conn,
+                user_id=user_id,
+                name=name,
+                member_type=member_type,
+                email=email,
+                mobile=mobile,
+                batch_id=batch_id,
+                active=True,
+            )
+            # async with DB_member as db:
+            #     db.upsert(
+            #         Document(
+            #             {
+            #                 "name": name,
+            #                 "level": member_type,
+            #                 "mobile": mobile,
+            #                 "email": email,
+            #                 "batch_id": batch_id,
+            #                 "active": True,
+            #             },
+            #             doc_id=user_id,
+            #         )
+            #     )
         # mark old data as inactive
-        async with DB_member as db:
-            db.update(operations.set("active", False), where("batch_id") < batch_id)
+        await queries.inactivate_old_batch(conn, batch_id=batch_id)
+        # async with DB_member as db:
+        #     db.update(operations.set("active", False), where("batch_id") < batch_id)
 
 
 async def klubmodul_runner():
