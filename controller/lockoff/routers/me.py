@@ -6,7 +6,7 @@ from ..access_token import generate_dl_token
 from ..db import queries
 from ..depends import DBcon, get_current_mobile
 
-router = APIRouter(tags=["card"])
+router = APIRouter(tags=["me"])
 
 
 @router.get("/me")
