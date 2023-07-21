@@ -30,6 +30,17 @@ async def access_log(
     pass
 
 
+@router.get("/members-without-danish-mobile")
+async def members_without_danish_mobile():
+    pass
+
+
+@router.post("/send-membercard-by-email")
+async def send_membercard_by_email():
+    pass
+    # send membercard to a member manually (to those with no danish mobile number in klubmodul?)
+
+
 @router.get("/system-status")
 async def system_status():
     pass
