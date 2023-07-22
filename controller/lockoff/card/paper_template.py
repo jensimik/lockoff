@@ -104,4 +104,4 @@ template = """<html>
     </div>
   </body>
 </html>
-"""
+"""  # noqa: E501
