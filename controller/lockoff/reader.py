@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 relay = LED(16)
 
 
-class OPTICON_CMD:
+class O_CMD:
     OK_SOUND = bytes([0x1B, 0x42, 0xD])
     OK_LED = bytes([0x1B, 0x4C, 0xD])
     ERROR_SOUND = bytes([0x1B, 0x45, 0xD])
@@ -87,14 +87,18 @@ async def check_qrcode(qr_code: str):
         await conn.commit()
 
 
+async def opticon_cmd(writer: asyncio.StreamWriter, cmds=list[bytes]):
+    for cmd in cmds:
+        writer.write(cmd)
+    await writer.drain()
+
+
 async def opticon_reader(display: GFXDisplay):
-    opticon_r, opticon_w = await serial_asyncio.open_serial_connection(
-        url=settings.opticon_url
-    )
+    _r, _w = await serial_asyncio.open_serial_connection(url=settings.opticon_url)
     # TODO: should i send opticon configuration by serial to ensure it is correct before starting?
     while True:
         # read a scan from the barcode reader read until carriage return CR
-        qr_code = (await opticon_r.readuntil(separator=b"\r")).decode("utf-8").strip()
+        qr_code = (await _r.readuntil(separator=b"\r")).decode("utf-8").strip()
         async with asyncio.TaskGroup() as tg:
             try:
                 await check_qrcode(qr_code)
@@ -103,20 +107,14 @@ async def opticon_reader(display: GFXDisplay):
                 # show OK on display
                 tg.create_task(display.send_message(message=b"K"))
                 # give good sound on opticon now qr code is verified
-                opticon_w.write(OPTICON_CMD.OK_SOUND)
-                opticon_w.write(OPTICON_CMD.OK_LED)
-                tg.create_task(opticon_w.drain())
+                tg.create_task(opticon_cmd(_w, [O_CMD.OK_SOUND, O_CMD.OK_LED]))
             except TokenError as ex:
                 # show error message on display
                 log.warning(ex)
                 tg.create_task(display.send_message(ex.code))
-                opticon_w.write(OPTICON_CMD.ERROR_SOUND)
-                opticon_w.write(OPTICON_CMD.ERROR_LED)
-                tg.create_task(opticon_w.drain())
+                tg.create_task(_w, [O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
             # generic error? show system error on display
             except Exception:
                 log.exception("generic error in reader")
                 tg.create_task(display.send_message(b"E"))
-                opticon_w.write(OPTICON_CMD.ERROR_SOUND)
-                opticon_w.write(OPTICON_CMD.ERROR_LED)
-                tg.create_task(opticon_w.drain())
+                tg.create_task(_w, [O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
