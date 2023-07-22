@@ -2,12 +2,13 @@
 import otp from './components/OTP.vue';
 import mobile from './components/Mobile.vue';
 import controllerAPI from './api/resources/allMethods';
-import { ref, nextTick } from 'vue'
+import { ref, nextTick } from 'vue';
 
 var step = ref(1);
 var mob = ref("");
 var token = ref("");
 var user_data = ref([]);
+var is_admin = ref(false);
 
 
 const mobile_update = async(val) => {
@@ -23,7 +24,8 @@ const pin_update = async(val) => {
     token.value = token_data.access_token;
     step.value = 3;
     controllerAPI.get_me(token.value).then((me_data) => {
-      user_data.value = me_data;
+      user_data.value = me_data.users;
+      is_admin.value = me_data.is_admin;
     }).catch((error) => {
       console.log(error);
     })
@@ -63,9 +65,9 @@ const pin_update = async(val) => {
   </div>
   <div v-show="step == 3">
     <div v-for="user in user_data" :key="user.user_id">
-      <p>{{ user.name }}</p>
-      <a :href="'https://lockoff-api.gnerd.dk/membership-card-' + user.user_id + '.pdf?token=' + token"><span style="font-size: 4em;">🖨️</span> download pdf for print</a>
-      <a :href="'https://lockoff-api.gnerd.dk/membership-card-' + user.user_id + '.pkpass?token=' + token"><span style="font-size: 4em;">📱</span> download digital membership card for wallet</a>
+      <p>{{ user.name }} <span v-if="is_admin">(admin)</span></p>
+      <a target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pdf'"><span style="font-size: 4em;">🖨️</span> download pdf for print</a>
+      <a target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pkpass'"><span style="font-size: 4em;">📱</span> download digital membership card for wallet</a>
     </div>
   </div>
 </template>

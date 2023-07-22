@@ -1,13 +1,16 @@
 import asyncio
 import logging
+import pathlib
 
+import aiosql
 import serial_asyncio
 
 from .config import settings
 
 log = logging.getLogger(__name__)
-
 lock = asyncio.Lock()
+module_directory = pathlib.Path(__file__).resolve().parent
+queries = aiosql.from_path(module_directory / "queries.sql", "aiosqlite")
 
 
 class GFXDisplay:
@@ -31,5 +34,19 @@ class GFXDisplay:
         async with lock:
             if settings.display_url:
                 self.display_w.write(message)
+                await asyncio.sleep(1.5)
             else:
                 log.info(f"display send message {message.decode('utf-8')}")
+
+
+class Watchdog:
+    def __init__(self):
+        self._watch = []
+
+    def watch(self, watch: asyncio.Task):
+        self._watch.append(watch)
+
+    def healthy(self):
+        if any([w.done() for w in self._watch]):
+            return False
+        return True

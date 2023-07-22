@@ -30,9 +30,9 @@ export default {
         }
     },
     async get_me(token) {
-        const response = await fetch(APISettings.baseURL + '/me?token=' + token, {
+        const response = await fetch(APISettings.baseURL + '/me', {
             method: 'GET',
-            headers: APISettings.headers
+            headers: {...APISettings.headers, Authorization: "Bearer " + token}
         });
         if (response.status != 200) {
             throw response.status;

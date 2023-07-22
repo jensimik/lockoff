@@ -15,6 +15,9 @@ class MyCustomSource(EnvSettingsSource):
     ) -> Any:
         if field_name == "tz":
             return gettz(value)
+        elif field_name == "admin_user_ids":
+            if value:
+                return [int(v) for v in value.split()]
         return value
         # return json.loads(value)
 
@@ -26,12 +29,15 @@ class Settings(BaseSettings):
     klubmodul_base_url: str = ""
     nonce_size: int = 4
     digest_size: int = 10
+    dl_nonce_size: int = 2
+    dl_digest_size: int = 5
+    dl_secret: bytes = "changeme"
     secret: bytes = "changeme"
     jwt_secret: str = ""
     opticon_url: str = "loop://?logging=debug"
     display_url: str = "loop://?logging=debug"
-    db_member: str = "/db_member.json"
-    db_dayticket: str = "/db_dayticket.json"
+    admin_user_ids: list[int] = []
+    db_file: str = "/db/lockoff.db3"
     redis_url: str = "redis://localhost"
     certificate: bytes = ""
     key: bytes = ""

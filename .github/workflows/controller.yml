@@ -17,6 +17,7 @@ env:
   KLUBMODUL_USERNAME: NONE
   KLUBMODUL_PASSWORD: NONE
   GPIOZERO_PIN_FACTORY: mock
+  DB_FILE: "/tmp/lockoff.db3"
 
 jobs:
   test:

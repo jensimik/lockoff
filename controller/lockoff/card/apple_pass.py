@@ -10,7 +10,7 @@ from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.serialization import pkcs7
 
-from .config import settings
+from ..config import settings
 
 module_directory = pathlib.Path(__file__).resolve().parent
 log = logging.getLogger(__name__)

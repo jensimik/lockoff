@@ -5,7 +5,7 @@ import qrcode
 from weasyprint import HTML
 
 from .paper_template import template
-from .access_token import generate_dayticket_access_token
+from ..access_token import generate_dayticket_access_token
 
 
 def generate_pdf(name: str, level: str, qr_code_data: str):

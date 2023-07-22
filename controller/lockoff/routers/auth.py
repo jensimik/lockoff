@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from datetime import datetime, timedelta
 from typing import Annotated
@@ -8,12 +7,12 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_limiter.depends import RateLimiter
 from jose import jwt
-from tinydb import operations, where
 
 from .. import schemas
 from ..config import settings
-from ..db import DB_member
+from ..depends import DBcon
 from ..klubmodul import KMClient
+from ..misc import queries
 
 router = APIRouter(tags=["auth"])
 log = logging.getLogger(__name__)
@@ -50,20 +49,17 @@ async def send_sms(user_id: int, message: str):
     "/request-totp", dependencies=[Depends(RateLimiter(times=105, seconds=300))]
 )
 async def request_totp(
-    rt: schemas.RequestTOTP, background_tasks: BackgroundTasks
+    rt: schemas.RequestTOTP, conn: DBcon, background_tasks: BackgroundTasks
 ) -> schemas.StatusReply:
-    async with DB_member as db:
-        user_ids = [
-            user.doc_id
-            for user in db.search(
-                (where("mobile") == rt.mobile) & (where("active") == True)
-            )
-        ]
+    users = await queries.get_active_users_by_mobile(conn, mobile=rt.mobile)
+    user_ids = [u["user_id"] for u in users]
     if user_ids:
         totp_secret = pyotp.random_base32()
         totp = pyotp.TOTP(totp_secret)
-        async with DB_member as db:
-            db.update(operations.set("totp_secret", totp_secret), doc_ids=user_ids)
+        await queries.update_user_set_totp_secret(
+            conn, mobile=rt.mobile, totp_secret=totp_secret
+        )
+        await conn.commit()
         log.info(f"send_sms(user_id={user_ids[0]}, message={totp.now()})")
         background_tasks.add_task(
             send_sms, user_id=user_ids[0], message=f"{totp.now()}"
@@ -73,25 +69,31 @@ async def request_totp(
 
 @router.post("/login", dependencies=[Depends(RateLimiter(times=105, seconds=300))])
 async def login(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], conn: DBcon
 ) -> schemas.JWTToken:
-    async with DB_member as db:
-        users = db.search(
-            (where("mobile") == form_data.username) & (where("active") == True)
-        )
-    if not users:
+    users = await queries.get_active_users_by_mobile(conn, mobile=form_data.username)
+    totp_secrets = [u["totp_secret"] for u in users]
+    user_ids = [u["user_id"] for u in users]
+    if not totp_secrets:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="mobile not found or code expired or not valid",
         )
-    totp = pyotp.TOTP(users[0]["totp_secret"])
+    totp = pyotp.TOTP(totp_secrets[0])
     if not totp.verify(otp=form_data.password, valid_window=2):
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="code is expired or not valid"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="code is expired or not valid",
         )
+    # give basic scope to all
+    scopes = ["basic"]
+    # or basic+admin if in the special admin_user_ids list
+    if set(settings.admin_user_ids) & set(user_ids):
+        scopes = ["basic", "admin"]
     encoded_jwt = jwt.encode(
         {
             "sub": form_data.username,
+            "scopes": scopes,
             "exp": datetime.utcnow() + timedelta(hours=2),
         },
         settings.jwt_secret,
