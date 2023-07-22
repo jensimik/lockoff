@@ -92,7 +92,7 @@ async def opticon_reader(display: GFXDisplay):
             try:
                 await check_qrcode(qr_code)
                 # give good sound on opticon
-                tg.create_task(opticon_w.write(0x42))
+                tg.create_task(opticon_w.write([0x1B, 0x42, 0xD]))
                 # show OK on display
                 tg.create_task(display.send_message(message=b"K"))
                 # buzz in
@@ -101,9 +101,9 @@ async def opticon_reader(display: GFXDisplay):
                 # show error message on display
                 log.warning(ex)
                 tg.create_task(display.send_message(ex.code))
-                tg.create_task(opticon_w.write(0x45))
+                tg.create_task(opticon_w.write([0x1B, 0x45, 0xD]))
             # generic error? show system error on display
             except Exception:
                 log.exception("generic error in reader")
                 tg.create_task(display.send_message(b"E"))
-                tg.create_task(opticon_w.write(0x45))
+                tg.create_task(opticon_w.write([0x1B, 0x45, 0xD]))
