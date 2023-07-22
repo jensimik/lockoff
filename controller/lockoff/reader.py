@@ -96,3 +96,7 @@ async def opticon_reader(display: GFXDisplay):
                     # show error message on display
                     log.error(ex)
                     tg.create_task(display.send_message(ex.code))
+                # generic error? show system error on display
+                except Exception:
+                    log.error(ex)
+                    tg.create_task(display.send_message(b"E"))

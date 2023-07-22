@@ -124,8 +124,8 @@ def generate_dl_token(
 ) -> str:
     expires = int((datetime.now(tz=settings.tz) + expire_delta).timestamp())
     data = struct.pack(">II", user_id, expires)
-    nonce = secrets.token_bytes(settings.nonce_size)
-    signature = hashlib.shake_256(data + nonce + settings.secret).digest(
+    nonce = secrets.token_bytes(settings.dl_nonce_size)
+    signature = hashlib.shake_256(data + nonce + settings.dl_secret).digest(
         settings.dl_digest_size
     )
     return base64.urlsafe_b64encode(data + nonce + signature).decode("utf-8")
@@ -134,17 +134,20 @@ def generate_dl_token(
 # depends for download files - see below
 def verify_dl_token(token: str) -> int:
     token_exception = HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST, detail="could not verify signature"
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="could not verify signature or link has expired",
     )
     try:
         raw_token = base64.urlsafe_b64decode(token)
         user_id, expires, _, signature = struct.unpack(
-            f">II{settings.nonce_size}s{settings.dl_digest_size}s", raw_token
+            f">II{settings.dl_nonce_size}s{settings.dl_digest_size}s", raw_token
         )
         data = raw_token[: -settings.dl_digest_size]
         expires_datetime = datetime.fromtimestamp(expires, tz=settings.tz)
         if not secrets.compare_digest(
-            hashlib.shake_256(data + settings.secret).digest(settings.dl_digest_size),
+            hashlib.shake_256(data + settings.dl_secret).digest(
+                settings.dl_digest_size
+            ),
             signature,
         ):
             raise token_exception
