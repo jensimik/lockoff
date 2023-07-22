@@ -32,8 +32,10 @@ async def buzz_in():
 async def check_member(
     user_id: int, member_type: TokenType, conn: aiosqlite.Connection
 ):
-    if not await queries.get_active_user_by_user_id(conn, user_id=user_id):
+    user = await queries.get_active_user_by_user_id(conn, user_id=user_id)
+    if not user:
         log_and_raise_token_error("did you cancel your membership?", code=b"C")
+    # TODO: check if morning member has access?
 
 
 async def check_dayticket_hack(user_id: int, conn: aiosqlite.Connection):
