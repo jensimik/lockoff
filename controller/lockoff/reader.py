@@ -2,6 +2,7 @@ import asyncio
 import calendar
 import logging
 import asyncio
+from enum import Enum
 from datetime import datetime
 
 import aiosqlite
@@ -22,6 +23,11 @@ log = logging.getLogger(__name__)
 
 # automation hat mini relay 1 is on gpio pin 16
 relay = LED(16)
+
+
+class OPTICON_CMD(Enum):
+    SOUND_OK: bytes([0x1B, 0x42, 0xD])
+    SOUND_ERROR: bytes([0x1B, 0x45, 0xD])
 
 
 async def buzz_in():
@@ -92,7 +98,7 @@ async def opticon_reader(display: GFXDisplay):
             try:
                 await check_qrcode(qr_code)
                 # give good sound on opticon
-                tg.create_task(opticon_w.write(bytes([0x1B, 0x42, 0xD])))
+                tg.create_task(opticon_w.write(OPTICON_CMD.SOUND_OK))
                 # show OK on display
                 tg.create_task(display.send_message(message=b"K"))
                 # buzz in
@@ -101,9 +107,9 @@ async def opticon_reader(display: GFXDisplay):
                 # show error message on display
                 log.warning(ex)
                 tg.create_task(display.send_message(ex.code))
-                tg.create_task(opticon_w.write(bytes([0x1B, 0x45, 0xD])))
+                tg.create_task(opticon_w.write(OPTICON_CMD.SOUND_ERROR))
             # generic error? show system error on display
             except Exception:
                 log.exception("generic error in reader")
                 tg.create_task(display.send_message(b"E"))
-                tg.create_task(opticon_w.write(bytes([0x1B, 0x45, 0xD])))
+                tg.create_task(opticon_w.write(OPTICON_CMD.SOUND_ERROR))
