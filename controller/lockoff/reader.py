@@ -2,7 +2,6 @@ import asyncio
 import calendar
 import logging
 import asyncio
-from enum import Enum
 from datetime import datetime
 
 import aiosqlite
@@ -25,7 +24,7 @@ log = logging.getLogger(__name__)
 relay = LED(16)
 
 
-class OPTICON_CMD(Enum):
+class OPTICON_CMD:
     SOUND_OK: bytes([0x1B, 0x42, 0xD])
     SOUND_ERROR: bytes([0x1B, 0x45, 0xD])
 
