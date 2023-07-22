@@ -24,9 +24,10 @@ relay = LED(16)
 
 
 class OPTICON_CMD:
-    OK_SOUND = bytes([0x1B, 0x42, 0xD])  # sound ok
-    OK_LED = bytes([0x1B, 0x4C, 0xD])  # led ok
-    ERROR = bytes([0x1B, 0x45, 0xD])  # sound error
+    OK_SOUND = bytes([0x1B, 0x42, 0xD])
+    OK_LED = bytes([0x1B, 0x4C, 0xD])
+    ERROR_SOUND = bytes([0x1B, 0x45, 0xD])
+    ERROR_LED = bytes([0x1B, 0x4E, 0xD])
 
 
 async def buzz_in():
@@ -109,11 +110,13 @@ async def opticon_reader(display: GFXDisplay):
                 # show error message on display
                 log.warning(ex)
                 tg.create_task(display.send_message(ex.code))
-                opticon_w.write(OPTICON_CMD.ERROR)
+                opticon_w.write(OPTICON_CMD.ERROR_SOUND)
+                opticon_w.write(OPTICON_CMD.ERROR_LED)
                 tg.create_task(opticon_w.drain())
             # generic error? show system error on display
             except Exception:
                 log.exception("generic error in reader")
                 tg.create_task(display.send_message(b"E"))
-                opticon_w.write(OPTICON_CMD.ERROR)
+                opticon_w.write(OPTICON_CMD.ERROR_SOUND)
+                opticon_w.write(OPTICON_CMD.ERROR_LED)
                 tg.create_task(opticon_w.drain())
