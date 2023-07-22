@@ -25,8 +25,8 @@ relay = LED(16)
 
 
 class OPTICON_CMD:
-    SOUND_OK = bytes([0x1B, 0x42, 0xD])
-    SOUND_ERROR = bytes([0x1B, 0x45, 0xD])
+    OK = bytes([0x1B, 0x42, 0x4C, 0xD])  # sound ok and led ok
+    ERROR = bytes([0x1B, 0x45, 0xD])  # sound error
 
 
 async def buzz_in():
@@ -90,19 +90,20 @@ async def opticon_reader(display: GFXDisplay):
     opticon_r, opticon_w = await serial_asyncio.open_serial_connection(
         url=settings.opticon_url
     )
+    # TODO: should i send opticon configuration by serial to ensure it is correct before starting?
     while True:
         # read a scan from the barcode reader read until carriage return CR
         qr_code = (await opticon_r.readuntil(separator=b"\r")).decode("utf-8").strip()
         async with asyncio.TaskGroup() as tg:
             try:
                 await check_qrcode(qr_code)
-                # give good sound on opticon
-                opticon_w.write(OPTICON_CMD.SOUND_OK)
-                tg.create_task(opticon_w.drain())
-                # show OK on display
-                tg.create_task(display.send_message(message=b"K"))
                 # buzz in
                 tg.create_task(buzz_in())
+                # show OK on display
+                tg.create_task(display.send_message(message=b"K"))
+                # give good sound on opticon now qr code is verified
+                opticon_w.write(OPTICON_CMD.SOUND_OK)
+                tg.create_task(opticon_w.drain())
             except TokenError as ex:
                 # show error message on display
                 log.warning(ex)
