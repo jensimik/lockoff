@@ -1,7 +1,6 @@
 import asyncio
 import calendar
 import logging
-import asyncio
 from datetime import datetime
 
 import aiosqlite
@@ -25,7 +24,8 @@ relay = LED(16)
 
 
 class OPTICON_CMD:
-    OK = bytes([0x1B, 0x42, 0x4C, 0xD])  # sound ok and led ok
+    OK_SOUND = bytes([0x1B, 0x42, 0xD])  # sound ok
+    OK_LED = bytes([0x1B, 0x4C, 0xD])  # led ok
     ERROR = bytes([0x1B, 0x45, 0xD])  # sound error
 
 
@@ -102,7 +102,8 @@ async def opticon_reader(display: GFXDisplay):
                 # show OK on display
                 tg.create_task(display.send_message(message=b"K"))
                 # give good sound on opticon now qr code is verified
-                opticon_w.write(OPTICON_CMD.OK)
+                opticon_w.write(OPTICON_CMD.OK_SOUND)
+                opticon_w.write(OPTICON_CMD.OK_LED)
                 tg.create_task(opticon_w.drain())
             except TokenError as ex:
                 # show error message on display
