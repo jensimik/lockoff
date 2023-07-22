@@ -4,9 +4,9 @@ from fastapi import APIRouter, Security
 
 from .. import schemas
 from ..access_token import generate_dl_token
-from ..db import queries
-from ..depends import DBcon, get_current_mobile
 from ..config import settings
+from ..depends import DBcon, get_current_mobile
+from ..misc import queries
 
 router = APIRouter(tags=["me"])
 
