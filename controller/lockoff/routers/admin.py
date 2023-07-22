@@ -1,14 +1,9 @@
-from datetime import datetime
 from typing import Annotated
 
-from dateutil.relativedelta import relativedelta
-from fastapi import APIRouter, HTTPException, Response, Security, status
+from fastapi import APIRouter, Security
 
 from lockoff import depends
 
-from ..access_token import TokenType, generate_access_token
-from ..apple_pass import ApplePass
-from ..config import settings
 from ..db import queries
 from ..depends import DBcon
 
