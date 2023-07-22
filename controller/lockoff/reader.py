@@ -97,5 +97,5 @@ async def opticon_reader(display: GFXDisplay):
                     tg.create_task(display.send_message(ex.code))
                 # generic error? show system error on display
                 except Exception:
-                    log.error("generic error in reader")
+                    log.exception("generic error in reader")
                     tg.create_task(display.send_message(b"E"))
