@@ -1,6 +1,7 @@
 import asyncio
 import calendar
 import logging
+import asyncio
 from datetime import datetime
 
 import aiosqlite
@@ -25,7 +26,7 @@ relay = LED(16)
 
 async def buzz_in():
     relay.on()
-    await asyncio.sleep(5)
+    await asyncio.sleep(4)
     relay.off()
 
 
@@ -35,7 +36,9 @@ async def check_member(
     user = await queries.get_active_user_by_user_id(conn, user_id=user_id)
     if not user:
         log_and_raise_token_error("did you cancel your membership?", code=b"C")
-    # TODO: check if morning member has access?
+    if member_type == TokenType.MORNING:
+        # TODO: check if morning member has access in current hour?
+        pass
 
 
 async def check_dayticket_hack(user_id: int, conn: aiosqlite.Connection):
@@ -54,7 +57,7 @@ async def check_dayticket_hack(user_id: int, conn: aiosqlite.Connection):
         )
 
 
-async def check_qrcode(qr_code: str) -> bool:
+async def check_qrcode(qr_code: str):
     async with aiosqlite.connect(settings.db_file) as conn:
         conn.row_factory = aiosqlite.Row
         user_id, token_type = verify_access_token(
@@ -68,6 +71,7 @@ async def check_qrcode(qr_code: str) -> bool:
             case TokenType.DAY_TICKET_HACK:
                 await check_dayticket_hack(user_id=user_id, conn=conn)
         log.info(f"{user_id} {token_type} access granted")
+        # log in access_log db
         await queries.log_entry(
             conn,
             user_id=user_id,
@@ -78,22 +82,28 @@ async def check_qrcode(qr_code: str) -> bool:
 
 
 async def opticon_reader(display: GFXDisplay):
-    opticon_r, _ = await serial_asyncio.open_serial_connection(url=settings.opticon_url)
+    opticon_r, opticon_w = await serial_asyncio.open_serial_connection(
+        url=settings.opticon_url
+    )
     while True:
         # read a scan from the barcode reader read until carriage return CR
         qr_code = (await opticon_r.readuntil(separator=b"\r")).decode("utf-8").strip()
         async with asyncio.TaskGroup() as tg:
             try:
                 await check_qrcode(qr_code)
+                # give good sound on opticon
+                tg.create_task(opticon_w.write(0x42))
                 # show OK on display
                 tg.create_task(display.send_message(message=b"K"))
                 # buzz in
                 tg.create_task(buzz_in())
             except TokenError as ex:
                 # show error message on display
-                log.error(ex)
+                log.warning(ex)
                 tg.create_task(display.send_message(ex.code))
+                tg.create_task(opticon_w.write(0x45))
             # generic error? show system error on display
             except Exception:
                 log.exception("generic error in reader")
                 tg.create_task(display.send_message(b"E"))
+                tg.create_task(opticon_w.write(0x45))
