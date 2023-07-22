@@ -17,7 +17,7 @@ template = """<html>
     }
     #introduction {
       text-align: left;
-    }  
+    }
     #cardwrap {
       display: flex;
       box-sizing: border-box;
@@ -45,7 +45,6 @@ template = """<html>
       margin: 0;
       text-align: left;
     }
-  
     #spacer {
       height: 1.5cm;
     }
@@ -73,7 +72,7 @@ template = """<html>
     <section id="introduction">
         <h1>Tillykke med dit NKK medlemsskab</h1>
         <p>Du kan nu printe dit medlemskort til klubben.</p>
-        <p>Du skal have kortet med når du klatrer i klubben (random tjeks).</p>    
+        <p>Du skal have kortet med når du klatrer i klubben (random tjeks).</p>
     </section>
     <div id="spacer"></div>
     <div id="cardwrap">
@@ -93,7 +92,7 @@ template = """<html>
                 <p id="navn">NAME</p>
                 <p id="level">LEVEL</p>
             </div>
-        </section>    
+        </section>
     </div>
     <div id="cardwrap">
         <section id="card">
