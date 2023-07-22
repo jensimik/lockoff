@@ -107,7 +107,7 @@ async def opticon_reader(display: GFXDisplay):
                 tg.create_task(buzz_in())
                 # show OK on display
                 tg.create_task(display.send_message(message=b"K"))
-                # give good sound on opticon now qr code is verified
+                # give good sound+led on opticon now qr code is verified
                 tg.create_task(o_cmd(_w, cmds=[O_CMD.OK_SOUND, O_CMD.OK_LED]))
             except TokenError as ex:
                 # show error message on display
