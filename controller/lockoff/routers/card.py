@@ -5,11 +5,10 @@ from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from ..access_token import TokenType, generate_access_token, verify_dl_token
-from ..apple_pass import ApplePass
+from ..card import ApplePass, generate_pdf
 from ..config import settings
-from ..db import queries
 from ..depends import DBcon
-from ..paper_pass import generate_pdf
+from ..misc import queries
 
 router = APIRouter(tags=["card"])
 

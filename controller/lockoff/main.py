@@ -10,12 +10,10 @@ from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
 
 from .config import settings
-from .db import queries
-from .display import GFXDisplay
 from .klubmodul import klubmodul_runner
+from .misc import GFXDisplay, Watchdog, queries
 from .reader import opticon_reader
 from .routers import admin, auth, card, me
-from .watchdog import Watchdog
 
 log = logging.getLogger(__name__)
 watchdog = Watchdog()

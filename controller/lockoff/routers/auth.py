@@ -10,9 +10,9 @@ from jose import jwt
 
 from .. import schemas
 from ..config import settings
-from ..db import queries
 from ..depends import DBcon
 from ..klubmodul import KMClient
+from ..misc import queries
 
 router = APIRouter(tags=["auth"])
 log = logging.getLogger(__name__)

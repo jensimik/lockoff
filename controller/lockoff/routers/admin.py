@@ -4,8 +4,8 @@ from fastapi import APIRouter, Security
 
 from lockoff import depends
 
-from ..db import queries
 from ..depends import DBcon
+from ..misc import queries
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 

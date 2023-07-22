@@ -15,8 +15,7 @@ from .access_token import (
     verify_access_token,
 )
 from .config import settings
-from .db import queries
-from .display import GFXDisplay
+from .misc import GFXDisplay, queries
 
 log = logging.getLogger(__name__)
 

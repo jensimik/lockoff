@@ -2,7 +2,7 @@ from typing import Annotated
 
 import aiosqlite
 from fastapi import Depends, HTTPException, status
-from fastapi.security import APIKeyQuery, OAuth2PasswordBearer, SecurityScopes
+from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from jose import JWTError, jwt
 from pydantic import ValidationError
 
@@ -16,24 +16,6 @@ oauth2_scheme = OAuth2PasswordBearer(
         "admin": "admin scope to access logs, etc",
     },
 )
-
-# query_token = APIKeyQuery(name="token")
-
-
-# async def get_current_mobile(token: str):
-#     credentials_exception = HTTPException(
-#         status_code=status.HTTP_401_UNAUTHORIZED,
-#         detail="Could not validate credentials",
-#         headers={"WWW-Authenticate": "Bearer"},
-#     )
-#     try:
-#         payload = jwt.decode(token, settings.jwt_secret, algorithms=["HS256"])
-#         mobile: str = payload.get("sub")
-#         if mobile is None:
-#             raise credentials_exception
-#     except JWTError:
-#         raise credentials_exception
-#     return mobile
 
 
 async def get_current_mobile(
