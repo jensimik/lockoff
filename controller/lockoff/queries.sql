@@ -10,6 +10,12 @@ select user_id, name, member_type, mobile, email, batch_id, active
   from users
  where user_id = :user_id;
 
+-- name: get_active_user_by_user_id^
+-- Get a user by user id
+select user_id, name, member_type, mobile, email, batch_id, active
+  from users
+ where user_id = :user_id and active = true;
+
 -- name: get_active_users_by_mobile
 -- get active users by mobile number
 select user_id, name, member_type, mobile, email, batch_id, totp_secret, active

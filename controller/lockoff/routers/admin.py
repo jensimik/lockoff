@@ -19,7 +19,7 @@ async def access_log(
 
 
 @router.post("/klubmodul-force-resync")
-async def access_log(
+async def klubmodul_force_resync(
     mobile: Annotated[str, Security(depends.get_current_mobile, scopes=["admin"])],
 ):
     pass
