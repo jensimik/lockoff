@@ -34,6 +34,7 @@ class GFXDisplay:
         async with lock:
             if settings.display_url:
                 self.display_w.write(message)
+                await asyncio.sleep(1.5)
             else:
                 log.info(f"display send message {message.decode('utf-8')}")
 
