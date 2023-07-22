@@ -25,8 +25,8 @@ relay = LED(16)
 
 
 class OPTICON_CMD:
-    SOUND_OK: bytes([0x1B, 0x42, 0xD])
-    SOUND_ERROR: bytes([0x1B, 0x45, 0xD])
+    SOUND_OK = bytes([0x1B, 0x42, 0xD])
+    SOUND_ERROR = bytes([0x1B, 0x45, 0xD])
 
 
 async def buzz_in():
