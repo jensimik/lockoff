@@ -89,7 +89,10 @@ class KMClient:
                 {"columnName": "send_email", "value": "savedraft"},
                 {"columnName": "sms_text", "value": message},
                 {"columnName": "subject", "value": ""},
-                {"columnName": "answer_email", "value": "3535"},
+                {
+                    "columnName": "answer_email",
+                    "value": f"{settings.klubmodul_admin_user_id}",
+                },
                 {"columnName": "mail_text", "value": "\r\n"},
                 {"columnName": "test_email", "value": ""},
                 {"columnName": "is_news_mail", "value": False},
@@ -118,7 +121,10 @@ class KMClient:
                     {"columnName": "send_email", "value": "savedraft"},
                     {"columnName": "sms_text", "value": ""},
                     {"columnName": "subject", "value": ""},
-                    {"columnName": "answer_email", "value": "3535"},
+                    {
+                        "columnName": "answer_email",
+                        "value": f"{settings.klubmodul_admin_user_id}",
+                    },
                     {"columnName": "mail_text", "value": "\r\n"},
                     {"columnName": "test_email", "value": ""},
                     {"columnName": "is_news_mail", "value": False},
@@ -166,6 +172,111 @@ class KMClient:
             raise KlubmodulException("send sms remove trail timeout")
         if response.is_error:
             raise KlubmodulException("send sms remove trail: " + response.reason_phrase)
+
+    async def send_email(self, user_id: int, subject: str, message: str) -> None:
+        data = {
+            {
+                "rowData": [
+                    {"columnName": "broadcast_media", "value": "email"},
+                    {"columnName": "send_email", "value": "sendemail"},
+                    {"columnName": "sms_text", "value": ""},
+                    {"columnName": "subject", "value": subject},
+                    {
+                        "columnName": "answer_email",
+                        "value": f"{settings.klubmodul_admin_user_id}",
+                    },
+                    {"columnName": "mail_text", "value": message},
+                    {"columnName": "test_email", "value": ""},
+                    {"columnName": "is_news_mail", "value": False},
+                    {"columnName": "is_all_team_member_profiles", "value": False},
+                    {"columnName": "is_all_team_nonmember_profiles", "value": False},
+                    {"columnName": "dd_target_teams", "values": []},
+                    {"columnName": "dd_target_team_names", "values": []},
+                    {"columnName": "dd_target_days", "values": []},
+                    {"columnName": "dd_target_waitinglist", "values": []},
+                    {"columnName": "dd_target_season", "value": None},
+                    {"columnName": "dd_target_all_profiles", "values": [f"{user_id}"]},
+                    {"columnName": "dd_target_titles", "values": []},
+                    {"columnName": "titles_as_filter", "value": False},
+                    {"columnName": "dd_target_ages", "values": []},
+                    {"columnName": "ages_as_filter", "value": False},
+                    {"columnName": "dd_target_vintages", "values": []},
+                    {"columnName": "vintages_as_filter", "value": False},
+                    {"columnName": "dd_target_pools", "values": []},
+                    {"columnName": "dd_target_genders", "values": []},
+                    {"columnName": "genders_as_filter", "value": False},
+                    {"columnName": "dd_target_promotion_team_names", "values": []},
+                    {"columnName": "dd_target_profiles", "values": [f"{user_id}"]},
+                ],
+                "extraArgs": {
+                    "formValues": [
+                        {"columnName": "broadcast_media", "value": "email"},
+                        {"columnName": "send_email", "value": "savedraft"},
+                        {"columnName": "sms_text", "value": ""},
+                        {"columnName": "subject", "value": subject},
+                        {
+                            "columnName": "answer_email",
+                            "value": f"{settings.klubmodul_admin_user_id}",
+                        },
+                        {"columnName": "mail_text", "value": message},
+                        {"columnName": "test_email", "value": ""},
+                        {"columnName": "is_news_mail", "value": False},
+                        {"columnName": "is_all_team_member_profiles", "value": False},
+                        {
+                            "columnName": "is_all_team_nonmember_profiles",
+                            "value": False,
+                        },
+                        {"columnName": "dd_target_teams", "values": []},
+                        {"columnName": "dd_target_team_names", "values": []},
+                        {"columnName": "dd_target_days", "values": []},
+                        {"columnName": "dd_target_waitinglist", "values": []},
+                        {"columnName": "dd_target_season", "value": None},
+                        {
+                            "columnName": "dd_target_all_profiles",
+                            "values": [f"{user_id}"],
+                        },
+                        {"columnName": "dd_target_titles", "values": []},
+                        {"columnName": "titles_as_filter", "value": False},
+                        {"columnName": "dd_target_ages", "values": []},
+                        {"columnName": "ages_as_filter", "value": False},
+                        {"columnName": "dd_target_vintages", "values": []},
+                        {"columnName": "vintages_as_filter", "value": False},
+                        {"columnName": "dd_target_pools", "values": []},
+                        {"columnName": "dd_target_genders", "values": []},
+                        {"columnName": "genders_as_filter", "value": False},
+                        {"columnName": "dd_target_promotion_team_names", "values": []},
+                        {"columnName": "dd_target_profiles", "values": []},
+                    ]
+                },
+            }
+        }
+        try:
+            response = await self.client.post(
+                "/Adminv2/NewsMail/__Create", json=data, timeout=10.0
+            )
+        except httpx.TimeoutException:
+            raise KlubmodulException("send email timeout")
+        if response.is_error:
+            raise KlubmodulException(
+                "send email server error: " + response.reason_phrase
+            )
+        save_id = response.json()["savedId"]
+
+        # cleanup after ourself again by removing the sms in klubmodul mail/sms overview
+        await asyncio.sleep(5)
+        try:
+            response = await self.client.request(
+                method="DELETE",
+                url="/Adminv2/Newsmail/__Delete",
+                json={"rowId": f"newsmail-{save_id}"},
+                timeout=10.0,
+            )
+        except httpx.TimeoutException:
+            raise KlubmodulException("send email remove trail timeout")
+        if response.is_error:
+            raise KlubmodulException(
+                "send email remove trail: " + response.reason_phrase
+            )
 
     async def __aenter__(self: U) -> U:
         await self._km_login()

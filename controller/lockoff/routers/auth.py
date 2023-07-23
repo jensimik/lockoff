@@ -18,28 +18,6 @@ router = APIRouter(tags=["auth"])
 log = logging.getLogger(__name__)
 
 
-# @router.get("/test")
-# async def test():
-#     async with DB_member as db:
-#         users = db.search(where("active") == True)
-
-#     # fixup 45
-#     for u in users:
-#         if (
-#             u["mobile"].startswith("45")
-#             or u["mobile"].startswith("0045")
-#             or u["mobile"].startswith("+45")
-#             or u["mobile"].startswith("045")
-#         ):
-#             u["mobile"] = u["mobile"][-8:]
-#     eight_digits = len([u for u in users if len(u["mobile"]) == 8])
-#     other = len(users) - eight_digits
-
-#     others = [u for u in users if len(u["mobile"]) != 8]
-
-#     return {"eight_digits": eight_digits, "other": other, "others": others}
-
-
 async def send_sms(user_id: int, message: str):
     async with KMClient() as km:
         await km.send_sms(user_id=user_id, message=message)
