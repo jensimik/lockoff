@@ -34,6 +34,8 @@ class MeReplyUser(BaseModel):
     user_id: int
     name: str
     token: str
+    member_type: str
+    expires: str
 
 
 class MeReply(BaseModel):
