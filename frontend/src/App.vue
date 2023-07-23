@@ -76,7 +76,7 @@ const pin_update = async(e) => {
     <div class="flex one">
       <label for="mobile">Verify mobile number</label>
       <div>
-        <input autofocus type="tel" inputtype="numeric" pattern="\d{8}" placeholder="00000000" autocomplete="tel-local" @input="mobile_update" style="font-family:monospace;font-size:3em;width:auto;margin-left:auto;margin-right:auto;" size="8" maxlength="8" required>
+        <input autofocus type="tel" inputmode="numeric" pattern="\d{8}" placeholder="00000000" autocomplete="tel-local" @input="mobile_update" style="font-family:monospace;font-size:3em;width:auto;margin-left:auto;margin-right:auto;" size="8" maxlength="8" required>
       </div>
     </div>
   </div>
@@ -85,7 +85,7 @@ const pin_update = async(e) => {
       <label for="pin">SMS code</label>
     </div>
     <div class="flex one">
-    <input id="otp" type="text" inputtype="numeric" pattern="\d{6}" placeholder="000000" autocomplete="one-time-code" @input="pin_update" style="font-family:monospace;font-size:3em;width:auto;margin-left:auto;margin-right:auto;" size="6" maxlength="6" required>
+    <input id="otp" type="text" inputmode="numeric" pattern="\d{6}" placeholder="000000" autocomplete="one-time-code" @input="pin_update" style="font-family:monospace;font-size:3em;width:auto;margin-left:auto;margin-right:auto;" size="6" maxlength="6" required>
     </div>
   </div>
   <div v-show="step == 3">
