@@ -71,6 +71,6 @@ async def get_current_users(
                 detail="Not enough permissions",
                 headers={"WWW-Authenticate": authenticate_value},
             )
-    return await getattr(queries, f"get_active_user_by_{token_data.username_type}")(
+    return await getattr(queries, f"get_active_users_by_{token_data.username_type}")(
         conn, **{token_data.username_type: token_data.username}
     )

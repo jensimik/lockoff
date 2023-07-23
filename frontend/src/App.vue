@@ -12,7 +12,7 @@ var is_admin = ref(false);
 
 
 const mobile_update = async(val) => {
-  controllerAPI.request_totp(val).then(() => {
+  controllerAPI.request_totp(val, "mobile").then(() => {
     step.value = 2;
     document.getElementById("otc1").focus();
     mob.value = val;
@@ -20,7 +20,7 @@ const mobile_update = async(val) => {
 //  await nextTick();
 }
 const pin_update = async(val) => {
-  controllerAPI.login(mob.value, val).then((token_data) => {
+  controllerAPI.login(mob.value, "mobile", val).then((token_data) => {
     token.value = token_data.access_token;
     step.value = 3;
     controllerAPI.get_me(token.value).then((me_data) => {
