@@ -15,10 +15,9 @@ const mobile_update = async(e) => {
   if (username.value.length == 8) {
     step.value = 2;
     controllerAPI.request_totp(username.value, "mobile").then(() => {
-      document.getElementById("otp").focus();
+//      document.getElementById("otp").focus();
       // listen for OTP token on sms automatic
       if ('OTPCredential' in window) {
-        console.log("OTPCredential is in window")
           const input = document.querySelector('input[autocomplete="one-time-code"]');
           if (!input) return;
           // Invoke the WebOTP API
@@ -26,7 +25,6 @@ const mobile_update = async(e) => {
             otp: { transport:['sms'] },
             signal: ac.signal
           }).then(otp => {
-            console.log("i got the otp automatic from webotp: " + otp.code);
             input.value = otp.code;
             // Automatically submit the form when an OTP is obtained.
           }).catch(err => {
