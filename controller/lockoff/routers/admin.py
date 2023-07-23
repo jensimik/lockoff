@@ -10,11 +10,6 @@ from ..misc import queries
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 
-@router.get("/stats")
-async def stats(conn: DBcon):
-    return await queries.stats(conn)
-
-
 @router.get("/access_log")
 async def access_log(
     user_id: Annotated[str, Security(depends.get_current_user_id, scopes=["admin"])],
