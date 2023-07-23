@@ -20,7 +20,7 @@ select user_id, name, member_type, mobile, email, batch_id, active
 -- get active users by user_ids
 select user_id, name, member_type, mobile, email, batch_id, totp_secret, active
   from users
- where user_id in :user_ids and active = true;
+ where user_id in (:user_ids) and active = true;
 
 -- name: get_active_users_by_mobile
 -- get active users by mobile number
