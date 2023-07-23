@@ -7,8 +7,23 @@ var username = ref("");
 var totp = ref("");
 var token = ref("");
 var user_data = ref([]);
+var os = ref("");
 
 const ac = new AbortController();
+
+
+const getMobileOS = () => {
+  const ua = navigator.userAgent
+  if (/android/i.test(ua)) {
+    return "Android"
+  }
+  else if (/iPhone/i.test(ua)) {
+    return "iOS"
+  }
+  return "Other"
+}
+
+os.value = getMobileOS();
 
 const mobile_update = async(e) => {
   e.target.style.setProperty('--_otp-digit', e.target.selectionStart);
@@ -116,6 +131,15 @@ const pin_update = async(e) => {
             </div>
           </footer>
         </article>
+
+
+        <div v-if="os == 'Android'">
+          <p>To use the digital wallet on android phones you need an app - we recommend one of these apps:</p>
+          <a target="_blank" href='https://play.google.com/store/apps/details?id=com.attidomobile.passwallet&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+          <a target="_blank" href='https://play.google.com/store/apps/details?id=io.walletpasses.android&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+          <p>be sure to <a target="_blank" href="https://support.passcreator.com/space/KB/22347871/Location+based+notifications+-+troubleshooting#Location-based-notifications-on-Android">enable geo and ibeacon in the app</a></p>
+
+        </div>
       </div>
     </div>
   </div>
