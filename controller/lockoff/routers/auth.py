@@ -1,10 +1,8 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Annotated
 
 import pyotp
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_limiter.depends import RateLimiter
 from jose import jwt
 
@@ -18,31 +16,20 @@ router = APIRouter(tags=["auth"])
 log = logging.getLogger(__name__)
 
 
-# @router.get("/test")
-# async def test():
-#     async with DB_member as db:
-#         users = db.search(where("active") == True)
-
-#     # fixup 45
-#     for u in users:
-#         if (
-#             u["mobile"].startswith("45")
-#             or u["mobile"].startswith("0045")
-#             or u["mobile"].startswith("+45")
-#             or u["mobile"].startswith("045")
-#         ):
-#             u["mobile"] = u["mobile"][-8:]
-#     eight_digits = len([u for u in users if len(u["mobile"]) == 8])
-#     other = len(users) - eight_digits
-
-#     others = [u for u in users if len(u["mobile"]) != 8]
-
-#     return {"eight_digits": eight_digits, "other": other, "others": others}
-
-
-async def send_sms(user_id: int, message: str):
+async def send_mobile(user_id: int, message: str):
     async with KMClient() as km:
         await km.send_sms(user_id=user_id, message=message)
+
+
+async def send_email(user_id: int, message: str):
+    async with KMClient() as km:
+        await km.send_email(user_id=user_id, subject="AUTHMSG", message=message)
+
+
+send_funcs = {
+    "email": send_email,
+    "mobile": send_mobile,
+}
 
 
 @router.post(
@@ -51,27 +38,39 @@ async def send_sms(user_id: int, message: str):
 async def request_totp(
     rt: schemas.RequestTOTP, conn: DBcon, background_tasks: BackgroundTasks
 ) -> schemas.StatusReply:
-    users = await queries.get_active_users_by_mobile(conn, mobile=rt.mobile)
+    # support either mobile or email as username_type
+    users = await getattr(queries, f"get_active_users_by_{rt.username_type}")(
+        conn, **{rt.username_type: rt.username}
+    )
     user_ids = [u["user_id"] for u in users]
     if user_ids:
         totp_secret = pyotp.random_base32()
         totp = pyotp.TOTP(totp_secret)
-        await queries.update_user_set_totp_secret(
-            conn, mobile=rt.mobile, totp_secret=totp_secret
+        await getattr(queries, f"update_user_by_{rt.username_type}_set_totp_secret")(
+            conn, totp_secret=totp_secret, **{rt.username_type: rt.username}
         )
         await conn.commit()
-        log.info(f"send_sms(user_id={user_ids[0]}, message={totp.now()})")
-        background_tasks.add_task(
-            send_sms, user_id=user_ids[0], message=f"{totp.now()}"
+
+        log.info(
+            f"send_{rt.username_type}(user_id={user_ids[0]}, message={totp.now()})"
         )
-    return schemas.StatusReply(status="sms sent")
+        code = totp.now()
+        background_tasks.add_task(
+            send_funcs[rt.username_type],
+            user_id=user_ids[0],
+            message=f"code is {code}\n\n@lockoff.nkk.dk #{code}",
+        )
+    return schemas.StatusReply(status=f"{rt.username_type} message sent")
 
 
 @router.post("/login", dependencies=[Depends(RateLimiter(times=105, seconds=300))])
 async def login(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], conn: DBcon
+    login_data: schemas.RequestLogin,
+    conn: DBcon,
 ) -> schemas.JWTToken:
-    users = await queries.get_active_users_by_mobile(conn, mobile=form_data.username)
+    users = await getattr(queries, f"get_active_users_by_{login_data.username_type}")(
+        conn, **{login_data.username_type: login_data.username}
+    )
     totp_secrets = [u["totp_secret"] for u in users]
     user_ids = [u["user_id"] for u in users]
     if not totp_secrets:
@@ -80,7 +79,7 @@ async def login(
             detail="mobile not found or code expired or not valid",
         )
     totp = pyotp.TOTP(totp_secrets[0])
-    if not totp.verify(otp=form_data.password, valid_window=2):
+    if not totp.verify(otp=login_data.totp, valid_window=2):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="code is expired or not valid",
@@ -92,7 +91,8 @@ async def login(
         scopes = ["basic", "admin"]
     encoded_jwt = jwt.encode(
         {
-            "sub": form_data.username,
+            "sub": login_data.username,
+            "sub_type": login_data.username_type,
             "scopes": scopes,
             "exp": datetime.utcnow() + timedelta(hours=2),
         },

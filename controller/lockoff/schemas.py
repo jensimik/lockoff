@@ -1,13 +1,18 @@
-from pydantic import BaseModel
+from typing import Literal
+
+from pydantic import BaseModel, constr
+
+username = constr(to_lower=True, min_length=6, max_length=50)
+username_type = Literal["mobile", "email"]
 
 
 class RequestTOTP(BaseModel):
-    mobile: str
+    username: username
+    username_type: username_type
 
 
-class Login(BaseModel):
-    mobile: str
-    totp: str
+class RequestLogin(RequestTOTP):
+    totp: constr(pattern=r"^[0-9]{6}$")
 
 
 class JWTToken(BaseModel):
@@ -16,7 +21,8 @@ class JWTToken(BaseModel):
 
 
 class TokenData(BaseModel):
-    mobile: str | None = None
+    username: username
+    username_type: username_type
     scopes: list[str] = []
 
 
@@ -31,5 +37,4 @@ class MeReplyUser(BaseModel):
 
 
 class MeReply(BaseModel):
-    is_admin: bool
     users: list[MeReplyUser]
