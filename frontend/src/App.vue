@@ -127,7 +127,7 @@ const pin_update = async(e) => {
               <a class="button" target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pdf'">🖨️ pdf for print</a>
             </div>
             <div class="fright">
-              <a class="button" target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pkpass'">📱 digital wallet</a>
+              <a class="button" target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pkpass'">📱 mobile pass</a>
             </div>
           </footer>
         </article>
