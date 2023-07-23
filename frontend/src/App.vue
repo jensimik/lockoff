@@ -1,31 +1,31 @@
 <script setup>
-import otp from './components/OTP.vue';
-import mobile from './components/Mobile.vue';
+import { ref } from 'vue';
 import controllerAPI from './api/resources/allMethods';
-import { ref, nextTick } from 'vue';
 
 var step = ref(1);
-var mob = ref("");
+var username = ref("");
+var totp = ref("");
 var token = ref("");
 var user_data = ref([]);
-var is_admin = ref(false);
 
 
-const mobile_update = async(val) => {
-  controllerAPI.request_totp(val, "mobile").then(() => {
+const mobile_update = async(e) => {
+  username.value = e.target.value;
+  if (username.value.length == 8) {
     step.value = 2;
-    document.getElementById("otc1").focus();
-    mob.value = val;
-  })
-//  await nextTick();
+    controllerAPI.request_totp(username.value, "mobile").then(() => {
+      document.getElementById("otp").focus();
+    })
+  }
 }
-const pin_update = async(val) => {
-  controllerAPI.login(mob.value, "mobile", val).then((token_data) => {
+const pin_update = async(e) => {
+  totp.value = e.target.value;
+  if (totp.value.length == 6) {
+    controllerAPI.login(username.value, "mobile", totp.value).then((token_data) => {
     token.value = token_data.access_token;
     step.value = 3;
     controllerAPI.get_me(token.value).then((me_data) => {
       user_data.value = me_data.users;
-      is_admin.value = me_data.is_admin;
     }).catch((error) => {
       console.log(error);
     })
@@ -34,6 +34,7 @@ const pin_update = async(val) => {
     step.value = 1;
     // TODO: clear and set focus on first element again?
   })
+  }
 }
 </script>
 
@@ -52,20 +53,22 @@ const pin_update = async(val) => {
     </div>
     <div v-show="step == 1" class="flex one">
       <label for="mobile">Verify mobile number</label>
-      <mobile :digit-count="8" :placeholder="0" @update:otp="mobile_update"></mobile>
+      <div>
+        <input autofocus type="tel" inputtype="numeric" placeholder="00000000" autocomplete="tel-local" @input="mobile_update" style="font-family:monospace;font-size:3em;width:auto;margin-left:auto;margin-right:auto;" size="8" maxlength="8" required>
+      </div>
     </div>
     <div v-show="step == 2">
       <div class="flex one">
         <label for="pin">SMS code</label>
      </div>
      <div v-show="step == 2" class="flex one">
-       <otp ref="o" :digit-count="6" :placeholder="1" @update:otp="pin_update"></otp>
+      <input id="otp" type="number" inputtype="numeric" pattern="[0-9]*" placeholder="000000" autocomplete="one-time-code" @input="pin_update" style="font-family:monospace;font-size:3em;width:auto;margin-left:auto;margin-right:auto;" size="6" maxlength="6" required>
      </div>
     </div>
   </div>
   <div v-show="step == 3">
     <div v-for="user in user_data" :key="user.user_id">
-      <p>{{ user.name }} <span v-if="is_admin">(admin)</span></p>
+      <p>{{ user.name }}</p>
       <a target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pdf'"><span style="font-size: 4em;">🖨️</span> download pdf for print</a>
       <a target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pkpass'"><span style="font-size: 4em;">📱</span> download digital membership card for wallet</a>
     </div>
@@ -79,5 +82,16 @@ const pin_update = async(val) => {
   padding:0 0 3em 0;
   margin-right: auto;
   margin-left: auto;
+}
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
 </style>

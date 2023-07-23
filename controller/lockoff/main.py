@@ -21,6 +21,7 @@ watchdog = Watchdog()
 origins = [
     "https://lockoff.nkk.dk",
     "http://localhost:5173",
+    "http://192.168.2.186:5173",
 ]
 
 
