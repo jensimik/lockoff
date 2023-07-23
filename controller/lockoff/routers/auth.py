@@ -53,7 +53,9 @@ async def request_totp(
         )
         await conn.commit()
 
-        log.info(f"send_sms(user_id={user_ids[0]}, message={totp.now()})")
+        log.info(
+            f"send_{rt.username_type}(user_id={user_ids[0]}, message={totp.now()})"
+        )
         background_tasks.add_task(
             send_funcs[rt.username_type], user_id=user_ids[0], message=f"{totp.now()}"
         )
@@ -62,9 +64,10 @@ async def request_totp(
 
 @router.post("/login", dependencies=[Depends(RateLimiter(times=105, seconds=300))])
 async def login(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], conn: DBcon
+    login_data: schemas.RequestLogin,
+    conn: DBcon,
 ) -> schemas.JWTToken:
-    users = await queries.get_active_users_by_mobile(conn, username=form_data.username)
+    users = await queries.get_active_users_by_mobile(conn, username=login_data.username)
     totp_secrets = [u["totp_secret"] for u in users]
     user_ids = [u["user_id"] for u in users]
     if not totp_secrets:
@@ -73,7 +76,7 @@ async def login(
             detail="mobile not found or code expired or not valid",
         )
     totp = pyotp.TOTP(totp_secrets[0])
-    if not totp.verify(otp=form_data.password, valid_window=2):
+    if not totp.verify(otp=login_data.totp, valid_window=2):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="code is expired or not valid",
