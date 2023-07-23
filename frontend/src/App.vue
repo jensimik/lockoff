@@ -101,7 +101,7 @@ const pin_update = async(e) => {
           <header>
             <h3>{{ user.name }}</h3> <a :href="'https://lockoff-api.gnerd.dk/' + user.token + '/qr-code.png'"><img class="qrcode" :src="'https://lockoff-api.gnerd.dk/' + user.token + '/qr-code.png'"></a>
           </header>
-          <p>{{ user.member_type }} member | nr. {{ user.user_id }} | expires {{ user.expires }}</p>
+          <p>nr. {{ user.user_id }} | {{ user.member_type }} member | expires {{ user.expires }}</p>
           <footer>
             <a class="button" target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pdf'">🖨️ pdf for print</a>
             <a class="button" target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pkpass'">📱 digital wallet pass</a>
