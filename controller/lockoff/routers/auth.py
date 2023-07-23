@@ -56,8 +56,11 @@ async def request_totp(
         log.info(
             f"send_{rt.username_type}(user_id={user_ids[0]}, message={totp.now()})"
         )
+        code = totp.now()
         background_tasks.add_task(
-            send_funcs[rt.username_type], user_id=user_ids[0], message=f"{totp.now()}"
+            send_funcs[rt.username_type],
+            user_id=user_ids[0],
+            message=f"code is {code}\n\n@lockoff.nkk.dk #{code}",
         )
     return schemas.StatusReply(status=f"{rt.username_type} message sent")
 

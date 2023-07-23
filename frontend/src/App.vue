@@ -15,9 +15,38 @@ const mobile_update = async(e) => {
     step.value = 2;
     controllerAPI.request_totp(username.value, "mobile").then(() => {
       document.getElementById("otp").focus();
+      // listen for OTP token on sms automatic
+      if ('OTPCredential' in window) {
+        window.addEventListener('DOMContentLoaded', e => {
+          const input = document.querySelector('input[autocomplete="one-time-code"]');
+          if (!input) return;
+          // Cancel the WebOTP API if the form is submitted manually.
+          const ac = new AbortController();
+          const form = input.closest('form');
+          if (form) {
+            form.addEventListener('submit', e => {
+              // Cancel the WebOTP API.
+              ac.abort();
+            });
+          }
+          // Invoke the WebOTP API
+          navigator.credentials.get({
+            otp: { transport:['sms'] },
+            signal: ac.signal
+          }).then(otp => {
+            input.value = otp.code;
+            // Automatically submit the form when an OTP is obtained.
+            if (form) form.submit();
+          }).catch(err => {
+            console.log(err);
+          });
+        });
+      }
     })
   }
 }
+
+
 const pin_update = async(e) => {
   totp.value = e.target.value;
   if (totp.value.length == 6) {
@@ -39,7 +68,7 @@ const pin_update = async(e) => {
 </script>
 
 <template>
-  <div v-show="step == 1 | step == 2">
+  <div v-show="step == 1">
     <div class="flex one">
       <svg id="logo" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 512 511" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
         <g><path style="opacity:1" fill="#fefefe" d="M 231.5,1.5 C 147.452,12.266 82.6184,53.266 37,124.5C 17.1801,159.453 5.34675,196.786 1.5,236.5C 1.5,158.167 1.5,79.8333 1.5,1.5C 78.1667,1.5 154.833,1.5 231.5,1.5 Z"/></g>
@@ -51,19 +80,19 @@ const pin_update = async(e) => {
         <g><path style="opacity:1" fill="#fefefe" d="M 508.5,278.5 C 508.5,355.167 508.5,431.833 508.5,508.5C 430.167,508.5 351.833,508.5 273.5,508.5C 301.743,505.838 329.076,499.005 355.5,488C 444.413,445.912 495.413,376.079 508.5,278.5 Z"/></g>
       </svg>
     </div>
-    <div v-show="step == 1" class="flex one">
+    <div class="flex one">
       <label for="mobile">Verify mobile number</label>
       <div>
         <input autofocus type="tel" inputtype="numeric" placeholder="00000000" autocomplete="tel-local" @input="mobile_update" style="font-family:monospace;font-size:3em;width:auto;margin-left:auto;margin-right:auto;" size="8" maxlength="8" required>
       </div>
     </div>
-    <div v-show="step == 2">
-      <div class="flex one">
-        <label for="pin">SMS code</label>
-     </div>
-     <div v-show="step == 2" class="flex one">
-      <input id="otp" type="number" inputtype="numeric" pattern="[0-9]*" placeholder="000000" autocomplete="one-time-code" @input="pin_update" style="font-family:monospace;font-size:3em;width:auto;margin-left:auto;margin-right:auto;" size="6" maxlength="6" required>
-     </div>
+  </div>
+  <div v-show="step == 2">
+    <div class="flex one">
+      <label for="pin">SMS code</label>
+    </div>
+    <div class="flex one">
+    <input id="otp" type="text" inputtype="numeric" pattern="[0-9]*" placeholder="000000" autocomplete="one-time-code" @input="pin_update" style="font-family:monospace;font-size:3em;width:auto;margin-left:auto;margin-right:auto;" size="6" maxlength="6" required>
     </div>
   </div>
   <div v-show="step == 3">
