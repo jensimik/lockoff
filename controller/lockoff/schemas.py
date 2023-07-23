@@ -1,5 +1,6 @@
+from typing import Literal
+
 from pydantic import BaseModel
-from pydantic.typing import Literal
 
 
 class RequestTOTP(BaseModel):
