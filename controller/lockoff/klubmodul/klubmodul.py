@@ -175,10 +175,42 @@ class KMClient:
 
     async def send_email(self, user_id: int, subject: str, message: str) -> None:
         data = {
-            {
-                "rowData": [
+            "rowData": [
+                {"columnName": "broadcast_media", "value": "email"},
+                {"columnName": "send_email", "value": "sendemail"},
+                {"columnName": "sms_text", "value": ""},
+                {"columnName": "subject", "value": subject},
+                {
+                    "columnName": "answer_email",
+                    "value": f"{settings.klubmodul_admin_user_id}",
+                },
+                {"columnName": "mail_text", "value": message},
+                {"columnName": "test_email", "value": ""},
+                {"columnName": "is_news_mail", "value": False},
+                {"columnName": "is_all_team_member_profiles", "value": False},
+                {"columnName": "is_all_team_nonmember_profiles", "value": False},
+                {"columnName": "dd_target_teams", "values": []},
+                {"columnName": "dd_target_team_names", "values": []},
+                {"columnName": "dd_target_days", "values": []},
+                {"columnName": "dd_target_waitinglist", "values": []},
+                {"columnName": "dd_target_season", "value": None},
+                {"columnName": "dd_target_all_profiles", "values": [f"{user_id}"]},
+                {"columnName": "dd_target_titles", "values": []},
+                {"columnName": "titles_as_filter", "value": False},
+                {"columnName": "dd_target_ages", "values": []},
+                {"columnName": "ages_as_filter", "value": False},
+                {"columnName": "dd_target_vintages", "values": []},
+                {"columnName": "vintages_as_filter", "value": False},
+                {"columnName": "dd_target_pools", "values": []},
+                {"columnName": "dd_target_genders", "values": []},
+                {"columnName": "genders_as_filter", "value": False},
+                {"columnName": "dd_target_promotion_team_names", "values": []},
+                {"columnName": "dd_target_profiles", "values": [f"{user_id}"]},
+            ],
+            "extraArgs": {
+                "formValues": [
                     {"columnName": "broadcast_media", "value": "email"},
-                    {"columnName": "send_email", "value": "sendemail"},
+                    {"columnName": "send_email", "value": "savedraft"},
                     {"columnName": "sms_text", "value": ""},
                     {"columnName": "subject", "value": subject},
                     {
@@ -189,13 +221,19 @@ class KMClient:
                     {"columnName": "test_email", "value": ""},
                     {"columnName": "is_news_mail", "value": False},
                     {"columnName": "is_all_team_member_profiles", "value": False},
-                    {"columnName": "is_all_team_nonmember_profiles", "value": False},
+                    {
+                        "columnName": "is_all_team_nonmember_profiles",
+                        "value": False,
+                    },
                     {"columnName": "dd_target_teams", "values": []},
                     {"columnName": "dd_target_team_names", "values": []},
                     {"columnName": "dd_target_days", "values": []},
                     {"columnName": "dd_target_waitinglist", "values": []},
                     {"columnName": "dd_target_season", "value": None},
-                    {"columnName": "dd_target_all_profiles", "values": [f"{user_id}"]},
+                    {
+                        "columnName": "dd_target_all_profiles",
+                        "values": [f"{user_id}"],
+                    },
                     {"columnName": "dd_target_titles", "values": []},
                     {"columnName": "titles_as_filter", "value": False},
                     {"columnName": "dd_target_ages", "values": []},
@@ -206,49 +244,9 @@ class KMClient:
                     {"columnName": "dd_target_genders", "values": []},
                     {"columnName": "genders_as_filter", "value": False},
                     {"columnName": "dd_target_promotion_team_names", "values": []},
-                    {"columnName": "dd_target_profiles", "values": [f"{user_id}"]},
-                ],
-                "extraArgs": {
-                    "formValues": [
-                        {"columnName": "broadcast_media", "value": "email"},
-                        {"columnName": "send_email", "value": "savedraft"},
-                        {"columnName": "sms_text", "value": ""},
-                        {"columnName": "subject", "value": subject},
-                        {
-                            "columnName": "answer_email",
-                            "value": f"{settings.klubmodul_admin_user_id}",
-                        },
-                        {"columnName": "mail_text", "value": message},
-                        {"columnName": "test_email", "value": ""},
-                        {"columnName": "is_news_mail", "value": False},
-                        {"columnName": "is_all_team_member_profiles", "value": False},
-                        {
-                            "columnName": "is_all_team_nonmember_profiles",
-                            "value": False,
-                        },
-                        {"columnName": "dd_target_teams", "values": []},
-                        {"columnName": "dd_target_team_names", "values": []},
-                        {"columnName": "dd_target_days", "values": []},
-                        {"columnName": "dd_target_waitinglist", "values": []},
-                        {"columnName": "dd_target_season", "value": None},
-                        {
-                            "columnName": "dd_target_all_profiles",
-                            "values": [f"{user_id}"],
-                        },
-                        {"columnName": "dd_target_titles", "values": []},
-                        {"columnName": "titles_as_filter", "value": False},
-                        {"columnName": "dd_target_ages", "values": []},
-                        {"columnName": "ages_as_filter", "value": False},
-                        {"columnName": "dd_target_vintages", "values": []},
-                        {"columnName": "vintages_as_filter", "value": False},
-                        {"columnName": "dd_target_pools", "values": []},
-                        {"columnName": "dd_target_genders", "values": []},
-                        {"columnName": "genders_as_filter", "value": False},
-                        {"columnName": "dd_target_promotion_team_names", "values": []},
-                        {"columnName": "dd_target_profiles", "values": []},
-                    ]
-                },
-            }
+                    {"columnName": "dd_target_profiles", "values": []},
+                ]
+            },
         }
         try:
             response = await self.client.post(
