@@ -101,7 +101,7 @@ async def login(
         scopes = ["basic", "admin"]
     encoded_jwt = jwt.encode(
         {
-            "sub": users[0]["mobile"],
+            "sub": " ".join(user_ids),  # specific user_ids
             "scopes": scopes,
             "exp": datetime.utcnow() + timedelta(hours=2),
         },

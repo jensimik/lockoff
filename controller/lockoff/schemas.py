@@ -20,7 +20,6 @@ class JWTToken(BaseModel):
 
 
 class TokenData(BaseModel):
-    mobile: str | None = None
     scopes: list[str] = []
 
 

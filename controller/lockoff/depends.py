@@ -18,7 +18,7 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 
-async def get_current_mobile(
+async def get_current_user_ids(
     security_scopes: SecurityScopes, token: Annotated[str, Depends(oauth2_scheme)]
 ):
     if security_scopes.scopes:
@@ -32,12 +32,13 @@ async def get_current_mobile(
     )
     try:
         payload = jwt.decode(token, settings.jwt_secret, algorithms=["HS256"])
-        mobile: str = payload.get("sub")
-        if mobile is None:
+        user_ids_raw: str = payload.get("sub")
+        if user_ids_raw is None:
             raise credentials_exception
+        user_ids = [int(user_id) for user_id in user_ids_raw.split()]
         token_scopes = payload.get("scopes", [])
-        token_data = schemas.TokenData(mobile=mobile, scopes=token_scopes)
-    except (JWTError, ValidationError, ValidationError):
+        token_data = schemas.TokenData(scopes=token_scopes)
+    except (JWTError, ValidationError, ValidationError, ValueError):
         raise credentials_exception
     for scope in security_scopes.scopes:
         if scope not in token_data.scopes:
@@ -46,7 +47,7 @@ async def get_current_mobile(
                 detail="Not enough permissions",
                 headers={"WWW-Authenticate": authenticate_value},
             )
-    return mobile
+    return user_ids
 
 
 async def get_db():
