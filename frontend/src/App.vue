@@ -99,10 +99,10 @@ const pin_update = async(e) => {
         <article class="card">
           <!-- -->
           <header>
-            <div class="fleft">
-              <h3>{{ user.name }} <span class="membernumber">(no. {{ user.user_id }})</span></h3>
+            <div class="hleft">
+              <h3>{{ user.name }} <span class="membernumber">({{ user.user_id }})</span></h3>
               </div>
-            <div class="fright">
+            <div class="hright">
               <a target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/qr-code.png'"><img class="qrcode" :src="'https://lockoff-api.gnerd.dk/' + user.token + '/qr-code.png'"></a>
             </div>
           </header>
@@ -133,6 +133,15 @@ h3 {
 }
 .button {
   width: 100%;
+}
+.hright {
+  display: inline-block;
+  text-align: right;
+  width: 2em;
+}
+.hleft {
+  display: inline-block;
+  width: calc(100% - 2em);
 }
 .fright {
   display: inline-block;
