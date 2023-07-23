@@ -99,12 +99,16 @@ const pin_update = async(e) => {
         <article class="card">
           <!-- -->
           <header>
-            <h3>{{ user.name }}</h3> <a :href="'https://lockoff-api.gnerd.dk/' + user.token + '/qr-code.png'"><img class="qrcode" :src="'https://lockoff-api.gnerd.dk/' + user.token + '/qr-code.png'"></a>
+            <h3>{{ user.name }} ({{ user.user_id }})</h3> <a :href="'https://lockoff-api.gnerd.dk/' + user.token + '/qr-code.png'"><img class="qrcode" :src="'https://lockoff-api.gnerd.dk/' + user.token + '/qr-code.png'"></a>
           </header>
-          <p>nr. {{ user.user_id }} | {{ user.member_type }} member | expires {{ user.expires }}</p>
+          <p>{{ user.member_type }} member exp {{ user.expires }}</p>
           <footer>
-            <a class="button" target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pdf'">🖨️ pdf for print</a>
-            <a class="button" target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pkpass'">📱 digital wallet pass</a>
+            <div class="fleft">
+              <a class="button" target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pdf'">🖨️ pdf for print</a>
+            </div>
+            <div class="fright">
+              <a class="button" target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pkpass'">📱 digital wallet pass</a>
+            </div>
           </footer>
         </article>
       </div>
@@ -119,9 +123,19 @@ h3 {
 .qrcode {
   height: 1.5em;
 }
-
 .button {
-  margin-right: 1em;
+  width: 100%;
+}
+.fright {
+  display: inline-block;
+  text-align: right;
+  padding-left: 0.5em;
+  width: 50%;
+}
+.fleft {
+  display: inline-block;
+  width: 50%;
+  padding-right: 0.5em;
 }
 .jcenter {
   justify-content: center;

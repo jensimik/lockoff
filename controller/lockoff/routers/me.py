@@ -28,7 +28,7 @@ async def me(
                 "name": user["name"],
                 "token": generate_dl_token(user["user_id"]),
                 "member_type": user["member_type"].lower(),
-                "expires": "{0:%Y-%m-%d}".format(expires_display),
+                "expires": "{0:%m/%y}".format(expires_display),
             }
             for user in users
         ],
