@@ -23,18 +23,23 @@ async def send_sms(user_id: int, message: str):
         await km.send_sms(user_id=user_id, message=message)
 
 
+async def send_email(user_id: int, subject: str, message: str):
+    async with KMClient() as km:
+        await km.send_email(user_id=user_id, subject=subject, message=message)
+
+
 @router.post(
-    "/request-totp", dependencies=[Depends(RateLimiter(times=105, seconds=300))]
+    "/request-mobile-totp", dependencies=[Depends(RateLimiter(times=105, seconds=300))]
 )
-async def request_totp(
-    rt: schemas.RequestTOTP, conn: DBcon, background_tasks: BackgroundTasks
+async def request_mobile_totp(
+    rt: schemas.RequestMobileTOTP, conn: DBcon, background_tasks: BackgroundTasks
 ) -> schemas.StatusReply:
     users = await queries.get_active_users_by_mobile(conn, mobile=rt.mobile)
     user_ids = [u["user_id"] for u in users]
     if user_ids:
         totp_secret = pyotp.random_base32()
         totp = pyotp.TOTP(totp_secret)
-        await queries.update_user_set_totp_secret(
+        await queries.update_user_by_mobile_set_totp_secret(
             conn, mobile=rt.mobile, totp_secret=totp_secret
         )
         await conn.commit()
@@ -45,11 +50,37 @@ async def request_totp(
     return schemas.StatusReply(status="sms sent")
 
 
+@router.post(
+    "/request-email-totp", dependencies=[Depends(RateLimiter(times=105, seconds=300))]
+)
+async def request_mobile_totp(
+    rt: schemas.RequestEmailTOTP, conn: DBcon, background_tasks: BackgroundTasks
+) -> schemas.StatusReply:
+    users = await queries.get_active_users_by_email(conn, mobile=rt.email)
+    user_ids = [u["user_id"] for u in users]
+    if user_ids:
+        totp_secret = pyotp.random_base32()
+        totp = pyotp.TOTP(totp_secret)
+        await queries.update_user_by_email_set_totp_secret(
+            conn, mobile=rt.email, totp_secret=totp_secret
+        )
+        await conn.commit()
+        log.info(
+            f"send_email(user_id={user_ids[0]}, subject=AUTHMSG, message={totp.now()})"
+        )
+        background_tasks.add_task(
+            send_email, user_id=user_ids[0], subject="AUTHMSG", message=f"{totp.now()}"
+        )
+    return schemas.StatusReply(status="sms sent")
+
+
 @router.post("/login", dependencies=[Depends(RateLimiter(times=105, seconds=300))])
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], conn: DBcon
 ) -> schemas.JWTToken:
-    users = await queries.get_active_users_by_mobile(conn, mobile=form_data.username)
+    users = await queries.get_active_users_by_mobile_or_email(
+        conn, username=form_data.username
+    )
     totp_secrets = [u["totp_secret"] for u in users]
     user_ids = [u["user_id"] for u in users]
     if not totp_secrets:
@@ -70,7 +101,7 @@ async def login(
         scopes = ["basic", "admin"]
     encoded_jwt = jwt.encode(
         {
-            "sub": form_data.username,
+            "sub": users[0]["mobile"],
             "scopes": scopes,
             "exp": datetime.utcnow() + timedelta(hours=2),
         },

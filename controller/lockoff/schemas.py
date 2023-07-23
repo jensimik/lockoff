@@ -1,8 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 
-class RequestTOTP(BaseModel):
-    mobile: str
+class RequestMobileTOTP(BaseModel):
+    mobile: str | None = None
+
+
+class RequestEmailTOTP(BaseModel):
+    email: str | None = None
 
 
 class Login(BaseModel):

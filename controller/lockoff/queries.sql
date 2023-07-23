@@ -22,6 +22,19 @@ select user_id, name, member_type, mobile, email, batch_id, totp_secret, active
   from users
  where mobile = :mobile and active = true;
 
+-- name: get_active_users_by_email
+-- get active users by mobile number
+select user_id, name, member_type, mobile, email, batch_id, totp_secret, active
+  from users
+ where email = :email and active = true;
+
+-- name: get_active_users_by_mobile_or_email
+-- get active users by email or mobile number
+select user_id, name, member_type, mobile, email, batch_id, totp_secret, active
+  from users
+ where (email = :username or mobile = :username) and active = true;
+
+
  -- name: get_active_user_totp_secret_by_mobile$
 select totp_secret
   from users
@@ -35,11 +48,18 @@ select user_id, name, member_type, mobile, email, batch_id, active
  where user_id = :user_id and active = true;
 
 
--- name: update_user_set_totp_secret!
+-- name: update_user_by_mobile_set_totp_secret!
 -- update users by mobile and set totp_secret
 update users
 set totp_secret = :totp_secret
 where mobile = :mobile;
+
+-- name: update_user_by_email_set_totp_secret!
+-- update users by mobile and set totp_secret
+update users
+set totp_secret = :totp_secret
+where email = :email;
+
 
 -- name: upsert_user!
 -- upsert a user in the database

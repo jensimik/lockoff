@@ -76,8 +76,8 @@ class KMClient:
             member_type = (
                 "FULL" if "1" in row["Hold"] else "MORN" if "2" in row["Hold"] else None
             )
-            name = row["Fornavn"] + " " + row["Efternavn"]
-            email = row["Email"]
+            name = row["Fornavn"].capitalize() + " " + row["Efternavn"].capitalize()
+            email = row["Email"].lower()
             mobile = row["Mobil"]
             if member_type:
                 yield user_id, name, member_type, email, mobile
