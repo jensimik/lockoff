@@ -67,7 +67,9 @@ async def login(
     login_data: schemas.RequestLogin,
     conn: DBcon,
 ) -> schemas.JWTToken:
-    users = await queries.get_active_users_by_mobile(conn, username=login_data.username)
+    users = await getattr(queries, f"get_active_users_by_{login_data.username_type}")(
+        conn, **{login_data.username_type: login_data.username}
+    )
     totp_secrets = [u["totp_secret"] for u in users]
     user_ids = [u["user_id"] for u in users]
     if not totp_secrets:
@@ -88,8 +90,8 @@ async def login(
         scopes = ["basic", "admin"]
     encoded_jwt = jwt.encode(
         {
-            "sub": form_data.username.lower(),
-            "sub_type": "mobile",
+            "sub": login_data.username,
+            "sub_type": login_data.username_type,
             "scopes": scopes,
             "exp": datetime.utcnow() + timedelta(hours=2),
         },
