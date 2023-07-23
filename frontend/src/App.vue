@@ -97,10 +97,11 @@ const pin_update = async(e) => {
     <div class="flex one">
       <div v-for="user in user_data" :key="user.user_id">
         <article class="card">
-          <!-- <img :src="'https://lockoff-api.gnerd.dk/' + user.token + '/qr-code.png'"> -->
+          <!-- -->
           <header>
-            <h3>{{ user.name }}</h3>
+            <h3>{{ user.name }}</h3> <a :href="'https://lockoff-api.gnerd.dk/' + user.token + '/qr-code.png'"><img class="qrcode" :src="'https://lockoff-api.gnerd.dk/' + user.token + '/qr-code.png'"></a>
           </header>
+          <p>{{ user.member_type }} member | nr. {{ user.user_id }} | expires {{ user.expires }}</p>
           <footer>
             <a class="button" target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pdf'">🖨️ pdf for print</a>
             <a class="button" target="_blank" :href="'https://lockoff-api.gnerd.dk/' + user.token + '/membership-card.pkpass'">📱 digital wallet pass</a>
@@ -112,6 +113,13 @@ const pin_update = async(e) => {
 </template>
 
 <style scoped>
+h3 {
+  font-size: 1.5em;
+}
+.qrcode {
+  height: 1.5em;
+}
+
 .button {
   margin-right: 1em;
 }
