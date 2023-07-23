@@ -1,8 +1,8 @@
 -- name: stats
 -- get some stats
-select mobile, count(*) as count
+select email, count(*) as count
 from users
-group by mobile
+group by email
 having count > 1;
 
 -- name: get_all_users
