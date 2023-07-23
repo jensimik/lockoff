@@ -1,3 +1,4 @@
+import io
 from datetime import datetime
 from typing import Annotated
 
@@ -5,12 +6,37 @@ from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from ..access_token import TokenType, generate_access_token, verify_dl_token
-from ..card import ApplePass, generate_pdf
+from ..card import ApplePass, generate_pdf, generate_png
 from ..config import settings
 from ..depends import DBcon
 from ..misc import queries
 
 router = APIRouter(tags=["card"])
+
+
+@router.get(
+    "/{token}/qr-code.png",
+    response_class=Response,
+    responses={
+        200: {"content": {"image/png": {}}},
+    },
+)
+async def get_qr_code_png(
+    user_id: Annotated[int, Depends(verify_dl_token)],
+    conn: DBcon,
+):
+    user = await queries.get_active_user_by_user_id(conn, user_id=user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    token_type = (
+        TokenType.MORNING if user["member_type"] == "MORN" else TokenType.NORMAL
+    )
+    access_token = generate_access_token(user_id=user["user_id"], token_type=token_type)
+    img = generate_png(qr_code_data=access_token.decode())
+    with io.BytesIO() as f:
+        img.save(f, format="png")
+        content = f.getvalue()
+    return Response(content=content, media_type="image/png")
 
 
 # pdf membership card ready to print
@@ -35,7 +61,7 @@ async def get_card_pdf(
     pdf_file = generate_pdf(
         name=user["name"],
         level=f"{token_type.name.capitalize()} {settings.current_season}",
-        qr_code_data=access_token,
+        qr_code_data=access_token.decode(),
     )
     return Response(
         content=pdf_file.getvalue(),
@@ -75,7 +101,7 @@ async def get_pkpass(
         name=user["name"],
         level=token_type.name.capitalize(),
         expires=expires_display,
-        qr_code_data=access_token.decode("utf-8"),
+        qr_code_data=access_token.decode(),
     )
     return Response(
         content=pkpass_file.getvalue(),

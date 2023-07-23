@@ -6,10 +6,10 @@ from weasyprint import HTML
 
 from .paper_template import template
 from ..access_token import generate_dayticket_access_token
+from PIL import Image
 
 
-def generate_pdf(name: str, level: str, qr_code_data: str):
-    pdf_file = io.BytesIO()
+def generate_png(qr_code_data: str) -> Image:
     # generate qr code
     qr = qrcode.QRCode(
         version=None, error_correction=qrcode.constants.ERROR_CORRECT_M, border=0
@@ -17,6 +17,13 @@ def generate_pdf(name: str, level: str, qr_code_data: str):
     qr.add_data(qr_code_data)
     qr.make(fit=True)
     img = qr.make_image(fill_color=(0, 0, 0), back_color=(255, 255, 255))
+    return img
+
+
+def generate_pdf(name: str, level: str, qr_code_data: str):
+    pdf_file = io.BytesIO()
+    # generate qr code
+    img = generate_png(qr_code_data=qr_code_data)
     with io.BytesIO() as f:
         img.save(f, format="png")
         img_str = base64.b64encode(f.getvalue())
