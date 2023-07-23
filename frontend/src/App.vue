@@ -11,11 +11,11 @@ var user_data = ref([]);
 const ac = new AbortController();
 
 const mobile_update = async(e) => {
+  e.target.style.setProperty('--_otp-digit', e.target.selectionStart);
   username.value = e.target.value;
   if (username.value.length == 8) {
     step.value = 2;
     controllerAPI.request_totp(username.value, "mobile").then(() => {
-//      document.getElementById("otp").focus();
       // listen for OTP token on sms automatic
       if ('OTPCredential' in window) {
           const input = document.querySelector('input[autocomplete="one-time-code"]');
@@ -26,7 +26,6 @@ const mobile_update = async(e) => {
             signal: ac.signal
           }).then(otp => {
             input.value = otp.code;
-            // Automatically submit the form when an OTP is obtained.
           }).catch(err => {
             console.log(err);
           });
@@ -37,6 +36,7 @@ const mobile_update = async(e) => {
 
 
 const pin_update = async(e) => {
+  e.target.style.setProperty('--_otp-digit', e.target.selectionStart);
   totp.value = e.target.value;
   if (totp.value.length == 6) {
     // Cancel the WebOTP API.
@@ -47,7 +47,9 @@ const pin_update = async(e) => {
     controllerAPI.get_me(token.value).then((me_data) => {
       user_data.value = me_data.users;
     }).catch((error) => {
+      console.log("failed to fetch me");
       console.log(error);
+      step.value = 1;
     })
   }).catch(() => {
     console.log("failed to login");
@@ -71,19 +73,19 @@ const pin_update = async(e) => {
         <g><path style="opacity:1" fill="#fefefe" d="M 508.5,278.5 C 508.5,355.167 508.5,431.833 508.5,508.5C 430.167,508.5 351.833,508.5 273.5,508.5C 301.743,505.838 329.076,499.005 355.5,488C 444.413,445.912 495.413,376.079 508.5,278.5 Z"/></g>
       </svg>
     </div>
-    <div class="flex one">
+    <div class="flex one jcenter">
       <label for="mobile">Verify mobile number</label>
-      <div>
-        <input autofocus type="tel" inputmode="numeric" pattern="\d{8}" placeholder="00000000" autocomplete="tel-local" @input="mobile_update" style="font-family:monospace;font-size:3em;width:auto;margin-left:auto;margin-right:auto;" size="8" maxlength="8" required>
-      </div>
+    </div>
+    <div class="flex one jcenter">
+      <input id="mobile" autofocus type="tel" inputmode="numeric" pattern="\d{8}" placeholder="00000000" autocomplete="tel-local" @input="mobile_update" size="8" maxlength="8" required>
     </div>
   </div>
   <div v-show="step == 2">
-    <div class="flex one">
+    <div class="flex one jcenter">
       <label for="pin">SMS code</label>
     </div>
-    <div class="flex one">
-    <input id="otp" type="text" inputmode="numeric" pattern="\d{6}" placeholder="000000" autocomplete="one-time-code" @input="pin_update" style="font-family:monospace;font-size:3em;width:auto;margin-left:auto;margin-right:auto;" size="6" maxlength="6" required>
+    <div class="flex one jcenter">
+    <input id="otp" type="text" inputmode="numeric" pattern="\d{6}" placeholder="000000" autocomplete="one-time-code" @input="pin_update" size="6" maxlength="6" required>
     </div>
   </div>
   <div v-show="step == 3">
@@ -96,22 +98,88 @@ const pin_update = async(e) => {
 </template>
 
 <style scoped>
+.jcenter {
+  justify-content: center;
+}
+label {
+  font-size: 1.5em;
+  width: auto;
+}
+:where([autocomplete=tel-local]):focus, :where([autocomplete=one-time-code]):focus {
+  border: none;
+}
+:where([autocomplete=tel-local]) {
+  --otp-digits: 8;
+  --otp-ls: 2ch;
+  --otp-gap: 1.25;
+  --otp-fz: 1.5em;
+  --otp-ls: 1em;
+
+  /* private consts */
+  --_otp-bgsz: calc(var(--otp-ls) + 1ch);
+  --_otp-digit: 0;
+
+  all: unset;
+  background: 
+  linear-gradient(90deg, 
+    var(--otp-bg, #BBB) calc(var(--otp-gap) * var(--otp-ls)),
+    transparent 0),
+    linear-gradient(90deg, 
+    var(--otp-bg, #EEE) calc(var(--otp-gap) * var(--otp-ls)),
+    transparent 0
+  );
+  background-position: calc(var(--_otp-digit) * var(--_otp-bgsz)) 0, 0 0;
+  background-repeat: no-repeat, repeat-x;
+  background-size: var(--_otp-bgsz) 100%;
+  caret-color: var(--otp-cc, #222);
+  caret-shape: block;
+  clip-path: inset(0% calc(var(--otp-ls) / 2) 0% 0%);
+  font-family: ui-monospace, monospace;
+  font-size: var(--otp-fz, 2.5em);
+  inline-size: calc(var(--otp-digits) * var(--_otp-bgsz));
+  letter-spacing: var(--otp-ls);
+  padding-block: var(--otp-pb, 1ch);
+  padding-inline-start: calc(((var(--otp-ls) - 1ch) / 2) * var(--otp-gap));
+}
+:where([autocomplete=one-time-code]) {
+  --otp-digits: 6;
+  --otp-ls: 2ch;
+  --otp-gap: 1.25;
+  --otp-fz: 1.5em;
+  --otp-ls: 1em;
+
+  /* private consts */
+  --_otp-bgsz: calc(var(--otp-ls) + 1ch);
+  --_otp-digit: 0;
+
+  all: unset;
+  background: 
+  linear-gradient(90deg, 
+    var(--otp-bg, #BBB) calc(var(--otp-gap) * var(--otp-ls)),
+    transparent 0),
+    linear-gradient(90deg, 
+    var(--otp-bg, #EEE) calc(var(--otp-gap) * var(--otp-ls)),
+    transparent 0
+  );
+  background-position: calc(var(--_otp-digit) * var(--_otp-bgsz)) 0, 0 0;
+  background-repeat: no-repeat, repeat-x;
+  background-size: var(--_otp-bgsz) 100%;
+  caret-color: var(--otp-cc, #222);
+  caret-shape: block;
+  clip-path: inset(0% calc(var(--otp-ls) / 2) 0% 0%);
+  font-family: ui-monospace, monospace;
+  font-size: var(--otp-fz, 2.5em);
+  inline-size: calc(var(--otp-digits) * var(--_otp-bgsz));
+  letter-spacing: var(--otp-ls);
+  padding-block: var(--otp-pb, 1ch);
+  padding-inline-start: calc(((var(--otp-ls) - 1ch) / 2) * var(--otp-gap));
+}
+
 #logo {
-  width: 70%;
+  width: 40%;
   margin: 0;
   padding:0 0 3em 0;
   margin-right: auto;
   margin-left: auto;
-}
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Firefox */
-input[type=number] {
-  -moz-appearance: textfield;
 }
 </style>
