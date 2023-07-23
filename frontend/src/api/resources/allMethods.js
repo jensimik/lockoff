@@ -3,7 +3,7 @@ import { APISettings } from '../config.js';
 export default {
 
     async request_totp(mobile) {
-        const response = await fetch(APISettings.baseURL + '/request-totp', {
+        const response = await fetch(APISettings.baseURL + '/request-mobile-totp', {
             method: 'POST',
             headers: { ...APISettings.headers, 'Content-Type': 'Application/json' },
             body: JSON.stringify({mobile: mobile})
