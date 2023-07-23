@@ -12,7 +12,7 @@ class RequestTOTP(BaseModel):
 
 
 class RequestLogin(RequestTOTP):
-    totp: constr(pattern=r"^[0-9]{8}$")
+    totp: constr(pattern=r"^[0-9]{6}$")
 
 
 class JWTToken(BaseModel):
