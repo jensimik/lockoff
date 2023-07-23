@@ -10,9 +10,14 @@ from ..misc import queries
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 
+@router.get("/stats")
+async def stats(conn: DBcon):
+    return await queries.stats(conn)
+
+
 @router.get("/access_log")
 async def access_log(
-    user_ids: Annotated[str, Security(depends.get_current_user_ids, scopes=["admin"])],
+    user_id: Annotated[str, Security(depends.get_current_user_id, scopes=["admin"])],
     conn: DBcon,
 ):
     return await queries.last_log_entries(conn, limit=30)
@@ -20,21 +25,21 @@ async def access_log(
 
 @router.post("/klubmodul-force-resync")
 async def klubmodul_force_resync(
-    user_ids: Annotated[str, Security(depends.get_current_user_ids, scopes=["admin"])],
+    user_id: Annotated[str, Security(depends.get_current_user_id, scopes=["admin"])],
 ):
     pass
 
 
 @router.get("/members-without-danish-mobile")
 async def members_without_danish_mobile(
-    user_ids: Annotated[str, Security(depends.get_current_user_ids, scopes=["admin"])],
+    user_id: Annotated[str, Security(depends.get_current_user_id, scopes=["admin"])],
 ):
     pass
 
 
 @router.post("/send-membercard-by-email")
 async def send_membercard_by_email(
-    user_ids: Annotated[str, Security(depends.get_current_user_ids, scopes=["admin"])],
+    user_id: Annotated[str, Security(depends.get_current_user_id, scopes=["admin"])],
 ):
     pass
     # send membercard to a member manually (to those with no danish mobile number in klubmodul?)
@@ -42,7 +47,7 @@ async def send_membercard_by_email(
 
 @router.get("/system-status")
 async def system_status(
-    user_ids: Annotated[str, Security(depends.get_current_user_ids, scopes=["admin"])],
+    user_id: Annotated[str, Security(depends.get_current_user_id, scopes=["admin"])],
 ):
     pass
     # return all alive?

@@ -1,17 +1,10 @@
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel
+from pydantic.typing import Literal
 
 
-class RequestMobileTOTP(BaseModel):
-    mobile: str | None = None
-
-
-class RequestEmailTOTP(BaseModel):
-    email: str | None = None
-
-
-class Login(BaseModel):
-    mobile: str
-    totp: str
+class RequestTOTP(BaseModel):
+    username: str
+    username_type: Literal["mobile", "email"]
 
 
 class JWTToken(BaseModel):
@@ -20,6 +13,8 @@ class JWTToken(BaseModel):
 
 
 class TokenData(BaseModel):
+    username: str
+    username_type: Literal["mobile", "email"]
     scopes: list[str] = []
 
 

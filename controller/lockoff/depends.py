@@ -18,7 +18,7 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 
-async def get_current_user_ids(
+async def get_current_user_id(
     security_scopes: SecurityScopes, token: Annotated[str, Depends(oauth2_scheme)]
 ):
     if security_scopes.scopes:
@@ -32,12 +32,11 @@ async def get_current_user_ids(
     )
     try:
         payload = jwt.decode(token, settings.jwt_secret, algorithms=["HS256"])
-        user_ids_raw: str = payload.get("sub")
-        if user_ids_raw is None:
+        user_id_raw: str = payload.get("sub")
+        if user_id_raw is None:
             raise credentials_exception
-        user_ids = [int(user_id) for user_id in user_ids_raw.split()]
         token_scopes = payload.get("scopes", [])
-        token_data = schemas.TokenData(scopes=token_scopes)
+        token_data = schemas.TokenData(user_id=user_id_raw, scopes=token_scopes)
     except (JWTError, ValidationError, ValidationError, ValueError):
         raise credentials_exception
     for scope in security_scopes.scopes:
@@ -47,7 +46,7 @@ async def get_current_user_ids(
                 detail="Not enough permissions",
                 headers={"WWW-Authenticate": authenticate_value},
             )
-    return user_ids
+    return token_data.user_id
 
 
 async def get_db():
