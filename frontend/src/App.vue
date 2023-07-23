@@ -25,6 +25,7 @@ const mobile_update = async(e) => {
             otp: { transport:['sms'] },
             signal: ac.signal
           }).then(otp => {
+            console.log("i got the otp automatic from webotp: " + otp)
             input.value = otp.code;
             // Automatically submit the form when an OTP is obtained.
           }).catch(err => {
