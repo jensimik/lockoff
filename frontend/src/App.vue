@@ -8,6 +8,7 @@ var totp = ref("");
 var token = ref("");
 var user_data = ref([]);
 
+const ac = new AbortController();
 
 const mobile_update = async(e) => {
   username.value = e.target.value;
@@ -17,18 +18,8 @@ const mobile_update = async(e) => {
       document.getElementById("otp").focus();
       // listen for OTP token on sms automatic
       if ('OTPCredential' in window) {
-        window.addEventListener('DOMContentLoaded', e => {
           const input = document.querySelector('input[autocomplete="one-time-code"]');
           if (!input) return;
-          // Cancel the WebOTP API if the form is submitted manually.
-          const ac = new AbortController();
-          const form = input.closest('form');
-          if (form) {
-            form.addEventListener('submit', e => {
-              // Cancel the WebOTP API.
-              ac.abort();
-            });
-          }
           // Invoke the WebOTP API
           navigator.credentials.get({
             otp: { transport:['sms'] },
@@ -36,11 +27,9 @@ const mobile_update = async(e) => {
           }).then(otp => {
             input.value = otp.code;
             // Automatically submit the form when an OTP is obtained.
-            if (form) form.submit();
           }).catch(err => {
             console.log(err);
           });
-        });
       }
     })
   }
@@ -50,6 +39,8 @@ const mobile_update = async(e) => {
 const pin_update = async(e) => {
   totp.value = e.target.value;
   if (totp.value.length == 6) {
+    // Cancel the WebOTP API.
+    ac.abort();
     controllerAPI.login(username.value, "mobile", totp.value).then((token_data) => {
     token.value = token_data.access_token;
     step.value = 3;
