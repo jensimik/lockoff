@@ -14,7 +14,10 @@ const mobile_update = async(e) => {
   e.target.style.setProperty('--_otp-digit', e.target.selectionStart);
   username.value = e.target.value;
   if (username.value.length == 8) {
+    e.target.value = "";
+    e.target.blur();
     step.value = 2;
+    window.scrollTo({ top: 0});
     controllerAPI.request_totp(username.value, "mobile").then(() => {
       // listen for OTP token on sms automatic
       if ('OTPCredential' in window) {
@@ -39,6 +42,8 @@ const pin_update = async(e) => {
   e.target.style.setProperty('--_otp-digit', e.target.selectionStart);
   totp.value = e.target.value;
   if (totp.value.length == 6) {
+    e.target.value = "";
+    e.target.blur();
     // Cancel the WebOTP API.
     ac.abort();
     controllerAPI.login(username.value, "mobile", totp.value).then((token_data) => {
