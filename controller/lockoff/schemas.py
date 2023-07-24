@@ -1,6 +1,6 @@
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, Field, constr
 
 username = constr(to_lower=True, min_length=6, max_length=50)
 username_type = Literal["mobile", "email"]
@@ -12,7 +12,7 @@ class RequestTOTP(BaseModel):
 
 
 class RequestLogin(RequestTOTP):
-    totp: constr(pattern="^[0-9]{6}$")
+    totp: Annotated[str, Field(pattern=r"^[0-9]{6}$")]
 
 
 class JWTToken(BaseModel):
