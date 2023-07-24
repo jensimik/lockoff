@@ -1,14 +1,9 @@
 import select
 import sys
 import time
-from machine import RTC
 
 from gfx_pack import SWITCH_A, GfxPack
 from machine import WDT
-
-# set clock to just 2000-01-01 00:00:00
-rtc = RTC()
-rtc.datetime((2000, 1, 1, 0, 0, 0, 0, 0))
 
 # setup display
 gp = GfxPack()
@@ -31,26 +26,22 @@ color_schemes = {
 
 
 MESSAGES = {
-    ".": ("READY", "READY TO SCAN"),
-    "K": ("OK", "ACCESS GRANTED"),
-    "Q": ("ERROR", "ERROR IN YOUR QR CODE"),
-    "C": ("ERROR", "MEMBERSHIP CANCELED"),
-    "F": ("ERROR", "COULD NOT FIND USER IN DB"),
-    "D": ("ERROR", "YOUR DAYTICKET IS EXPIRED"),
-    "X": ("ERROR", "YOUR QR CODE IS EXPIRED"),
-    "S": ("ERROR", "WRONG SIGNATURE IN QR CODE"),
-    "E": ("ERROR", "SYSTEM ERROR"),
-    "B": ("BOOT", "BOOT WAIT TIME"),
+    ",": ("READY", "READY TO SCAN", 0),
+    ".": ("READY", "READY TO SCAN", 1),
+    "K": ("OK", "ACCESS GRANTED", 1),
+    "Q": ("ERROR", "ERROR IN YOUR QR CODE", 1),
+    "C": ("ERROR", "MEMBERSHIP CANCELED", 1),
+    "F": ("ERROR", "COULD NOT FIND USER IN DB", 1),
+    "D": ("ERROR", "YOUR DAYTICKET IS EXPIRED", 1),
+    "X": ("ERROR", "YOUR QR CODE IS EXPIRED", 1),
+    "S": ("ERROR", "WRONG SIGNATURE IN QR CODE", 1),
+    "E": ("ERROR", "SYSTEM ERROR", 1),
+    "B": ("BOOT", "BOOT WAIT TIME", 1),
 }
 
 
-def get_color():
-    _, _, _, hour, _, _, _, _ = rtc.datetime()
-    return color_schemes[hour % 2]
-
-
-def show_message(header, text):
-    bg_color, text_color = get_color()
+def show_message(header, text, color_scheme):
+    bg_color, text_color = color_schemes[color_scheme]
     display.set_pen(bg_color)  # Set pen to white
     display.clear()
     display.set_pen(text_color)  # Set pen to black

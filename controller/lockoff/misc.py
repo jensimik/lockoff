@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import pathlib
+from datetime import datetime
 
 import aiosql
 import serial_asyncio
@@ -23,9 +24,14 @@ class GFXDisplay:
     async def runner(self):
         # send idle
         while True:
+            now = datetime.now(tz=settings.tz)
             async with lock:
                 if settings.display_url:
-                    self.display_w.write(b".")
+                    # show screensaver at nightime idle
+                    if now.hour < 7:
+                        self.display_w.write(b",")
+                    else:
+                        self.display_w.write(b".")
                 else:
                     log.info("display send idle message")
             await asyncio.sleep(1.5)
