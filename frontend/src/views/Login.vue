@@ -117,7 +117,7 @@ const totp_update = async(e) => {
   </div>
   <div v-show="step == 'totp'">
     <div class="flex one jcenter">
-      <label for="pin">SMS code</label>
+      <label for="pin">code</label>
     </div>
     <div class="flex one jcenter">
     <input id="otp" type="text" inputmode="numeric" pattern="\d{6}" placeholder="000000" autocomplete="one-time-code" @input="totp_update" v-model="totp" size="6" maxlength="6" required>
