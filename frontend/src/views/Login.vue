@@ -131,6 +131,8 @@ const totp_update = async(e) => {
 }
 div.email > input, div.email > button {
   font-size: 1.5em;
+  margin-right: 1em;
+  margin-left: 1em;
 }
 @media (min-width: 800px) {
   div.email > input, div.email > button {
