@@ -1,4 +1,5 @@
 import { APISettings } from '../config.js';
+import { getWithExpiry } from '../../store.js';
 
 export default {
 
@@ -26,10 +27,11 @@ export default {
             return response.json();
         }
     },
-    async get_me(token) {
+    async get_me() {
+        var access_token = getWithExpiry("access_token");
         const response = await fetch(APISettings.baseURL + '/me', {
             method: 'GET',
-            headers: {...APISettings.headers, Authorization: "Bearer " + token}
+            headers: {...APISettings.headers, Authorization: "Bearer " + access_token}
         });
         if (response.status != 200) {
             throw response.status;
