@@ -131,7 +131,11 @@ const totp_update = async(e) => {
 }
 div.email > input, div.email > button {
   font-size: 1.5em;
-  width: 50%;
+}
+@media (min-width: 800px) {
+  div.email > input, div.email > button {
+    width: 50%;
+  }
 }
 .jcenter {
   justify-content: center;
