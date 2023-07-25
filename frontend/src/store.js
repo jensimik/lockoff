@@ -14,7 +14,7 @@ export const getWithExpiry = function(key) {
 	const itemStr = localStorage.getItem(key)
 	// if the item doesn't exist, return null
 	if (!itemStr) {
-        console.log("could not find key: " + key);
+    //    console.log("could not find key: " + key);
 		return null
 	}
 	const item = JSON.parse(itemStr)

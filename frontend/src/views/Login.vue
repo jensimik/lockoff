@@ -5,20 +5,30 @@ import { getWithExpiry, setWithExpiry } from '../store';
 import { getMobileOS } from '../misc';
 import router from '../router';
 
-var step = ref(1);
+var step = ref("username");
 var username = ref("");
+var username_type = ref("mobile");
 var totp = ref("");
 var os = ref(getMobileOS());
 
 const ac = new AbortController();
 
+const options = ref([
+  { text: 'verify mobile', value: 'mobile' },
+  { text: 'verify email', value: 'email' },
+])
+
+const selector_change = async(e) => {
+  username.value = "";
+}
+
 const mobile_update = async(e) => {
   e.target.style.setProperty('--_otp-digit', e.target.selectionStart);
   if (username.value.length == 8) {
     e.target.blur();
-    step.value = 2;
+    step.value = "totp";
     window.scrollTo({ top: 0});
-    controllerAPI.request_totp(username.value, "mobile").then(() => {
+    controllerAPI.request_totp(username.value, username_type.value).then(() => {
       // listen for OTP token on sms automatic
       if ('OTPCredential' in window) {
           const input = document.querySelector('input[autocomplete="one-time-code"]');
@@ -37,6 +47,16 @@ const mobile_update = async(e) => {
   }
 }
 
+const email_update = async(e) => {
+  e.target.blur();
+  step.value = "totp";
+  window.scrollTo({ top: 0});
+  controllerAPI.request_totp(username.value, username_type.value).then(() => {
+    console.log("requested totp on email");
+  })
+}
+
+
 
 const totp_update = async(e) => {
   e.target.style.setProperty('--_otp-digit', e.target.selectionStart);
@@ -44,7 +64,7 @@ const totp_update = async(e) => {
     e.target.blur();
     // Cancel the WebOTP API.
     ac.abort();
-    controllerAPI.login(username.value, "mobile", totp.value).then((token_data) => {  
+    controllerAPI.login(username.value, username_type.value, totp.value).then((token_data) => {  
         setWithExpiry("access_token", token_data.access_token, 7100 * 1000);
         var redirect_path = getWithExpiry("redirect_path");
         if (redirect_path)
@@ -55,14 +75,14 @@ const totp_update = async(e) => {
         console.log("failed to login : " + e);
         username.value = "";
         totp.value = "";
-        step.value = 1;
+        step.value = "username";
     })
   }
 }
 </script>
 
 <template>
-  <div v-show="step == 1">
+  <div v-show="step == 'username'">
     <div class="flex one">
       <svg id="logo" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 512 511" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
         <g><path style="opacity:1" fill="#fefefe" d="M 231.5,1.5 C 147.452,12.266 82.6184,53.266 37,124.5C 17.1801,159.453 5.34675,196.786 1.5,236.5C 1.5,158.167 1.5,79.8333 1.5,1.5C 78.1667,1.5 154.833,1.5 231.5,1.5 Z"/></g>
@@ -75,13 +95,27 @@ const totp_update = async(e) => {
       </svg>
     </div>
     <div class="flex one jcenter">
-      <label for="mobile">Verify mobile number</label>
+      <label>
+        <select id="selector" v-model="username_type" @change="selector_change">
+          <option v-for="option in options" :key="option.value" :value="option.value">{{ option.text }}</option>
+        </select>
+      </label>
     </div>
-    <div class="flex one jcenter">
-      <input id="mobile" autofocus type="tel" inputmode="numeric" pattern="\d{8}" placeholder="00000000" autocomplete="tel-local" @input="mobile_update" v-model="username" size="8" maxlength="8" required>
+    <div v-if="username_type == 'mobile'">
+      <div class="flex one jcenter">
+        <input id="mobile" autofocus type="tel" inputmode="numeric" pattern="\d{8}" placeholder="00000000" autocomplete="tel-local" @input="mobile_update" v-model="username" size="8" maxlength="8" required>
+      </div>
+    </div>
+    <div v-if="username_type == 'email'">
+      <div class="flex one jcenter email">
+        <input id="email" autofocus type="email" placeholder="monkey@nkk.dk" autocomplete="email" v-model="username" required>
+      </div>
+      <div class="flex one jcenter email">
+        <button @click="email_update">verify</button>
+      </div>
     </div>
   </div>
-  <div v-show="step == 2">
+  <div v-show="step == 'totp'">
     <div class="flex one jcenter">
       <label for="pin">SMS code</label>
     </div>
@@ -92,6 +126,13 @@ const totp_update = async(e) => {
 </template>
 
 <style scoped>
+#selector {
+  width: 8em;
+}
+div.email > input, div.email > button {
+  font-size: 1.5em;
+  width: 50%;
+}
 .jcenter {
   justify-content: center;
 }
