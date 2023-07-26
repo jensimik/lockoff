@@ -317,7 +317,7 @@ async def refresh():
 
 async def klubmodul_runner():
     # a bit of initial sleeping for two hours
-    # await asyncio.sleep(2 * 60 * 60)
+    await asyncio.sleep(2 * 60 * 60)
     while True:
         try:
             log.info("klubmodul refreshing data")
