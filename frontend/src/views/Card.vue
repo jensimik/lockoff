@@ -8,7 +8,7 @@ export default {
     return { 
         user_data: null, 
         os: getMobileOS(),
-        baseURL: APISettings.baseURL
+        baseURL: APISettings.baseURL,
     };
   },
   created() {
@@ -46,23 +46,43 @@ export default {
               <a class="button" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pdf'">🖨️ pdf for print</a>
             </div>
             <div class="fright">
-              <a class="button" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pkpass'">📱 mobile pass</a>
+              <a class="button" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pkpass'">📱 mobile pass<span v-if="os== 'Android'">*</span></a>
             </div>
+            <a v-if="os == 'iOS'" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pkpass'"><img class="addtoapplewallet" src="/US-UK_Add_to_Apple_Wallet_RGB_101421.svg" /></a>
           </footer>
         </article>
         </div>
         <div v-if="os == 'Android'">
-          <p>To use the digital wallet on android phones you need an app - i recommend one of these apps:</p>
-          <a target="_blank" href='https://play.google.com/store/apps/details?id=com.attidomobile.passwallet&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
-          <a target="_blank" href='https://play.google.com/store/apps/details?id=io.walletpasses.android&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+          <p>* to use the digital wallet on android phones you need an app - i recommend one of these apps:</p>
+          <div class="flex two">
+            <div>
+              <h4>WalletPass</h4>
+              <a target="_blank" href='https://play.google.com/store/apps/details?id=io.walletpasses.android'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+            </div>
+            <div>
+              <h4>PassWallet</h4>
+              <a target="_blank" href='https://play.google.com/store/apps/details?id=com.attidomobile.passwallet'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+            </div>
+          </div>
           <p>be sure to <a target="_blank" href="https://support.passcreator.com/space/KB/22347871/Location+based+notifications+-+troubleshooting#Location-based-notifications-on-Android">enable geo and ibeacon in the app</a></p>
         </div>
     </div>
 </template>
 
 <style scoped>
+img[alt="Get it on Google Play"] {
+  width: 100%;
+}
+img.addtoapplewallet {
+  width: 50%;
+  margin-left: 50%;
+}
 h3 {
   font-size: 1.5em;
+}
+h4 {
+  margin: 0;
+  padding: 0;
 }
 .membernumber {
   font-size: 0.5em;
