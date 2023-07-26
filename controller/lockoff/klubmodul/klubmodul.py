@@ -9,7 +9,7 @@ import aiosqlite
 import httpx
 
 from ..config import settings
-from ..misc import queries
+from ..misc import queries, simple_hash
 from .klubmodul_login_data import data as login_data
 
 log = logging.getLogger(__name__)
@@ -305,8 +305,8 @@ async def refresh():
                 user_id=user_id,
                 name=name,
                 member_type=member_type,
-                email=email,
-                mobile=mobile,
+                email=simple_hash(email),
+                mobile=simple_hash(mobile),
                 batch_id=batch_id,
                 active=True,
             )

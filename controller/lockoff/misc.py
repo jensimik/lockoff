@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import logging
 import pathlib
 from datetime import datetime
@@ -12,6 +13,10 @@ log = logging.getLogger(__name__)
 lock = asyncio.Lock()
 module_directory = pathlib.Path(__file__).resolve().parent
 queries = aiosql.from_path(module_directory / "queries.sql", "aiosqlite")
+
+
+def simple_hash(data: str) -> str:
+    return hashlib.sha256(f"{data}{settings.hash_salt}".encode()).hexdigest()
 
 
 class GFXDisplay:

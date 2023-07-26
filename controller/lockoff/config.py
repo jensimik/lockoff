@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     klubmodul_password: str = ""
     klubmodul_base_url: str = ""
     klubmodul_admin_user_id: int = 3535  # change to your own user_id for the admin user
+    hash_salt: str = "changeme"
     nonce_size: int = 4
     digest_size: int = 10
     dl_nonce_size: int = 2

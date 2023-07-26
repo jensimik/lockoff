@@ -56,6 +56,7 @@ async def system_status(
     ],
 ):
     pass
+    # last successful sync with klubmodul and number of users synced
     # return all alive?
     # last x access_log
     # estimated number of day-tickets left in reception?

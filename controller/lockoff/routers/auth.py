@@ -10,7 +10,7 @@ from .. import schemas
 from ..config import settings
 from ..depends import DBcon
 from ..klubmodul import KMClient
-from ..misc import queries
+from ..misc import queries, simple_hash
 
 router = APIRouter(tags=["auth"])
 log = logging.getLogger(__name__)
@@ -40,14 +40,16 @@ async def request_totp(
 ) -> schemas.StatusReply:
     # support either mobile or email as username_type
     users = await getattr(queries, f"get_active_users_by_{rt.username_type}")(
-        conn, **{rt.username_type: rt.username}
+        conn, **{rt.username_type: simple_hash(rt.username)}
     )
     user_ids = [u["user_id"] for u in users]
     if user_ids:
         totp_secret = pyotp.random_base32()
         totp = pyotp.TOTP(totp_secret)
         await getattr(queries, f"update_user_by_{rt.username_type}_set_totp_secret")(
-            conn, totp_secret=totp_secret, **{rt.username_type: rt.username}
+            conn,
+            totp_secret=totp_secret,
+            **{rt.username_type: simple_hash(rt.username)},
         )
         await conn.commit()
 
@@ -69,7 +71,7 @@ async def login(
     conn: DBcon,
 ) -> schemas.JWTToken:
     users = await getattr(queries, f"get_active_users_by_{login_data.username_type}")(
-        conn, **{login_data.username_type: login_data.username}
+        conn, **{login_data.username_type: simple_hash(login_data.username)}
     )
     totp_secrets = [u["totp_secret"] for u in users]
     user_ids = [u["user_id"] for u in users]
