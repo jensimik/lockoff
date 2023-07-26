@@ -40,7 +40,16 @@ services:
       - klubmodul_password=${KLUBMODUL_PASSWORD}
       - opticon_url=/dev/OPTICON
       - display_url=/dev/DISPLAY
-      - redis_url=redis://:${REDIS_PASSWORD}@redis
+      - redis_url=${REDIS_URL}
+      - jwt_secret=${JWT_SECRET}
+      - secret=${SECRET}
+      - key=${KEY}
+      - certificate=${CERTIFICATE}
+      - certificate_password=${CERTIFICATE_PASSWORD}
+      - wwdr_certificate=${WWDR_CERTIFICATE}
+      - GPIOZERO_PIN_FACTORY=native
+      - admin_user_ids=${ADMIN_USER_IDS}
+      - hash_salt=${HASH_SALT}
     group_add:
       - dialout
     devices:
