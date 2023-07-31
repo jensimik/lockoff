@@ -3,7 +3,6 @@ import io
 
 import qrcode
 from PIL import Image
-
 from weasyprint import HTML
 
 from .paper_template import template
