@@ -119,12 +119,14 @@ async def system_status(
 ):
     last_sync = await queries.get_last_klubmodul_sync(conn)
     active_users = await queries.count_active_users(conn)
-    last_access = await queries.last_log_entries(conn, limit=50)
+    member_access = await queries.last_log_entries(conn, limit=50)
+    dt_access = []
 
     return {
         "last_sync": last_sync,
         "active_users": active_users,
-        "last_access": last_access,
+        "member_access": member_access,
+        "dt_access": dt_access,
         "dayticket_reception": 0,
         "dayticket_used": 0,
     }
