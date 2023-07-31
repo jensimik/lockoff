@@ -117,8 +117,8 @@ async def system_status(
     ],
     conn: DBcon,
 ):
-    lsd = datetime.now(tz=settings.tz) - datetime.fromisoformat(
-        await queries.get_last_klubmodul_sync(conn)
+    lsd = datetime.utcnow() - datetime.fromisoformat(
+        await queries.get_last_klubmodul_sync(conn),
     )
     active_users = await queries.count_active_users(conn)
     member_access = await queries.last_log_entries(conn, limit=50)
