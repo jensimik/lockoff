@@ -43,7 +43,6 @@ def generate_access_token(
     """Generate a new access token
     the access token should be used as data in a QR code
     the QR code can be printed or used in apple/google wallet as a memebership card
-    user_id 0 is a special case for day tickets
 
     Returns
     -------
