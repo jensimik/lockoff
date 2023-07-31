@@ -13,7 +13,7 @@ colorzero==2.0
 cryptography==38.0.4
 cssselect2==0.7.0
 ecdsa==0.18.0
-fastapi==0.100.0
+fastapi==0.100.1
 fastapi-limiter==0.1.5
 fonttools==4.41.1
 gpiozero==1.6.2
@@ -31,7 +31,7 @@ pydantic==2.1.1
 pydantic-settings==2.0.2
 pydantic_core==2.4.0
 pydyf==0.7.0
-pyotp==2.8.0
+pyotp==2.9.0
 pyphen==0.14.0
 pypng==0.20220715.0
 pyserial==3.5
