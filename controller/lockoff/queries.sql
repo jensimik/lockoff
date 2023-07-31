@@ -111,7 +111,7 @@ where ticket_id = :ticket_id;
 
 -- name: get_dayticket_stats
 -- get stats about dayticket batches
-select batch_id, SUM(CASE WHEN expire = 0 THEN 1 ELSE 0 END) as unused,  SUM(CASE WHEN expire > 0 THEN 1 ELSE 0 END) as used
+select batch_id, SUM(CASE WHEN expires = 0 THEN 1 ELSE 0 END) as unused,  SUM(CASE WHEN expires > 0 THEN 1 ELSE 0 END) as used
 from dayticket
 group by batch_id
 
