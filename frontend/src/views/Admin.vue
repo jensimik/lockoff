@@ -30,8 +30,11 @@ export default {
 </script>
 
 <template>
+    <h3>Daytickets</h3>
+    <p>Estimated tickets in the reception <span class="bold">{{ data.dayticket_reception }}</span> and <span class="bold">{{ data.dayticket_used }}</span> this season.</p>
+    <button>generate print</button>
     <h3>Klubmodul</h3>
-    <p>Last synced ({{ data.last_sync }}) and {{ data.active_users }} number of active members.</p>
+    <p>Last synced <span class="bold">{{ data.last_sync }}</span> with <span class="bold">{{ data.active_users }}</span> active members.</p>
     <button class="warning" @click="forceResyncKlubmodul">resync klubmodul</button>
     <h3>Access log most recent</h3>
     <table class="primary">
@@ -54,5 +57,8 @@ export default {
 <style scoped>
 table {
     width: 100%;
+}
+.bold {
+    font-weight: bolder;
 }
 </style>
