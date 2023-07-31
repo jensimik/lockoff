@@ -3,8 +3,14 @@ import controllerAPI from "../api/resources/allMethods";
 
 export default {
   name: "Print Daytickets",
+  props: ['foo'],
+  setup(props) {
+    console.log(props.pages_to_print);
+    this.pages_to_print = props.pages_to_print;
+  },
   data() {
     return { 
+        pages_to_print: 1,
         data: {}, 
     };
   },
@@ -13,7 +19,7 @@ export default {
   },
   methods: {
     fetchData() {
-        controllerAPI.generate_daytickets().then((print_data) => {
+        controllerAPI.generate_daytickets(this.pages_to_print).then((print_data) => {
             this.data = print_data;
         }).catch((error) => {
             console.log("failed to fetch print data");

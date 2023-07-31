@@ -7,6 +7,7 @@ export default {
   data() {
     return { 
         data: {}, 
+        pages_to_print: 1,
     };
   },
   created() {
@@ -28,7 +29,7 @@ export default {
         })
     },
     print() {
-        router.push({name: "dayticket_print"});
+        router.push({name: "dayticket_print", params: {pages: this.pages_to_print}});
         return false;
     }
   }
@@ -48,6 +49,7 @@ export default {
     <div class="flex two">
         <h3>Daytickets</h3>
         <div class="right">
+            <input id="pages_to_print" type="number" v-model="pages_to_print" />
             <button @click="print">generate print</button>
         </div>
     </div>
@@ -59,7 +61,7 @@ export default {
             <thead>
                 <tr>
                     <th>batch_id</th>
-                    <th>ticket_ids</th>
+                    <th class="center">ticket_ids</th>
                     <th class="right">used</th>
                     <th class="right">unused</th>
                 </tr>
@@ -67,7 +69,7 @@ export default {
             <tbody>
                 <tr v-for="batch in data.dt_stats" :key="batch.batch_id">
                     <td>{{ batch.batch_id }}</td>
-                    <td>{{ batch.range_start }}-{{ batch.range_end }}</td>
+                    <td class="center">{{ batch.range_start }}-{{ batch.range_end }}</td>
                     <td class="right">{{ batch.used }}</td>
                     <td class="right">{{ batch.unused }}</td>
                 </tr>
@@ -95,13 +97,17 @@ export default {
 </template>
 
 <style scoped>
-td.right {
-    text-align: right;
-}
 .bold {
     font-weight: bolder;
 }
 .right {
     text-align: right;
+}
+.center {
+    text-align: center;
+}
+#pages_to_print {
+    display: inline-block;
+    width: 5em;
 }
 </style>

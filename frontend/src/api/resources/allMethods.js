@@ -63,11 +63,12 @@ export default {
             return response.json();
         }
     },
-    async generate_daytickets() {
+    async generate_daytickets(pages_to_print) {
         var access_token = getWithExpiry("access_token");
         const response = await fetch(APISettings.baseURL + '/admin/generate-daytickets', {
             method: 'POST',
-            headers: {...APISettings.headers, Authorization: "Bearer " + access_token}
+            headers: {...APISettings.headers, 'Content-Type': 'Application/json', Authorization: "Bearer " + access_token},
+            body: JSON.stringify({pages_to_print: pages_to_print})
         });
         if (response.status != 200) {
             throw response.status;

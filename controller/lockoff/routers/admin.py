@@ -35,6 +35,7 @@ log = logging.getLogger(__name__)
 
 @router.post("/generate-daytickets")
 async def klubmodul_force_resync(
+    pages_to_print: schemas.PagesToPrint,
     _: Annotated[
         list[aiosqlite.Row], Security(depends.get_current_users, scopes=["admin"])
     ],
@@ -42,7 +43,8 @@ async def klubmodul_force_resync(
 ):
     batch_id = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
     dayticket_ids = [
-        await queries.insert_dayticket(conn, batch_id=batch_id) for _ in range(30)
+        await queries.insert_dayticket(conn, batch_id=batch_id)
+        for _ in range(30 * pages_to_print)
     ]
     await conn.commit()
     return [
