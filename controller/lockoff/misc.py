@@ -37,6 +37,7 @@ class GFXDisplay:
                         self.display_w.write(b",")
                     else:
                         self.display_w.write(b".")
+                    await self.display_w.drain()
                 else:
                     log.info("display send idle message")
             await asyncio.sleep(1.5)
@@ -45,7 +46,7 @@ class GFXDisplay:
         async with lock:
             if settings.display_url:
                 self.display_w.write(message)
-                await asyncio.sleep(1.5)
+                await self.display_w.drain()
             else:
                 log.info(f"display send message {message.decode('utf-8')}")
 
