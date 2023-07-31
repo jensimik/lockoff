@@ -39,4 +39,41 @@ export default {
             return response.json();
         }
     },
+    async system_status() {
+        var access_token = getWithExpiry("access_token");
+        const response = await fetch(APISettings.baseURL + '/admin/system-status', {
+            method: 'GET',
+            headers: {...APISettings.headers, Authorization: "Bearer " + access_token}
+        });
+        if (response.status != 200) {
+            throw response.status;
+        } else {
+            return response.json();
+        }
+    },
+    async klubmodul_force_resync() {
+        var access_token = getWithExpiry("access_token");
+        const response = await fetch(APISettings.baseURL + '/admin/klubmodul-force-resync', {
+            method: 'POST',
+            headers: {...APISettings.headers, Authorization: "Bearer " + access_token}
+        });
+        if (response.status != 200) {
+            throw response.status;
+        } else {
+            return response.json();
+        }
+    },
+    async generate_daytickets(pages_to_print) {
+        var access_token = getWithExpiry("access_token");
+        const response = await fetch(APISettings.baseURL + '/admin/generate-daytickets', {
+            method: 'POST',
+            headers: {...APISettings.headers, 'Content-Type': 'Application/json', Authorization: "Bearer " + access_token},
+            body: JSON.stringify({pages_to_print: pages_to_print})
+        });
+        if (response.status != 200) {
+            throw response.status;
+        } else {
+            return response.json();
+        }
+    },
 }

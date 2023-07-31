@@ -98,7 +98,7 @@ update users
 set active = false
 where batch_id != :batch_id;
 
--- name: insert_dayticket!
+-- name: insert_dayticket<!
 -- insert a new dayticket with no expire time set yet
 insert into dayticket(batch_id, expires)
 values (:batch_id, 0)
@@ -108,6 +108,12 @@ values (:batch_id, 0)
 select ticket_id, expires
 from dayticket
 where ticket_id = :ticket_id;
+
+-- name: get_dayticket_stats
+-- get stats about dayticket batches
+select batch_id, min(ticket_id) as range_start, max(ticket_id) as range_end, SUM(CASE WHEN expires = 0 THEN 1 ELSE 0 END) as unused,  SUM(CASE WHEN expires > 0 THEN 1 ELSE 0 END) as used
+from dayticket
+group by batch_id
 
 -- name: update_dayticket_expire!
 -- update a dayticket to expire at x time

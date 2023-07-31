@@ -5,7 +5,7 @@ from datetime import datetime
 
 import aiosqlite
 import serial_asyncio
-from dateutil import relativedelta
+from dateutil.relativedelta import relativedelta
 from gpiozero import LED
 
 from .access_token import (

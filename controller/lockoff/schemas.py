@@ -5,6 +5,10 @@ from pydantic import BaseModel, Field, constr
 username_type = Literal["mobile", "email"]
 
 
+class PagesToPrint(BaseModel):
+    pages_to_print: int
+
+
 class RequestTOTP(BaseModel):
     username: constr(to_lower=True, min_length=6, max_length=50)
     username_type: username_type

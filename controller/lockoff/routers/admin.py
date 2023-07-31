@@ -1,4 +1,5 @@
 import io
+import logging
 from datetime import datetime
 from typing import Annotated
 
@@ -29,9 +30,12 @@ from ..misc import queries
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
+log = logging.getLogger(__name__)
+
 
 @router.post("/generate-daytickets")
 async def klubmodul_force_resync(
+    pages_to_print: schemas.PagesToPrint,
     _: Annotated[
         list[aiosqlite.Row], Security(depends.get_current_users, scopes=["admin"])
     ],
@@ -39,9 +43,17 @@ async def klubmodul_force_resync(
 ):
     batch_id = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
     dayticket_ids = [
-        await queries.insert_dayticket(conn, batch_id=batch_id) for _ in range(30)
+        await queries.insert_dayticket(conn, batch_id=batch_id)
+        for _ in range(30 * pages_to_print.pages_to_print)
     ]
-    return [generate_dl_token(user_id=dayticket_id) for dayticket_id in dayticket_ids]
+    await conn.commit()
+    return [
+        {
+            "dayticket_id": dayticket_id,
+            "dl_token": generate_dl_token(user_id=dayticket_id),
+        }
+        for dayticket_id in dayticket_ids
+    ]
 
 
 @router.get(
@@ -55,8 +67,10 @@ async def get_qr_code_png(
     ticket_id: Annotated[int, Depends(verify_dl_token)],
     conn: DBcon,
 ):
+    log.info("getting qr code for ticket_id {ticket_id}")
     ticket = await queries.get_dayticket_by_id(conn, ticket_id=ticket_id)
     if not ticket:
+        log.error("could not find ticket with id {ticket_id}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     access_token = generate_access_token(
         user_id=ticket_id,
@@ -80,6 +94,25 @@ async def access_log(
     return await queries.last_log_entries(conn, limit=30)
 
 
+# from dateutil.rrule import rrulestr
+# from dateutil.relativedelta import relativedelta
+# from dateutil.tz import gettz
+# from datetime import datetime
+
+# tz = gettz("Europe/Copenhagen")
+
+# today = datetime.now(tz=tz) + relativedelta(hour=0, minute=0, second=0, microsecond=0)
+# a = """FREQ=HOURLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+# FREQ=HOURLY;BYDAY=SA,SU;BYHOUR=9,10,11,12,13,14,15,16,17,18,19,20,21,22,23"""
+# aex = "FREQ=HOURLY;BYMONTH=7;BYDAY=MO,TU,WE,TH,FR;BYHOUR=9,10,11,12,13,14"
+# b = rrulestr(a, forceset=True, dtstart=today)
+# b.exrule(rrulestr(aex, dtstart=today, forceset=True))
+# c = datetime.now(tz=tz) + relativedelta(minute=0, second=0, microsecond=0)
+# today_end = today + relativedelta(days=1)
+# b.between(today, today_end)
+# c in b
+
+
 @router.post("/klubmodul-force-resync")
 async def klubmodul_force_resync(
     _: Annotated[
@@ -87,7 +120,7 @@ async def klubmodul_force_resync(
     ],
     background_tasks: BackgroundTasks,
 ) -> schemas.StatusReply:
-    background_tasks.add_task(refresh())
+    background_tasks.add_task(refresh)
     return schemas.StatusReply(status="sync started")
 
 
@@ -98,16 +131,21 @@ async def system_status(
     ],
     conn: DBcon,
 ):
-    last_sync = await queries.get_last_klubmodul_sync(conn)
+    lsd = datetime.now(tz=settings.tz) - datetime.fromisoformat(
+        await queries.get_last_klubmodul_sync(conn),
+    )
+    hours, remainder = divmod(lsd.total_seconds(), 3600)
+    minutes, _ = divmod(remainder, 60)
     active_users = await queries.count_active_users(conn)
-    last_access = await queries.last_log_entries(conn, limit=10)
-
+    member_access = await queries.last_log_entries(conn, limit=50)
+    dt_stats = await queries.get_dayticket_stats(conn)
+    dayticket_reception = sum([d["unused"] for d in dt_stats])
+    dayticket_used = sum([d["used"] for d in dt_stats])
     return {
-        "last_sync": last_sync,
+        "last_sync": f"{hours:.0f} hours and {minutes:.0f} minutes ago",
         "active_users": active_users,
-        "last_access": last_access,
+        "member_access": member_access,
+        "dt_stats": dt_stats,
+        "dayticket_reception": dayticket_reception,
+        "dayticket_used": dayticket_used,
     }
-    # last successful sync with klubmodul and number of users synced
-    # return all alive?
-    # last x access_log
-    # estimated number of day-tickets left in reception?

@@ -20,14 +20,19 @@ const router = createRouter({
             component: () => import('../views/Card.vue'),
         },
         {
+            path: '/admin',
+            name: 'admin',
+            component: () => import('../views/Admin.vue'),
+        },
+        {
             path: '/access_log',
             name: 'access_log',
             component: () => import('../views/Card.vue'),
         },
         {
-            path: '/dayticket_print',
+            path: '/print',
             name: 'dayticket_print',
-            component: () => import('../views/Card.vue'),
+            component: () => import('../views/Print.vue'),
         }
     ],
     scrollBehavior(to, from, savedPosition) {
