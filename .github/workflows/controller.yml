@@ -90,3 +90,4 @@ jobs:
           url: "https://lockoff-watchtower.gnerd.dk/v1/update"
           method: "GET"
           bearerToken: ${{ secrets.WATCHTOWER_TOKEN }}
+          timeout: 1200000
