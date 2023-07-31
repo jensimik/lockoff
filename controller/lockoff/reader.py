@@ -101,6 +101,7 @@ async def opticon_reader(display: GFXDisplay):
     _r, _w = await serial_asyncio.open_serial_connection(url=settings.opticon_url)
     # TODO: should i send opticon configuration by serial to ensure it is correct before starting?
     # first trigger reader
+    await o_cmd(_w, [O_CMD.DETRIGGER])
     await o_cmd(_w, [O_CMD.TRIGGER])
     while True:
         # read a scan from the barcode reader read until carriage return CR
@@ -108,7 +109,7 @@ async def opticon_reader(display: GFXDisplay):
         async with asyncio.TaskGroup() as tg:
             try:
                 # detrigger reader
-                tg.create_task(o_cmd(_w, cmds=[O_CMD.DETRIGGER]))
+                await o_cmd(_w, [O_CMD.DETRIGGER])
                 # check the qr_code (raises exception on errors)
                 await check_qrcode(qr_code)
                 # buzz in
