@@ -20,6 +20,11 @@ const router = createRouter({
             component: () => import('../views/Card.vue'),
         },
         {
+            path: '/admin',
+            name: 'admin',
+            component: () => import('../views/Admin.vue'),
+        },
+        {
             path: '/access_log',
             name: 'access_log',
             component: () => import('../views/Card.vue'),
