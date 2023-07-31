@@ -65,16 +65,21 @@ if __name__ == "__main__":
     poll = select.poll()
     poll.register(sys.stdin, select.POLLIN)
 
+    # start tick and show ready message
+    tick1 = time.ticks_ms()
+    show_message(*MESSAGES["."])
+    # main loop
     while True:
         # feed watchdog
         wdt.feed()
         if poll.poll(2000):
             data = sys.stdin.read(1)
-            # print("#")  # print ACK back
-            show_message(*MESSAGES.get(data, MESSAGES["E"]))
-            # sleep a little before next message
-            if not data == ".":
-                time.sleep(1.8)
+            if data in [".", ","]:
+                if time.ticks_diff(time.ticks_ms(), tick1) > 5000:
+                    show_message(*MESSAGES.get(data, MESSAGES["E"]))
+            else:
+                show_message(*MESSAGES.get(data, MESSAGES["E"]))
+                tick1 = time.ticks_ms()
         else:
             # system error
             show_message(*MESSAGES["E"])

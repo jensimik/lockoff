@@ -74,7 +74,7 @@ async def get_qr_code_png(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     access_token = generate_access_token(
         user_id=ticket_id,
-        token_type=TokenType.DAY_TICKET_HACK,
+        token_type=TokenType.DAY_TICKET,
         expire_delta=relativedelta(months=3),
     )
     img = generate_png(qr_code_data=access_token.decode())

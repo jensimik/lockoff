@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from ..access_token import TokenType, generate_access_token, verify_dl_token
-from ..card import ApplePass, generate_pdf, generate_png
+from ..card import ApplePass, generate_png, generate_pdf
 from ..config import settings
 from ..depends import DBcon
 from ..misc import queries

@@ -33,6 +33,11 @@ const router = createRouter({
             path: '/print',
             name: 'dayticket_print',
             component: () => import('../views/Print.vue'),
+        },
+        {
+            path: '/scanner',
+            name: 'scanner',
+            component: () => import('../views/Scanner.vue'),
         }
     ],
     scrollBehavior(to, from, savedPosition) {

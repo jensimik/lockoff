@@ -28,6 +28,8 @@ class O_CMD:
     OK_LED = bytes([0x1B, 0x4C, 0xD])
     ERROR_SOUND = bytes([0x1B, 0x45, 0xD])
     ERROR_LED = bytes([0x1B, 0x4E, 0xD])
+    TRIGGER = bytes([0x1B, 0x5A, 0xD])
+    DETRIGGER = bytes([0x1B, 0x59, 0xD])
 
 
 async def buzz_in():
@@ -47,7 +49,7 @@ async def check_member(
         pass
 
 
-async def check_dayticket_hack(user_id: int, conn: aiosqlite.Connection):
+async def check_dayticket(user_id: int, conn: aiosqlite.Connection):
     if ticket := await queries.get_dayticket_by_id(conn, ticket_id=user_id):
         if ticket["expires"] == 0:
             # first use - set expire at midnight of current day
@@ -76,8 +78,8 @@ async def check_qrcode(qr_code: str):
         match token_type:
             case TokenType.NORMAL | TokenType.MORNING:
                 await check_member(user_id=user_id, member_type=token_type, conn=conn)
-            case TokenType.DAY_TICKET_HACK:
-                await check_dayticket_hack(user_id=user_id, conn=conn)
+            case TokenType.DAY_TICKET:
+                await check_dayticket(user_id=user_id, conn=conn)
         log.info(f"{user_id} {token_type} access granted")
         # log in access_log db
         await queries.log_entry(
@@ -101,23 +103,22 @@ async def opticon_reader(display: GFXDisplay):
     while True:
         # read a scan from the barcode reader read until carriage return CR
         qr_code = (await _r.readuntil(separator=b"\r")).decode("utf-8").strip()
-        async with asyncio.TaskGroup() as tg:
-            try:
-                # check the qr_code (raises exception on errors)
-                await check_qrcode(qr_code)
-                # buzz in
-                tg.create_task(buzz_in())
-                # show OK on display
-                tg.create_task(display.send_message(message=b"K"))
-                # give good sound+led on opticon now qr code is verified
-                tg.create_task(o_cmd(_w, cmds=[O_CMD.OK_SOUND, O_CMD.OK_LED]))
-            except TokenError as ex:
-                # show error message on display
-                log.warning(ex)
-                tg.create_task(display.send_message(ex.code))
-                tg.create_task(o_cmd(_w, cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED]))
-            # generic error? show system error on display
-            except Exception:
-                log.exception("generic error in reader")
-                tg.create_task(display.send_message(b"E"))
-                tg.create_task(o_cmd(_w, cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED]))
+        try:
+            # check the qr_code (raises exception on errors)
+            await check_qrcode(qr_code)
+            # buzz in
+            asyncio.create_task(buzz_in())
+            # show OK on display
+            asyncio.create_task(display.send_message(message=b"K"))
+            # give good sound+led on opticon now qr code is verified
+            asyncio.create_task(o_cmd(_w, cmds=[O_CMD.OK_SOUND, O_CMD.OK_LED]))
+        except TokenError as ex:
+            # show error message on display
+            log.warning(ex)
+            asyncio.create_task(display.send_message(ex.code))
+            asyncio.create_task(o_cmd(_w, cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED]))
+        # generic error? show system error on display
+        except Exception:
+            log.exception("generic error in reader")
+            asyncio.create_task(display.send_message(b"E"))
+            asyncio.create_task(o_cmd(_w, cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED]))
