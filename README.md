@@ -10,7 +10,7 @@ Controller:
 - [Pimoroni Automation hat mini](https://shop.pimoroni.com/products/automation-hat-mini) ([manual](https://github.com/pimoroni/automation-hat))
 - 12/24 volt door deadbolt
 - ibeacon using bluetooth on the raspberry
-- _Signed_ QR codes for access (Apple/Android wallet or printed) wallet pass geo+ibeacon
+- _Signed_ QR codes for access (Apple/Android wallet with geo+ibeacon or pdf-printed pass)
 
 Display:
 

@@ -73,6 +73,17 @@ update users
 set totp_secret = :totp_secret
 where email = :email;
 
+-- name: get_last_klubmodul_sync$
+-- get the last isoformat datetime klubmodul were synced (last batchid)
+select max(batch_id)
+from users
+where active == True
+
+-- name: count_active_users$
+-- count active users
+select count(*)
+from users
+where active == True
 
 -- name: upsert_user!
 -- upsert a user in the database
@@ -86,6 +97,11 @@ update set name=excluded.name, member_type=excluded.member_type, mobile=excluded
 update users 
 set active = false
 where batch_id != :batch_id;
+
+-- name: insert_dayticket!
+-- insert a new dayticket with no expire time set yet
+insert into dayticket(batch_id, expires)
+values (:batch_id, 0)
 
 -- name: get_dayticket_by_id^
 -- get a dayticket by id
@@ -131,5 +147,6 @@ create table if not exists access_log (
 );
 create table if not exists dayticket (
     ticket_id integer not null primary key,
-    expires integer nul null
+    batch_id text not null,
+    expires integer not null
 );

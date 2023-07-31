@@ -49,18 +49,20 @@ async def check_member(
 
 async def check_dayticket_hack(user_id: int, conn: aiosqlite.Connection):
     if ticket := await queries.get_dayticket_by_id(conn, ticket_id=user_id):
-        if datetime.utcnow() > datetime.utcfromtimestamp(ticket["expires"]):
+        if ticket["expires"] == 0:
+            # first use - set expire at midnight of current day
+            expire = datetime.now(tz=settings.tz) + relativedelta(
+                hour=23, minute=59, second=59, microsecond=0
+            )
+            await queries.update_dayticket_expire(
+                conn,
+                ticket_id=user_id,
+                expires=int(expire.timestamp()),
+            )
+        elif datetime.now(tz=settings.tz) > datetime.fromtimestamp(
+            ticket["expires"], tz=settings.tz
+        ):
             log_and_raise_token_error("dayticket is expired", code=b"D")
-    else:
-        # expire at midnight
-        expire = datetime.now(tz=settings.tz) + relativedelta(
-            hour=23, minute=59, second=59, microsecond=0
-        )
-        await queries.update_dayticket_expire(
-            conn,
-            ticket_id=user_id,
-            expires=calendar.timegm(expire.utctimetuple()),
-        )
 
 
 async def check_qrcode(qr_code: str):
@@ -82,7 +84,7 @@ async def check_qrcode(qr_code: str):
             conn,
             user_id=user_id,
             token_type=token_type.name,
-            timestamp=datetime.utcnow().isoformat(timespec="seconds"),
+            timestamp=datetime.now(tz=settings.tz).isoformat(timespec="seconds"),
         )
         await conn.commit()
 

@@ -9,7 +9,7 @@ from machine import WDT
 gp = GfxPack()
 display = gp.display
 WIDTH, HEIGHT = display.get_bounds()
-display.set_backlight(0.2)  # turn off the white component of the backlight
+display.set_backlight(0.2)  # dim backlight
 display.set_font("bitmap8")
 
 

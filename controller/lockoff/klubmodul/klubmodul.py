@@ -16,6 +16,8 @@ log = logging.getLogger(__name__)
 
 U = typing.TypeVar("U", bound="KMClient")
 
+refresh_lock = asyncio.Lock()
+
 
 class KMClient:
     def __init__(self):
@@ -297,22 +299,23 @@ class KlubmodulException(Exception):
 
 
 async def refresh():
-    batch_id = datetime.utcnow().isoformat(timespec="seconds")
-    async with KMClient() as client, aiosqlite.connect(settings.db_file) as conn:
-        async for user_id, name, member_type, email, mobile in client.get_members():
-            await queries.upsert_user(
-                conn,
-                user_id=user_id,
-                name=name,
-                member_type=member_type,
-                email=simple_hash(email),
-                mobile=simple_hash(mobile),
-                batch_id=batch_id,
-                active=True,
-            )
-        # mark old data as inactive
-        await queries.inactivate_old_batch(conn, batch_id=batch_id)
-        await conn.commit()
+    with refresh_lock:
+        batch_id = datetime.utcnow().isoformat(timespec="seconds")
+        async with KMClient() as client, aiosqlite.connect(settings.db_file) as conn:
+            async for user_id, name, member_type, email, mobile in client.get_members():
+                await queries.upsert_user(
+                    conn,
+                    user_id=user_id,
+                    name=name,
+                    member_type=member_type,
+                    email=simple_hash(email),
+                    mobile=simple_hash(mobile),
+                    batch_id=batch_id,
+                    active=True,
+                )
+            # mark old data as inactive
+            await queries.inactivate_old_batch(conn, batch_id=batch_id)
+            await conn.commit()
 
 
 async def klubmodul_runner():
