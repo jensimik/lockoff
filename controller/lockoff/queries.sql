@@ -98,7 +98,7 @@ update users
 set active = false
 where batch_id != :batch_id;
 
--- name: insert_dayticket!
+-- name: insert_dayticket<!
 -- insert a new dayticket with no expire time set yet
 insert into dayticket(batch_id, expires)
 values (:batch_id, 0)
