@@ -120,12 +120,14 @@ async def system_status(
     lsd = datetime.now(tz=settings.tz) - datetime.fromisoformat(
         await queries.get_last_klubmodul_sync(conn),
     )
+    hours, remainder = divmod(lsd, 3600)
+    minutes, _ = divmod(remainder, 60)
     active_users = await queries.count_active_users(conn)
     member_access = await queries.last_log_entries(conn, limit=50)
     dt_access = []
 
     return {
-        "last_sync": f"{lsd:%H} hours and {lsd:%M} minutes ago",
+        "last_sync": f"{hours} hours and {minutes} minutes ago",
         "active_users": active_users,
         "member_access": member_access,
         "dt_access": dt_access,
