@@ -59,6 +59,7 @@ export default {
             <thead>
                 <tr>
                     <th>batch_id</th>
+                    <th>ticket_ids</th>
                     <th class="right">used</th>
                     <th class="right">unused</th>
                 </tr>
@@ -66,6 +67,7 @@ export default {
             <tbody>
                 <tr v-for="batch in data.dt_stats" :key="batch.batch_id">
                     <td>{{ batch.batch_id }}</td>
+                    <td>{{ batch.range_start }}-{{ batch.range_end }}</td>
                     <td class="right">{{ batch.used }}</td>
                     <td class="right">{{ batch.unused }}</td>
                 </tr>
