@@ -54,6 +54,7 @@ export default {
             } else {
             this.error += err.message
             }
+        }
    }
 }
 </script>
