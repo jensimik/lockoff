@@ -75,7 +75,7 @@ if __name__ == "__main__":
         if poll.poll(2000):
             data = sys.stdin.read(1)
             if data in [".", ","]:
-                if time.ticks_diff(time.ticks_us(), tick1) > 5000:
+                if time.ticks_diff(time.ticks_ms(), tick1) > 5000:
                     show_message(*MESSAGES.get(data, MESSAGES["E"]))
             else:
                 show_message(*MESSAGES.get(data, MESSAGES["E"]))
