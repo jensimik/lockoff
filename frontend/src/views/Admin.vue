@@ -59,15 +59,15 @@ export default {
             <thead>
                 <tr>
                     <th>batch_id</th>
-                    <th>used</th>
-                    <th>unused</th>
+                    <th class="right">used</th>
+                    <th class="right">unused</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="batch in data.dt_stats" :key="batch.batch_id">
                     <td>{{ batch.batch_id }}</td>
-                    <td>{{ batch.used }}</td>
-                    <td>{{ batch.unused }}</td>
+                    <td class="right">{{ batch.used }}</td>
+                    <td class="right">{{ batch.unused }}</td>
                 </tr>
             </tbody>
         </table>
@@ -93,6 +93,9 @@ export default {
 </template>
 
 <style scoped>
+td.right {
+    text-align: right;
+}
 .bold {
     font-weight: bolder;
 }

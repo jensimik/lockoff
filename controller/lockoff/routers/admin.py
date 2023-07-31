@@ -137,12 +137,13 @@ async def system_status(
     active_users = await queries.count_active_users(conn)
     member_access = await queries.last_log_entries(conn, limit=50)
     dt_stats = await queries.get_dayticket_stats(conn)
-
+    dayticket_reception = sum([d["unused"] for d in dt_stats])
+    dayticket_used = sum([d["used"] for d in dt_stats])
     return {
         "last_sync": f"{hours:.0f} hours and {minutes:.0f} minutes ago",
         "active_users": active_users,
         "member_access": member_access,
         "dt_stats": dt_stats,
-        "dayticket_reception": 0,
-        "dayticket_used": 0,
+        "dayticket_reception": dayticket_reception,
+        "dayticket_used": dayticket_used,
     }
