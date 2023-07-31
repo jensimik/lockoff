@@ -78,6 +78,6 @@ export default {
 <style scoped>
 .wrapper {
     width: 100%;
-    max-width: 800px;
+    max-width: 300px;
 }
 </style>
