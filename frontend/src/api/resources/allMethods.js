@@ -63,4 +63,16 @@ export default {
             return response.json();
         }
     },
+    async generate_daytickets() {
+        var access_token = getWithExpiry("access_token");
+        const response = await fetch(APISettings.baseURL + '/admin/generate-daytickets', {
+            method: 'POST',
+            headers: {...APISettings.headers, Authorization: "Bearer " + access_token}
+        });
+        if (response.status != 200) {
+            throw response.status;
+        } else {
+            return response.json();
+        }
+    },
 }

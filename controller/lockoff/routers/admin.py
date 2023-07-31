@@ -1,4 +1,5 @@
 import io
+import logging
 from datetime import datetime
 from typing import Annotated
 
@@ -29,6 +30,8 @@ from ..misc import queries
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
+log = logging.getLogger(__name__)
+
 
 @router.post("/generate-daytickets")
 async def klubmodul_force_resync(
@@ -41,7 +44,14 @@ async def klubmodul_force_resync(
     dayticket_ids = [
         await queries.insert_dayticket(conn, batch_id=batch_id) for _ in range(30)
     ]
-    return [generate_dl_token(user_id=dayticket_id) for dayticket_id in dayticket_ids]
+    log.info(dayticket_ids)
+    return [
+        {
+            "dayticket_id": dayticket_id,
+            "dl_token": generate_dl_token(user_id=dayticket_id),
+        }
+        for dayticket_id in dayticket_ids
+    ]
 
 
 @router.get(
@@ -134,7 +144,3 @@ async def system_status(
         "dayticket_reception": 0,
         "dayticket_used": 0,
     }
-    # last successful sync with klubmodul and number of users synced
-    # return all alive?
-    # last x access_log
-    # estimated number of day-tickets left in reception?

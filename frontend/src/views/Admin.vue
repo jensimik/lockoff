@@ -1,5 +1,7 @@
 <script>
 import controllerAPI from "../api/resources/allMethods";
+import router from "../router";
+
 export default {
   name: "Admin dashboard",
   data() {
@@ -24,6 +26,10 @@ export default {
         controllerAPI.klubmodul_force_resync().then(() => {
             console.log("force resync");
         })
+    },
+    print() {
+        router.push({name: "dayticket_print"});
+        return false;
     }
   }
 }
@@ -42,11 +48,30 @@ export default {
     <div class="flex two">
         <h3>Daytickets</h3>
         <div class="right">
-            <button>generate print</button>
+            <button @click="print">generate print</button>
         </div>
     </div>
     <div class="flex one">
         <p><span class="bold">{{ data.dayticket_reception }}</span> tickets in the reception and <span class="bold">{{ data.dayticket_used }}</span> used in total this season.</p>
+    </div>
+    <div class="flex one">
+        <table>
+            <thead>
+                <tr>
+                    <th>batch_id</th>
+                    <th>used</th>
+                    <th>unused</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="batch in data.dt_stats" :key="batch.batch_id">
+                    <td>{{ batch.batch_id }}</td>
+                    <td>{{ batch.used }}</td>
+                    <td>{{ batch.unused }}</td>
+                </tr>
+            </tbody>
+        </table>
+
     </div>
     <div class="flex one">
         <h3>Access log most recent</h3>
@@ -68,9 +93,6 @@ export default {
 </template>
 
 <style scoped>
-table {
-    width: 100%;
-}
 .bold {
     font-weight: bolder;
 }
