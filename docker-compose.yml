@@ -1,5 +1,14 @@
 version: "3.8"
 services:
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_HTTP_API_UPDATE=true
+      - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_TOKEN}
   autoheal:
     image: willfarrell/autoheal:latest
     container_name: autoheal
@@ -31,7 +40,7 @@ services:
     container_name: lockoff
     restart: always
     volumes:
-      - $PWD/lockoff.db3:/lockoff.db3
+      - $PWD/lockoff.db3:/db/lockoff.db3
     environment:
       - prod=1
       - tz=Europe/Copenhagen
