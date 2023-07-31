@@ -15,7 +15,8 @@ export default {
     methods: {
         onDetect (detectedCodes) {
             console.log(detectedCodes);
-            this.code = detectedCodes[0].rawValue;
+            const [ firstCode ] = detectedCodes
+            this.code = firstCode.rawValue;
         },
         paintOutline(detectedCodes, ctx) {
             for (const detectedCode of detectedCodes) {
@@ -35,22 +36,51 @@ export default {
             }
         },
         logErrors(err) {
-            this.error = true;
-        }
-    }
+            this.error = `[${err.name}]: `
+            if (err.name === 'NotAllowedError') {
+            this.error += 'you need to grant camera access permission'
+            } else if (err.name === 'NotFoundError') {
+            this.error += 'no camera on this device'
+            } else if (err.name === 'NotSupportedError') {
+            this.error += 'secure context required (HTTPS, localhost)'
+            } else if (err.name === 'NotReadableError') {
+            this.error += 'is the camera already in use?'
+            } else if (err.name === 'OverconstrainedError') {
+            this.error += 'installed cameras are not suitable'
+            } else if (err.name === 'StreamApiNotSupportedError') {
+            this.error += 'Stream API is not supported in this browser'
+            } else if (err.name === 'InsecureContextError') {
+            this.error += 'Camera access is only permitted in secure context. Use HTTPS or localhost rather than HTTP.'
+            } else {
+            this.error += err.message
+            }
+   }
 }
 </script>
 
 
 
 <template>
-    <div class="flex two">
-        <div>
-            <qrcode-stream :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
-        </div>
-        <div>
-            <p>{{ code }}</p>
-            <p v-if="error">could not load camera somehow? are you on mobile?</p>
-        </div>
+    <div class="left50">
+        <qrcode-stream :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
+    </div>
+    <div class="right50">
+        <p>{{ code }}</p>
+        <p v-if="error">{{ error }}</p>
     </div>
 </template>
+
+<style scoped>
+.left50 {
+    width: 50%;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+.right50 {
+    width: 50%;
+    display: inline-block;
+    margin: 0;
+    padding: 1em;
+}
+</style>
