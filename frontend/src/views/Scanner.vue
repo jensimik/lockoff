@@ -7,16 +7,23 @@ export default {
         return {
             code: "",
             error: false,
+            paused: false,
+            features: {
+                audio: false,
+                video: {
+                    width: { ideal: 640 },
+                    height: { ideal: 480 }
+                }
+            },
         }
     },
     components: {
         QrcodeStream,
     },
     methods: {
-        onDetect (detectedCodes) {
-            console.log(detectedCodes);
-            const [ firstCode ] = detectedCodes
+        onDetect ([ firstCode ]) {
             this.code = firstCode.rawValue;
+            this.paused = true;
         },
         paintOutline(detectedCodes, ctx) {
             for (const detectedCode of detectedCodes) {
@@ -62,12 +69,14 @@ export default {
 
 
 <template>
-    <div class="left50">
-        <qrcode-stream :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
-    </div>
-    <div class="right50">
-        <p>{{ code }}</p>
-        <p v-if="error">{{ error }}</p>
+    <div>
+        <div class="left50">
+            <qrcode-stream :paused="paused" :constraints="features" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
+        </div>
+        <div class="right50">
+            <p>{{ code }}</p>
+            <p v-if="error">{{ error }}</p>
+        </div>
     </div>
 </template>
 
