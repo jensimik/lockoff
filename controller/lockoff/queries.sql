@@ -113,6 +113,7 @@ where ticket_id = :ticket_id;
 -- get stats about dayticket batches
 select batch_id, count(expires = 0) as unused, count(expires > 0) as used
 from dayticket
+group by batch_id
 
 -- name: update_dayticket_expire!
 -- update a dayticket to expire at x time
