@@ -47,7 +47,7 @@ async def check_member(
         pass
 
 
-async def check_dayticket_hack(user_id: int, conn: aiosqlite.Connection):
+async def check_dayticket(user_id: int, conn: aiosqlite.Connection):
     if ticket := await queries.get_dayticket_by_id(conn, ticket_id=user_id):
         if ticket["expires"] == 0:
             # first use - set expire at midnight of current day
@@ -76,8 +76,8 @@ async def check_qrcode(qr_code: str):
         match token_type:
             case TokenType.NORMAL | TokenType.MORNING:
                 await check_member(user_id=user_id, member_type=token_type, conn=conn)
-            case TokenType.DAY_TICKET_HACK:
-                await check_dayticket_hack(user_id=user_id, conn=conn)
+            case TokenType.DAY_TICKET:
+                await check_dayticket(user_id=user_id, conn=conn)
         log.info(f"{user_id} {token_type} access granted")
         # log in access_log db
         await queries.log_entry(

@@ -20,7 +20,6 @@ class TokenType(Enum):
     NORMAL = 1
     MORNING = 2
     DAY_TICKET = 3
-    DAY_TICKET_HACK = 4
 
 
 class TokenError(Exception):
@@ -68,15 +67,6 @@ def generate_access_token(
     )
 
     return base45.b45encode(data + nonce + signature)
-
-
-def generate_dayticket_access_token() -> bytes:
-    """generate a new access token only valid today as a dayticket"""
-    return generate_access_token(
-        user_id=0,
-        token_type=TokenType.DAY_TICKET,
-        expire_delta=relativedelta(hour=23, minute=59, second=0, microsecond=0),
-    )
 
 
 def verify_access_token(token: str) -> tuple[int, TokenType]:
