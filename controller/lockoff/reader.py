@@ -100,33 +100,25 @@ async def o_cmd(writer: asyncio.StreamWriter, cmds: list[bytes]):
 async def opticon_reader(display: GFXDisplay):
     _r, _w = await serial_asyncio.open_serial_connection(url=settings.opticon_url)
     # TODO: should i send opticon configuration by serial to ensure it is correct before starting?
-    # first trigger reader
-    await o_cmd(_w, [O_CMD.DETRIGGER])
-    await o_cmd(_w, [O_CMD.TRIGGER])
     while True:
         # read a scan from the barcode reader read until carriage return CR
         qr_code = (await _r.readuntil(separator=b"\r")).decode("utf-8").strip()
-        async with asyncio.TaskGroup() as tg:
-            try:
-                # detrigger reader
-                await o_cmd(_w, [O_CMD.DETRIGGER])
-                # check the qr_code (raises exception on errors)
-                await check_qrcode(qr_code)
-                # buzz in
-                tg.create_task(buzz_in())
-                # show OK on display
-                tg.create_task(display.send_message(message=b"K"))
-                # give good sound+led on opticon now qr code is verified
-                tg.create_task(o_cmd(_w, cmds=[O_CMD.OK_SOUND, O_CMD.OK_LED]))
-            except TokenError as ex:
-                # show error message on display
-                log.warning(ex)
-                tg.create_task(display.send_message(ex.code))
-                tg.create_task(o_cmd(_w, cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED]))
-            # generic error? show system error on display
-            except Exception:
-                log.exception("generic error in reader")
-                tg.create_task(display.send_message(b"E"))
-                tg.create_task(o_cmd(_w, cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED]))
-        # trigger reader for next read
-        # await o_cmd(_w, [O_CMD.TRIGGER])
+        try:
+            # check the qr_code (raises exception on errors)
+            await check_qrcode(qr_code)
+            # buzz in
+            asyncio.create_task(buzz_in())
+            # show OK on display
+            asyncio.create_task(display.send_message(message=b"K"))
+            # give good sound+led on opticon now qr code is verified
+            asyncio.create_task(o_cmd(_w, cmds=[O_CMD.OK_SOUND, O_CMD.OK_LED]))
+        except TokenError as ex:
+            # show error message on display
+            log.warning(ex)
+            asyncio.create_task(display.send_message(ex.code))
+            asyncio.create_task(o_cmd(_w, cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED]))
+        # generic error? show system error on display
+        except Exception:
+            log.exception("generic error in reader")
+            asyncio.create_task(display.send_message(b"E"))
+            asyncio.create_task(o_cmd(_w, cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED]))
