@@ -127,7 +127,7 @@ async def system_status(
     dt_access = []
 
     return {
-        "last_sync": f"{hours} hours and {minutes} minutes ago",
+        "last_sync": f"{hours:.0f} hours and {minutes:.0f} minutes ago",
         "active_users": active_users,
         "member_access": member_access,
         "dt_access": dt_access,
