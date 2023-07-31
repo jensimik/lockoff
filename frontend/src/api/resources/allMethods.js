@@ -41,8 +41,20 @@ export default {
     },
     async system_status() {
         var access_token = getWithExpiry("access_token");
-        const response = await fetch(APISettings.baseURL + '/system-status', {
+        const response = await fetch(APISettings.baseURL + '/admin/system-status', {
             method: 'GET',
+            headers: {...APISettings.headers, Authorization: "Bearer " + access_token}
+        });
+        if (response.status != 200) {
+            throw response.status;
+        } else {
+            return response.json();
+        }
+    },
+    async klubmodul_force_resync() {
+        var access_token = getWithExpiry("access_token");
+        const response = await fetch(APISettings.baseURL + '/admin/klubmodul-force-resync', {
+            method: 'POST',
             headers: {...APISettings.headers, Authorization: "Bearer " + access_token}
         });
         if (response.status != 200) {

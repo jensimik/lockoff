@@ -87,7 +87,7 @@ async def klubmodul_force_resync(
     ],
     background_tasks: BackgroundTasks,
 ) -> schemas.StatusReply:
-    background_tasks.add_task(refresh())
+    background_tasks.add_task(refresh)
     return schemas.StatusReply(status="sync started")
 
 
@@ -100,7 +100,7 @@ async def system_status(
 ):
     last_sync = await queries.get_last_klubmodul_sync(conn)
     active_users = await queries.count_active_users(conn)
-    last_access = await queries.last_log_entries(conn, limit=10)
+    last_access = await queries.last_log_entries(conn, limit=50)
 
     return {
         "last_sync": last_sync,
