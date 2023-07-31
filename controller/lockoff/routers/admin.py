@@ -44,7 +44,7 @@ async def klubmodul_force_resync(
     batch_id = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
     dayticket_ids = [
         await queries.insert_dayticket(conn, batch_id=batch_id)
-        for _ in range(30 * pages_to_print)
+        for _ in range(30 * pages_to_print.pages_to_print)
     ]
     await conn.commit()
     return [

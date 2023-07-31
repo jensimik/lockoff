@@ -1,25 +1,20 @@
 <script>
 import controllerAPI from "../api/resources/allMethods";
+import { useRoute } from 'vue-router';
 
 export default {
   name: "Print Daytickets",
-  props: ['foo'],
-  setup(props) {
-    console.log(props.pages_to_print);
-    this.pages_to_print = props.pages_to_print;
-  },
   data() {
     return { 
-        pages_to_print: 1,
         data: {}, 
     };
   },
-  created() {
-    this.fetchData();
+  mounted() {
+    this.fetchData(this.$route.query.pages_to_print);
   },
   methods: {
-    fetchData() {
-        controllerAPI.generate_daytickets(this.pages_to_print).then((print_data) => {
+    fetchData(pages_to_print) {
+        controllerAPI.generate_daytickets(pages_to_print).then((print_data) => {
             this.data = print_data;
         }).catch((error) => {
             console.log("failed to fetch print data");
