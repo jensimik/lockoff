@@ -80,6 +80,8 @@ jobs:
           platforms: linux/arm64
           context: "{{defaultContext}}:controller"
           push: true
+          cache-from: type=registry,ref=jensimik/lockoff:buildcache
+          cache-to: type=registry,ref=jensimik/lockoff:buildcache,mode=max
           tags: |
             jensimik/lockoff:1
             jensimik/lockoff:1.0
