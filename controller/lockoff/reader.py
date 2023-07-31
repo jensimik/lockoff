@@ -129,4 +129,4 @@ async def opticon_reader(display: GFXDisplay):
                 tg.create_task(display.send_message(b"E"))
                 tg.create_task(o_cmd(_w, cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED]))
         # trigger reader for next read
-        await o_cmd(_w, [O_CMD.TRIGGER])
+        # await o_cmd(_w, [O_CMD.TRIGGER])
