@@ -29,7 +29,7 @@ export default {
         })
     },
     print() {
-        router.push({name: "dayticket_print", query: {pages: this.pages_to_print}});
+        router.push({name: "dayticket_print", query: {pages_to_print: this.pages_to_print}});
         return false;
     }
   }
