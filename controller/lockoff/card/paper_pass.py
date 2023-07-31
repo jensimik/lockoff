@@ -1,12 +1,12 @@
-# import base64
-# import io
+import base64
+import io
 
 import qrcode
 from PIL import Image
 
-# from weasyprint import HTML
+from weasyprint import HTML
 
-# from .paper_template import template
+from .paper_template import template
 
 
 def generate_png(qr_code_data: str) -> Image:
@@ -20,22 +20,22 @@ def generate_png(qr_code_data: str) -> Image:
     return img
 
 
-# def generate_pdf(name: str, level: str, qr_code_data: str):
-#     pdf_file = io.BytesIO()
-#     # generate qr code
-#     img = generate_png(qr_code_data=qr_code_data)
-#     with io.BytesIO() as f:
-#         img.save(f, format="png")
-#         img_str = base64.b64encode(f.getvalue())
-#     # make simple template
-#     html = (
-#         template.replace("IMGSTR", img_str.decode("utf-8"))
-#         .replace("NAME", name)
-#         .replace("LEVEL", level)
-#     )
-#     # make the pdf from html
-#     HTML(string=html, base_url="").write_pdf(pdf_file)
-#     return pdf_file
+def generate_pdf(name: str, level: str, qr_code_data: str):
+    pdf_file = io.BytesIO()
+    # generate qr code
+    img = generate_png(qr_code_data=qr_code_data)
+    with io.BytesIO() as f:
+        img.save(f, format="png")
+        img_str = base64.b64encode(f.getvalue())
+    # make simple template
+    html = (
+        template.replace("IMGSTR", img_str.decode("utf-8"))
+        .replace("NAME", name)
+        .replace("LEVEL", level)
+    )
+    # make the pdf from html
+    HTML(string=html, base_url="").write_pdf(pdf_file)
+    return pdf_file
 
 
 # if __name__ == "__main__":
