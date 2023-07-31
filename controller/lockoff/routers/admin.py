@@ -44,7 +44,7 @@ async def klubmodul_force_resync(
     dayticket_ids = [
         await queries.insert_dayticket(conn, batch_id=batch_id) for _ in range(30)
     ]
-    log.info(dayticket_ids)
+    await conn.commit()
     return [
         {
             "dayticket_id": dayticket_id,
@@ -65,8 +65,10 @@ async def get_qr_code_png(
     ticket_id: Annotated[int, Depends(verify_dl_token)],
     conn: DBcon,
 ):
+    log.info("getting qr code for ticket_id {ticket_id}")
     ticket = await queries.get_dayticket_by_id(conn, ticket_id=ticket_id)
     if not ticket:
+        log.error("could not find ticket with id {ticket_id}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     access_token = generate_access_token(
         user_id=ticket_id,

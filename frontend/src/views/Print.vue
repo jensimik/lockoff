@@ -26,7 +26,7 @@ export default {
 
 <template>
     <div v-for="ticket in data" :key="ticket.ticket_id">
-        <img :src="'https://lockoff-api.gnerd.dk/admin/' + ticket.token + '/qr-code.png'" />
+        <img :src="'https://lockoff-api.gnerd.dk/admin/' + ticket.dl_token + '/qr-code.png'" />
         <p>{{ ticket.ticket_id }}</p>
     </div>
 </template>
