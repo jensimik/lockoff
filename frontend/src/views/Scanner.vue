@@ -44,7 +44,13 @@ export default {
 
 
 <template>
-    <qrcode-stream :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
-    <p>{{ code }}</p>
-    <p v-if="error">could not load camera somehow? are you on mobile?</p>
+    <div class="flex two">
+        <div>
+            <qrcode-stream :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
+        </div>
+        <div>
+            <p>{{ code }}</p>
+            <p v-if="error">could not load camera somehow? are you on mobile?</p>
+        </div>
+    </div>
 </template>
