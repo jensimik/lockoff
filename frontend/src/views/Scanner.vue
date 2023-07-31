@@ -62,13 +62,22 @@ export default {
 
 
 <template>
-    <div class="flex two">
-        <div>
-            <qrcode-stream :paused="paused" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
-        </div>
-        <div>
-            <p>{{ code }}</p>
-            <p v-if="error">{{ error }}</p>
+    <div class="wrapper">
+        <div class="flex two">
+            <div>
+                <qrcode-stream :paused="paused" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
+            </div>
+            <div>
+                <p>{{ code }}</p>
+                <p v-if="error">{{ error }}</p>
+            </div>
         </div>
     </div>
 </template>
+
+<style scoped>
+.wrapper {
+    width: 100%;
+    max-width: 800px;
+}
+</style>
