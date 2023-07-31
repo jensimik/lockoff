@@ -300,7 +300,7 @@ class KlubmodulException(Exception):
 
 async def refresh():
     async with refresh_lock:
-        batch_id = datetime.utcnow().isoformat(timespec="seconds")
+        batch_id = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
         async with KMClient() as client, aiosqlite.connect(settings.db_file) as conn:
             async for user_id, name, member_type, email, mobile in client.get_members():
                 await queries.upsert_user(
@@ -320,7 +320,7 @@ async def refresh():
 
 async def klubmodul_runner():
     # a bit of initial sleeping for two hours
-    await asyncio.sleep(2 * 60 * 60)
+    # await asyncio.sleep(2 * 60 * 60)
     while True:
         try:
             log.info("klubmodul refreshing data")
