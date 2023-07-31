@@ -8,13 +8,6 @@ export default {
             code: "",
             error: false,
             paused: false,
-            features: {
-                audio: false,
-                video: {
-                    width: { ideal: 640 },
-                    height: { ideal: 480 }
-                }
-            },
         }
     },
     components: {
@@ -69,28 +62,13 @@ export default {
 
 
 <template>
-    <div>
-        <div class="left50">
-            <qrcode-stream :paused="paused" :constraints="features" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
+    <div class="flex two">
+        <div>
+            <qrcode-stream :paused="paused" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
         </div>
-        <div class="right50">
+        <div>
             <p>{{ code }}</p>
             <p v-if="error">{{ error }}</p>
         </div>
     </div>
 </template>
-
-<style scoped>
-.left50 {
-    width: 50%;
-    display: inline-block;
-    margin: 0;
-    padding: 0;
-}
-.right50 {
-    width: 50%;
-    display: inline-block;
-    margin: 0;
-    padding: 1em;
-}
-</style>
