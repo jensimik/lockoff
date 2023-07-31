@@ -111,7 +111,7 @@ where ticket_id = :ticket_id;
 
 -- name: get_dayticket_stats
 -- get stats about dayticket batches
-select batch_id, min(dayticket_id) as range_start, max(dayticket_id) as range_end, SUM(CASE WHEN expires = 0 THEN 1 ELSE 0 END) as unused,  SUM(CASE WHEN expires > 0 THEN 1 ELSE 0 END) as used
+select batch_id, min(ticket_id) as range_start, max(ticket_id) as range_end, SUM(CASE WHEN expires = 0 THEN 1 ELSE 0 END) as unused,  SUM(CASE WHEN expires > 0 THEN 1 ELSE 0 END) as used
 from dayticket
 group by batch_id
 
