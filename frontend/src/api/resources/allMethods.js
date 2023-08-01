@@ -1,6 +1,13 @@
 import { APISettings } from '../config.js';
 import { getWithExpiry } from '../../store.js';
 
+class HTTP400Error extends Error {
+    constructor(message) {
+      super(message);
+      this.name = "400";
+    }
+  }
+
 export default {
 
     async request_totp(username, username_type) {
@@ -84,7 +91,7 @@ export default {
             body: JSON.stringify({token: token})
         });
         if (response.status != 200) {
-            throw response.status;
+            throw new HTTP400Error(response.text);
         } else {
             return response.json();
         }
