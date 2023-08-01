@@ -8,6 +8,14 @@ export default {
             code: "",
             error: false,
             paused: false,
+            constraints: {
+                width: {
+                    exact: 300
+                },
+                height: {
+                    exact: 300
+                }
+            }
         }
     },
     components: {
@@ -64,7 +72,7 @@ export default {
 <template>
     <div class="wrapper">
         <div class="cam">
-            <qrcode-stream :paused="paused" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
+            <qrcode-stream :constraints="constraints" :paused="paused" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
         </div>
         <div class="mes">
             <p>{{ code }}</p>
