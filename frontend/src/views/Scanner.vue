@@ -7,9 +7,8 @@ export default {
     data() {
         return {
             show: "",
-            code: "",
-            error: false,
             paused: false,
+            error: "",
             constraints: {
                 facingMode: {exact: 'environment'},
                 width: {
@@ -28,11 +27,9 @@ export default {
         onDetect ([ firstCode ]) {
             this.code = firstCode.rawValue;
             controllerAPI.check_token(this.code).then((data) => {
-                this.error = "";
                 this.show = data;
             }).catch((error) => {
-                this.show = "";
-                this.error = {code: error.name, message: error.message};
+                this.show = {code: error.name, message: error.message};
             });
             // this.paused = true;
         },
@@ -84,8 +81,7 @@ export default {
             <qrcode-stream :constraints="constraints" :paused="paused" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
         </div>
         <div>
-            <pre v-if="show">{{ show }}</pre>
-            <pre v-if="error">{{ error }}</pre>
+            <pre>{{ show }}{{ error }}</pre>
         </div>
     </div>
 </template>
