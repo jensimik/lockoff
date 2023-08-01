@@ -75,11 +75,11 @@ export default {
 
 <style scoped>
 .cam {
-    width: 50vw;
-    height: 50vh;
+    width: 50%;
+    display: inline-block;
 }
 .mes {
-    width: 50vw;
-    height: 100vh;
+    width: 50%;
+    display: inline-block;
 }
 </style>
