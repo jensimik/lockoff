@@ -86,7 +86,7 @@ async def get_qr_code_png(
     return Response(content=content, media_type="image/png")
 
 
-@router.post("/check-token/{token}")
+@router.post("/check-token")
 async def check_token(
     token: str,
     _: Annotated[
