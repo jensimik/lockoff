@@ -72,7 +72,7 @@ export default {
 
 <template>
     <div class="flex one">
-        <div>
+        <div class="cam">
             <qrcode-stream :constraints="constraints" :paused="paused" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
         </div>
         <div>
@@ -81,3 +81,11 @@ export default {
         </div>
     </div>
 </template>
+
+<style scoped>
+.cam {
+    width: 300px;
+    height: 300px;
+    justify-content: center;
+}
+</style>
