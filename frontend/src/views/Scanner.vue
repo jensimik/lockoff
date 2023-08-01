@@ -87,6 +87,15 @@ export default {
 </template>
 
 <style scoped>
+
+/deep/ .qrcode-stream-camera {
+    width: 300px;
+    height: 300px;
+}
+/deep/ .qrcode-stream-overlay {
+    width: 300px;
+    height: 300px;
+}
 .cam {
     width: 300px;
     height: 300px;
