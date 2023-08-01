@@ -12,6 +12,8 @@ import { RouterView } from 'vue-router';
 #wrap {
     width: 100vw;
     max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 @media print { 
     #wrap {

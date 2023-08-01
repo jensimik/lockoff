@@ -32,7 +32,6 @@ export default {
                 const [firstPoint, ...otherPoints] = detectedCode.cornerPoints
 
                 ctx.strokeStyle = 'red'
-                ctx.stroke = '3px'
 
                 ctx.beginPath()
                 ctx.moveTo(firstPoint.x, firstPoint.y)
@@ -71,7 +70,7 @@ export default {
 
 
 <template>
-    <div class="flex one">
+    <div class="flex one jcc">
         <div class="cam">
             <qrcode-stream :constraints="constraints" :paused="paused" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
         </div>
@@ -86,6 +85,10 @@ export default {
 .cam {
     width: 300px;
     height: 300px;
+    max-width: 300px;
+    max-height: 300px;
+}
+.jcc {
     justify-content: center;
 }
 </style>
