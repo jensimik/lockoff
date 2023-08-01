@@ -9,7 +9,7 @@ export default {
             error: false,
             paused: false,
             constraints: {
-                facingMode: 'environment',
+                facingMode: {exact: 'environment'},
                 width: {
                     exact: 300
                 },
@@ -25,7 +25,7 @@ export default {
     methods: {
         onDetect ([ firstCode ]) {
             this.code = firstCode.rawValue;
-            this.paused = true;
+            // this.paused = true;
         },
         paintOutline(detectedCodes, ctx) {
             for (const detectedCode of detectedCodes) {
@@ -71,24 +71,13 @@ export default {
 
 
 <template>
-    <div class="wrapper">
-        <div class="cam">
+    <div class="flex one">
+        <div>
             <qrcode-stream :constraints="constraints" :paused="paused" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
         </div>
-        <div class="mes">
+        <div>
             <p>{{ code }}</p>
             <p v-if="error">{{ error }}</p>
         </div>
     </div>
 </template>
-
-<style scoped>
-.cam {
-    width: 50%;
-    display: inline-block;
-}
-.mes {
-    width: 50%;
-    display: inline-block;
-}
-</style>
