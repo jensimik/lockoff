@@ -1,10 +1,12 @@
 <script>
 import { QrcodeStream } from 'vue-qrcode-reader'
+import controllerAPI from "../api/resources/allMethods";
 
 export default {
     name: "scanner",
     data() {
         return {
+            show: "",
             code: "",
             error: false,
             paused: false,
@@ -25,6 +27,11 @@ export default {
     methods: {
         onDetect ([ firstCode ]) {
             this.code = firstCode.rawValue;
+            controllerAPI.check_token(this.code).then((data) => {
+                this.show = data;
+            }).catch((error) => {
+                this.error = error;
+            });
             // this.paused = true;
         },
         paintOutline(detectedCodes, ctx) {
@@ -76,6 +83,7 @@ export default {
         </div>
         <div>
             <p>{{ code }}</p>
+            <pre>{{ show }}</pre>
             <p v-if="error">{{ error }}</p>
         </div>
     </div>

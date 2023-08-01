@@ -18,7 +18,9 @@ from fastapi import (
 from .. import depends, schemas
 from ..access_token import (
     TokenType,
+    TokenError,
     generate_access_token,
+    verify_access_token,
     generate_dl_token,
     verify_dl_token,
 )
@@ -82,6 +84,50 @@ async def get_qr_code_png(
         img.save(f, format="png")
         content = f.getvalue()
     return Response(content=content, media_type="image/png")
+
+
+@router.post("/check-token/{token}")
+async def check_token(
+    token: str,
+    _: Annotated[
+        list[aiosqlite.Row], Security(depends.get_current_users, scopes=["admin"])
+    ],
+    conn: DBcon,
+) -> schemas.TokenCheck:
+    try:
+        user_id, token_type = verify_access_token(token=token)
+        name = "n/a"
+    except TokenError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+    match token_type:
+        case TokenType.NORMAL | TokenType.MORNING:
+            user = await queries.get_user_by_user_id(conn, user_id=user_id)
+            name = user["name"]
+            if not user:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="user not found"
+                )
+            elif not user["active"]:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="user not active"
+                )
+            if token_type == TokenType.MORNING:
+                # TODO: do check for hours?
+                pass
+        case TokenType.DAY_TICKET:
+            ticket = await queries.get_dayticket_by_id(conn, ticket_id=user_id)
+            if not ticket:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="dayticket not found!?",
+                )
+            expires = datetime.fromtimestamp(ticket["expires"], tz=settings.tz)
+            if expires < datetime.now(tz=settings.tz):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"dayticket is expired {expires}",
+                )
+    return schemas.TokenCheck(user_id=user_id, token_type=token_type.name, name=name)
 
 
 @router.get("/access_log")

@@ -76,4 +76,17 @@ export default {
             return response.json();
         }
     },
+    async check_token(token) {
+        var access_token = getWithExpiry("access_token");
+        const response = await fetch(APISettings.baseURL + '/admin/check-token', {
+            method: 'POST',
+            headers: {...APISettings.headers, 'Content-Type': 'Application/json', Authorization: "Bearer " + access_token},
+            body: JSON.stringify({token: token})
+        });
+        if (response.status != 200) {
+            throw response.status;
+        } else {
+            return response.json();
+        }
+    },
 }

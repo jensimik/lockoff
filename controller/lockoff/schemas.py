@@ -1,8 +1,14 @@
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Optional
 
 from pydantic import BaseModel, Field, constr
 
 username_type = Literal["mobile", "email"]
+
+
+class TokenCheck(BaseModel):
+    user_id: int
+    token_type: str
+    name: Optional[str] = ""
 
 
 class PagesToPrint(BaseModel):
