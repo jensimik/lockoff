@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import controllerAPI from '../api/resources/allMethods';
 import { getWithExpiry, setWithExpiry } from '../store';
 import { getMobileOS } from '../misc';
+import { useRoute } from 'vue-router'
 import router from '../router';
 
 var step = ref("username");
@@ -10,6 +11,8 @@ var username = ref("");
 var username_type = ref("mobile");
 var totp = ref("");
 var os = ref(getMobileOS());
+const route = useRoute();
+const next_hop = route.query.next;
 
 const ac = new AbortController();
 
@@ -66,9 +69,8 @@ const totp_update = async(e) => {
     ac.abort();
     controllerAPI.login(username.value, username_type.value, totp.value).then((token_data) => {  
         setWithExpiry("access_token", token_data.access_token, 7100 * 1000);
-        var redirect_path = getWithExpiry("redirect_path");
-        if (redirect_path)
-            router.push({path: redirect_path});
+        if (next_hop)
+            router.push({name: next_hop});
         else
             router.push({name: "card"})
     }).catch((e) => {

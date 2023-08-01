@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { getWithExpiry, setWithExpiry } from '../store';
+import { getWithExpiry } from '../store';
 
 const isAuthenticated = function() {
  var access_token = getWithExpiry("access_token");
@@ -51,8 +51,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from) => {
     if (!isAuthenticated() && to.name !== 'login') {
-        setWithExpiry("redirect_path", to.path, 3600 * 1000);
-        return { name: 'login' }
+        return { name: 'login', query: { next: to.name } }
     }
 })
 

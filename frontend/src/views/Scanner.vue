@@ -63,21 +63,23 @@ export default {
 
 <template>
     <div class="wrapper">
-        <div class="flex two">
-            <div>
-                <qrcode-stream :paused="paused" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
-            </div>
-            <div>
-                <p>{{ code }}</p>
-                <p v-if="error">{{ error }}</p>
-            </div>
+        <div class="cam">
+            <qrcode-stream :paused="paused" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
+        </div>
+        <div class="mes">
+            <p>{{ code }}</p>
+            <p v-if="error">{{ error }}</p>
         </div>
     </div>
 </template>
 
 <style scoped>
-.wrapper {
-    width: 100%;
-    max-width: 300px;
+.cam {
+    width: 50vw;
+    height: 100vh;
+}
+.mes {
+    width: 50vw;
+    height: 100vh;
 }
 </style>
