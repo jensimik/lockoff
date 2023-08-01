@@ -88,14 +88,14 @@ async def get_qr_code_png(
 
 @router.post("/check-token")
 async def check_token(
-    token: str,
+    token_input: schemas.TokenCheckInput,
     _: Annotated[
         list[aiosqlite.Row], Security(depends.get_current_users, scopes=["admin"])
     ],
     conn: DBcon,
 ) -> schemas.TokenCheck:
     try:
-        user_id, token_type = verify_access_token(token=token)
+        user_id, token_type = verify_access_token(token=token_input.token)
         name = "n/a"
     except TokenError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)

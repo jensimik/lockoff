@@ -5,6 +5,10 @@ from pydantic import BaseModel, Field, constr
 username_type = Literal["mobile", "email"]
 
 
+class TokenCheckInput(BaseModel):
+    token: str
+
+
 class TokenCheck(BaseModel):
     user_id: int
     token_type: str
