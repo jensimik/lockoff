@@ -32,7 +32,7 @@ export default {
                 this.show = data;
             }).catch((error) => {
                 this.show = "";
-                this.error = error.message;
+                this.error = {code: error.name, message: error.message};
             });
             // this.paused = true;
         },
@@ -85,7 +85,7 @@ export default {
         </div>
         <div>
             <pre v-if="show">{{ show }}</pre>
-            <p v-if="error">{{ error }}</p>
+            <pre v-if="error">{{ error }}</pre>
         </div>
     </div>
 </template>
