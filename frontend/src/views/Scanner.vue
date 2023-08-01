@@ -9,6 +9,7 @@ export default {
             error: false,
             paused: false,
             constraints: {
+                facingMode: 'environment',
                 width: {
                     exact: 300
                 },
