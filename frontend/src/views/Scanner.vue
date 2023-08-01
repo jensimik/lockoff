@@ -76,7 +76,7 @@ export default {
 <style scoped>
 .cam {
     width: 50vw;
-    height: 100vh;
+    height: 50vh;
 }
 .mes {
     width: 50vw;
