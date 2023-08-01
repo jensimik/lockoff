@@ -124,13 +124,19 @@ async def check_token(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="dayticket not found!?",
                 )
-            if ticket["expires"] > 0:
-                expires = datetime.fromtimestamp(ticket["expires"], tz=settings.tz)
-                if expires < datetime.now(tz=settings.tz):
+            match ticket["expires"]:
+                case _ as expires if expires == 0:
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=f"dayticket is expired {expires}",
+                        detail=f"dayticket has not been activated yet",
                     )
+                case _ as expires if expires > 0:
+                    expires = datetime.fromtimestamp(ticket["expires"], tz=settings.tz)
+                    if expires < datetime.now(tz=settings.tz):
+                        raise HTTPException(
+                            status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=f"dayticket is expired {expires}",
+                        )
     return schemas.TokenCheck(user_id=user_id, token_type=token_type.name, name=name)
 
 
