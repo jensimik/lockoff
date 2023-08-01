@@ -91,7 +91,8 @@ export default {
             body: JSON.stringify({token: token})
         });
         if (response.status != 200) {
-            throw new HTTP400Error(await response.text());
+            let data = await response.json();
+            throw new HTTP400Error(data["detail"]);
         } else {
             return response.json();
         }

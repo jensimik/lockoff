@@ -30,7 +30,7 @@ export default {
             controllerAPI.check_token(this.code).then((data) => {
                 this.show = data;
             }).catch((error) => {
-                this.error = error;
+                this.error = error.message;
             });
             // this.paused = true;
         },

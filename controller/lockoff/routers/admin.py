@@ -98,7 +98,10 @@ async def check_token(
         user_id, token_type = verify_access_token(token=token_input.token)
         name = "n/a"
     except TokenError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="could not verify signature - is it a nkk qr code?",
+        )
     match token_type:
         case TokenType.NORMAL | TokenType.MORNING:
             user = await queries.get_user_by_user_id(conn, user_id=user_id)
