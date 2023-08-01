@@ -101,6 +101,7 @@ export default {
     height: 300px;
     max-width: 300px;
     max-height: 300px;
+    position:relative;
 }
 .jcc {
     justify-content: center;
