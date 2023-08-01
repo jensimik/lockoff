@@ -28,8 +28,10 @@ export default {
         onDetect ([ firstCode ]) {
             this.code = firstCode.rawValue;
             controllerAPI.check_token(this.code).then((data) => {
+                this.error = "";
                 this.show = data;
             }).catch((error) => {
+                this.show = "";
                 this.error = error.message;
             });
             // this.paused = true;
@@ -82,8 +84,7 @@ export default {
             <qrcode-stream :constraints="constraints" :paused="paused" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
         </div>
         <div>
-            <p>{{ code }}</p>
-            <pre>{{ show }}</pre>
+            <pre v-if="show">{{ show }}</pre>
             <p v-if="error">{{ error }}</p>
         </div>
     </div>
