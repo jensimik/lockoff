@@ -77,6 +77,7 @@ export default {
 
 <template>
     <div class="flex one jcc">
+        <p>Scanner</p>
         <div class="cam">
             <qrcode-stream :constraints="constraints" :paused="paused" :track="paintOutline" @detect="onDetect" @error="logErrors"></qrcode-stream>
         </div>
