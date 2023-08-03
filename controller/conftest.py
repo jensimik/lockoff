@@ -14,14 +14,13 @@ from lockoff.depends import get_db
 from lockoff.misc import queries, simple_hash
 
 
-@asynccontextmanager
-async def testing_lifespan(app: FastAPI):
+async def _setup_db():
     _redis = aioredis.FakeRedis(encoding="utf-8", decode_responses=True)
     await FastAPILimiter.init(_redis)
     yield
 
 
-async def testing_get_db():
+async def testing_get_db() -> aiosqlite.Connection:
     """Return a database connection for use as a dependency.
     This connection has the Row row factory automatically attached."""
 
@@ -64,7 +63,12 @@ async def testing_get_db():
             ),
         )
     await db.commit()
+    return db
 
+
+@asynccontextmanager
+async def testing_lifespan(app: FastAPI):
+    db = await _setup_db()
     try:
         yield db
     finally:
@@ -74,10 +78,11 @@ async def testing_get_db():
 
 @pytest_asyncio.fixture
 async def conn() -> aiosqlite.Connection:
-    gen = testing_get_db()
-    awaitable = anext(gen)
-    res = await awaitable
-    yield res
+    db = await _setup_db()
+    try:
+        yield db
+    finally:
+        await db.close()
 
 
 @pytest.fixture
