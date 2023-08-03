@@ -10,8 +10,6 @@ from lockoff.main import app
 from lockoff.misc import queries
 from lockoff.config import settings
 
-pytest.patch("redis_instance", aioredis.FakeRedis())
-
 
 @asynccontextmanager
 async def testing_lifespan(app: FastAPI):
