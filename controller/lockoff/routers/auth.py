@@ -68,6 +68,11 @@ async def login(
     users = await getattr(queries, f"get_active_users_by_{login_data.username_type}")(
         conn, **{login_data.username_type: username_hash}
     )
+    if not users:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="code is expired or not valid",
+        )
     totp_secrets = [u["totp_secret"] for u in users]
     user_ids = [u["user_id"] for u in users]
     totp = pyotp.TOTP(totp_secrets[0])
