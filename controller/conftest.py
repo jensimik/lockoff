@@ -73,6 +73,7 @@ async def testing_get_db():
 
 
 @pytest.fixture
+@asynccontextmanager
 async def async_db() -> aiosqlite.Connection:
     """Return a database connection for use as a dependency.
     This connection has the Row row factory automatically attached."""
