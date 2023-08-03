@@ -10,7 +10,6 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from fastapi_limiter import FastAPILimiter
 from lockoff.access_token import TokenType
-from lockoff.config import settings
 from lockoff.depends import get_db
 from lockoff.misc import queries
 
