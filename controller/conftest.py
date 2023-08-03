@@ -41,7 +41,7 @@ async def testing_get_db():
             db,
             user_id=x,
             name=f"test user {x}",
-            member_type="FULL" if x in range(5) else "MORN"
+            member_type="FULL" if x in range(5) else "MORN",
             mobile=f"1000100{x}",
             email=f"test{x}@test.dk",
             batch_id=batch_id,
