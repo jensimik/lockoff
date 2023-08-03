@@ -12,7 +12,7 @@ async def test_lcd(mock_serial):
     test_message = b"K"
     stub = mock_serial.stub(
         send_bytes=b"",
-        receive_bytes=test_message.decode(),
+        receive_bytes=test_message,
     )
     await lcd.send_message(test_message)
     await asyncio.sleep(0.1)
