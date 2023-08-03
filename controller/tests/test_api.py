@@ -1,5 +1,6 @@
+import pyotp
 import pytest
-from fastapi import BackgroundTasks, status
+from fastapi import status
 from fastapi.testclient import TestClient
 from lockoff.routers.auth import send_email, send_mobile
 
@@ -67,5 +68,28 @@ def test_request_totp_email(user_id, ok, mocker, client: TestClient):
         mock.assert_not_called()
 
 
-# def test_login_mobile(mocker, client: TestClient):
-#     mobile = "10001000"
+@pytest.mark.parametrize(
+    ["user_id", "use_correct_totp", "ok"],
+    (
+        (0, True, True),  # normal user, correct_totp
+        (5, True, True),  # morning user, correct totp
+        (9, True, False),  # inactive user, correct totp
+        (0, False, True),  # normal user, wrong totp
+        (5, False, True),  # morning user, wrong totp
+        (9, False, False),  # inactive user, wrong totp
+    ),
+)
+def test_login_mobile(user_id, use_correct_totp, ok, client: TestClient):
+    mobile = f"1000100{user_id}"
+    totp = pyotp.TOTP("STATICVALUE")
+    totp_wrong = pyotp.TOTP("OTHERVALUE")
+    data = {
+        "username": mobile,
+        "username_type": "mobile",
+        "totp": totp.now() if use_correct_totp else totp_wrong.now(),
+    }
+    response = client.post("/login", json=data)
+    if ok:
+        assert response.status_code == status.HTTP_200_OK
+    else:
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
