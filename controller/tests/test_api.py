@@ -121,3 +121,8 @@ def test_me(aclient: TestClient):
         response2 = aclient.get(f"/{token}/{x}")
         assert response2.status_code == status.HTTP_200_OK
         assert content_type == response2.headers["content-type"]
+
+
+def test_admin(aclient: TestClient):
+    response = aclient.get("/admin/system-status")
+    assert response.status_code == status.HTTP_200_OK
