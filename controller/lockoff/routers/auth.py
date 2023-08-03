@@ -19,11 +19,13 @@ log = logging.getLogger(__name__)
 async def send_mobile(user_id: int, message: str):
     async with KMClient() as km:
         await km.send_sms(user_id=user_id, message=message)
+    log.info(f"sms sent to {user_id}")
 
 
 async def send_email(user_id: int, message: str):
     async with KMClient() as km:
         await km.send_email(user_id=user_id, subject="AUTHMSG", message=message)
+    log.info(f"email sent to {user_id}")
 
 
 send_funcs = {
