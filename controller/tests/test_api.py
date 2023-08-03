@@ -23,23 +23,45 @@ def test_endpoint_generic(url, expected_status_code, client: TestClient):
     assert response.status_code == expected_status_code
 
 
-def test_request_totp_mobile(mocker, client: TestClient):
-    mobile = "10001000"
+@pytest.mark.parametrize(
+    ["mobile", "sc"],
+    (
+        ("10001000", True),
+        ("10001008", True),
+        ("10001009", False),  # inactive user
+    ),
+)
+def test_request_totp_mobile(mobile, ok, mocker, client: TestClient):
     mock = mocker.patch("fastapi.BackgroundTasks.add_task")
     data = {"username": mobile, "username_type": "mobile"}
     response = client.post("/request-totp", json=data)
 
     assert response.status_code == status.HTTP_200_OK
-    assert mock.called_once()
-    assert mock.called_with(mocker.ANY, send_mobile, mobile=mobile, message=mocker.ANY)
+    if ok:
+        mock.assert_called_once()
+        mock.assert_called_with(
+            mocker.ANY, send_mobile, mobile=mobile, message=mocker.ANY
+        )
+    else:
+        mock.assert_not_called()
 
 
-def test_request_totp_email(mocker, client: TestClient):
-    email = "test1@test.dk"
+@pytest.mark.parametrize(
+    ["email"],
+    (("test0@test.dk", True), ("test1@test.dk", True), ("test9@test.dk", False)),
+)
+def test_request_totp_email(email, ok, mocker, client: TestClient):
     mock = mocker.patch("fastapi.BackgroundTasks.add_task")
     data = {"username": email, "username_type": "email"}
     response = client.post("/request-totp", json=data)
 
     assert response.status_code == status.HTTP_200_OK
-    assert mock.called_once()
-    assert mock.called_with(mocker.ANY, send_email, email=email, message=mocker.ANY)
+    if ok:
+        mock.assert_called_once()
+        mock.assert_called_with(mocker.ANY, send_email, email=email, message=mocker.ANY)
+    else:
+        mock.assert_not_called()
+
+
+# def test_login_mobile(mocker, client: TestClient):
+#     mobile = "10001000"

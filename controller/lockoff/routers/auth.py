@@ -44,15 +44,7 @@ async def request_totp(
     )
     user_ids = [u["user_id"] for u in users]
     if user_ids:
-        totp_secret = pyotp.random_base32()
-        totp = pyotp.TOTP(totp_secret)
-        await getattr(queries, f"update_user_by_{rt.username_type}_set_totp_secret")(
-            conn,
-            totp_secret=totp_secret,
-            **{rt.username_type: simple_hash(rt.username)},
-        )
-        await conn.commit()
-
+        totp = pyotp.TOTP(users[0]["totp_secret"])
         log.info(
             f"send_{rt.username_type}(user_id={user_ids[0]}, message={totp.now()})"
         )

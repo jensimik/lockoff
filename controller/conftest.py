@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 
 import aiosqlite
+import pyotp
 import pytest
 from fakeredis import aioredis
 from fastapi import FastAPI
@@ -45,6 +46,7 @@ async def testing_get_db():
             mobile=f"1000100{x}",
             email=f"test{x}@test.dk",
             batch_id=batch_id,
+            totp_secret=pyotp.random_base32(),
             active=True if x < 8 else False,
         )
         # insert some daytickets
