@@ -105,7 +105,7 @@ def client(mocker) -> TestClient:
 
 @pytest.fixture
 def a0client(mocker) -> TestClient:
-    """authenticated client"""
+    """authenticated client without admin scope"""
     mocker.patch("lockoff.lifespan.lifespan", testing_lifespan)
     from lockoff.main import app
 
@@ -129,7 +129,7 @@ def a0client(mocker) -> TestClient:
 
 @pytest.fixture
 def a1client(mocker) -> TestClient:
-    """authenticated client"""
+    """authenticated client with admin scope"""
     mocker.patch("lockoff.lifespan.lifespan", testing_lifespan)
     from lockoff.main import app
 

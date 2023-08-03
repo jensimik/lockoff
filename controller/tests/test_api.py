@@ -101,7 +101,7 @@ def test_login_mobile(user_id, use_correct_totp, ok, client: TestClient):
 
 
 def test_me(a0client: TestClient):
-    response = aclient.get("/me")
+    response = a0client.get("/me")
     assert response.status_code == status.HTTP_200_OK
 
     json = response.json()
@@ -118,11 +118,15 @@ def test_me(a0client: TestClient):
         ("membership-card.pdf", "application/pdf"),
         # ("membership-card.pkpass", "application/vnd.apple.pkpass"),
     ]:
-        response2 = aclient.get(f"/{token}/{x}")
+        response2 = a0client.get(f"/{token}/{x}")
         assert response2.status_code == status.HTTP_200_OK
         assert content_type == response2.headers["content-type"]
 
+    # normal use do not have access to admin
+    response = a0client.get("/admin/system-status")
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
 
 def test_admin(a1client: TestClient):
-    response = aclient.get("/admin/system-status")
+    response = a1client.get("/admin/system-status")
     assert response.status_code == status.HTTP_200_OK
