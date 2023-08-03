@@ -13,7 +13,7 @@ from lockoff.reader import (
 @pytest.mark.asyncio
 async def test_check_qr_code(async_db):
     with pytest.raises(TokenError):
-        check_qrcode(qr_code="trash", conn=async_db)
+        await check_qrcode(qr_code="trash", conn=async_db)
 
 
 @pytest.mark.asyncio
