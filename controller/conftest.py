@@ -22,7 +22,7 @@ async def testing_lifespan(app: FastAPI):
 
 @pytest.fixture
 def client(mocker) -> TestClient:
-    mocker.patch("lockoff.misc.lifespan", testing_lifespan)
+    mocker.patch("lockoff.lifespan.lifespan", testing_lifespan)
     from lockoff.main import app
 
     with TestClient(

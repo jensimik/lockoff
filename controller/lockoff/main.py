@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_limiter.depends import RateLimiter
 
 from .config import settings
-from .misc import lifespan, watchdog
+from .lifespan import lifespan, watchdog
 from .routers import admin, auth, card, me
 
 log = logging.getLogger(__name__)
