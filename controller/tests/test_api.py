@@ -25,10 +25,10 @@ def test_endpoint_generic(url, expected_status_code, client: TestClient):
 
 def test_request_totp_mobile(mocker, client: TestClient):
     mobile = "10001000"
-    mobile_send_mock = mocker.patch("lockoff.routers.auth.send_mobile")
-    spy = mocker.spy(BackgroundTasks, "add_task")
+    mock = mocker.patch("fastapi.BackgroundTasks.add_task")
     data = {"username": mobile, "username_type": "mobile"}
     response = client.post("/request-totp", json=data)
 
     assert response.status_code == status.HTTP_200_OK
-    spy.assert_called_with(mocker.ANY, send_mobile, mobile=mobile, message=mocker.ANY)
+    assert mock.called_once()
+    assert mock.called_with(mocker.ANY, send_mobile, mobile=mobile, message=mocker.ANY)
