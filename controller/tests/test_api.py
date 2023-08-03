@@ -100,7 +100,7 @@ def test_login_mobile(user_id, use_correct_totp, ok, client: TestClient):
         assert "token_type" not in json
 
 
-def test_me(aclient: TestClient):
+def test_me(a0client: TestClient):
     response = aclient.get("/me")
     assert response.status_code == status.HTTP_200_OK
 
@@ -123,6 +123,6 @@ def test_me(aclient: TestClient):
         assert content_type == response2.headers["content-type"]
 
 
-def test_admin(aclient: TestClient):
+def test_admin(a1client: TestClient):
     response = aclient.get("/admin/system-status")
     assert response.status_code == status.HTTP_200_OK

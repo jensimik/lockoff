@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     jwt_secret: str = ""
     opticon_url: str = "loop://?logging=debug"
     display_url: str = "loop://?logging=debug"
-    admin_user_ids: list[int] = []
+    admin_user_ids: list[int] = [1]
     db_file: str = "/db/lockoff.db3"
     redis_url: str = "redis://localhost"
     certificate: bytes = ""

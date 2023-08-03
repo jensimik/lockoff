@@ -104,7 +104,7 @@ def client(mocker) -> TestClient:
 
 
 @pytest.fixture
-def aclient(mocker) -> TestClient:
+def a0client(mocker) -> TestClient:
     """authenticated client"""
     mocker.patch("lockoff.lifespan.lifespan", testing_lifespan)
     from lockoff.main import app
@@ -117,6 +117,30 @@ def aclient(mocker) -> TestClient:
     ) as client:
         totp = pyotp.TOTP(TOTP_SECRET)
         data = {"username": "10001000", "username_type": "mobile", "totp": totp.now()}
+        response = client.post("/login", json=data)
+        json = response.json()
+
+        client.headers = {
+            "Authorization": f"{json['token_type']} {json['access_token']}"
+        }
+
+        yield client
+
+
+@pytest.fixture
+def a1client(mocker) -> TestClient:
+    """authenticated client"""
+    mocker.patch("lockoff.lifespan.lifespan", testing_lifespan)
+    from lockoff.main import app
+
+    app.dependency_overrides[get_db] = testing_get_db
+
+    with TestClient(
+        app=app,
+        base_url="http://test",
+    ) as client:
+        totp = pyotp.TOTP(TOTP_SECRET)
+        data = {"username": "10001001", "username_type": "mobile", "totp": totp.now()}
         response = client.post("/login", json=data)
         json = response.json()
 
