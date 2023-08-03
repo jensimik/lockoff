@@ -1,4 +1,6 @@
+import random
 from contextlib import asynccontextmanager
+from datetime import datetime, timedelta
 
 import aiosqlite
 import pytest
@@ -6,10 +8,10 @@ from fakeredis import aioredis
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from fastapi_limiter import FastAPILimiter
+from lockoff.access_token import TokenType
 from lockoff.config import settings
-from lockoff.misc import queries
 from lockoff.depends import get_db
-import aiosql
+from lockoff.misc import queries
 
 
 @asynccontextmanager
@@ -28,9 +30,41 @@ async def testing_get_db():
     # tuples manually.
     db.row_factory = aiosqlite.Row
 
+    # setup schemas
+    await queries.create_schema(db)
+    await db.commit()
+
+    # make some sample data in the database to run tests agains
+    batch_id = datetime.utcnow().isoformat(timespec="seconds")
+    for x in range(10):
+        # insert test user
+        await queries.upsert_user(
+            db,
+            user_id=100 + x,
+            name=f"test user {x}",
+            mobile=f"1000100{x}",
+            email=f"test{x}@test.dk",
+            batch_id=batch_id,
+            active=True,
+        )
+        # insert some log entry
+        await queries.log_entry(
+            db,
+            user_id=random.randint(100, 110),
+            token_type=random.choice(
+                [TokenType.NORMAL, TokenType.MORNING, TokenType.DAY_TICKET]
+            ).name,
+            timestamp=int(
+                (
+                    datetime.utcnow() - timedelta(minutes=random.randint(0, 200))
+                ).timestamp()
+            ),
+        )
+
     try:
         yield db
     finally:
+        # test data is automatically cleared between tests
         await db.close()
 
 
