@@ -75,54 +75,8 @@ async def testing_get_db():
 @pytest.fixture
 @asynccontextmanager
 async def async_db() -> aiosqlite.Connection:
-    """Return a database connection for use as a dependency.
-    This connection has the Row row factory automatically attached."""
-
-    db = await aiosqlite.connect(":memory:")
-    # Provide a smarter version of the results. This keeps from having to unpack
-    # tuples manually.
-    db.row_factory = aiosqlite.Row
-
-    # setup schemas
-    await queries.create_schema(db)
-
-    # make some sample data in the database to run tests agains
-    batch_id = datetime.utcnow().isoformat(timespec="seconds")
-    for x in range(10):
-        # insert test user
-        await queries.upsert_user(
-            db,
-            user_id=x,
-            name=f"test user {x}",
-            member_type="FULL" if x in range(5) else "MORN",
-            mobile=simple_hash(f"1000100{x}"),
-            email=simple_hash(f"test{x}@test.dk"),
-            batch_id=batch_id,
-            totp_secret="H6IC425Q5IFZYAP4VINKRVHX7ZIEKO7E",
-            active=True if x < 8 else False,
-        )
-        # insert some daytickets
-        await queries.insert_dayticket(db, batch_id=batch_id)
-        # insert some log entry
-        await queries.log_entry(
-            db,
-            user_id=random.randint(0, 9),
-            token_type=random.choice(
-                [TokenType.NORMAL, TokenType.MORNING, TokenType.DAY_TICKET]
-            ).name,
-            timestamp=int(
-                (
-                    datetime.utcnow() - timedelta(minutes=random.randint(0, 200))
-                ).timestamp()
-            ),
-        )
-    await db.commit()
-
-    try:
+    async with get_db() as db:
         yield db
-    finally:
-        # test data is automatically cleared between tests
-        await db.close()
 
 
 @pytest.fixture
