@@ -1,7 +1,14 @@
 import pytest
-from fastapi import HTTPException
-from lockoff.access_token import verify_dl_token, generate_dl_token, TokenError
 from dateutil.relativedelta import relativedelta
+from fastapi import HTTPException
+from lockoff.access_token import (
+    TokenError,
+    TokenType,
+    generate_access_token,
+    generate_dl_token,
+    verify_access_token,
+    verify_dl_token,
+)
 
 
 @pytest.mark.parametrize(
@@ -15,3 +22,36 @@ def test_dl_token(user_id):
     token_expired = generate_dl_token(user_id, expire_delta=relativedelta(hours=-10))
     with pytest.raises(HTTPException):
         verify_dl_token(token_expired)
+
+
+@pytest.mark.parametrize(
+    ["user_id", "token_type"],
+    (
+        (0, TokenType.NORMAL),
+        (1, TokenType.MORNING),
+        (2, TokenType.DAY_TICKET),
+        (3, TokenType.NORMAL),
+    ),
+)
+def test_token(user_id, token_type):
+    # ok
+    token_bytes = generate_access_token(user_id=user_id, token_type=token_type)
+    token_str = token_bytes.decode()
+
+    verify_user_id, verify_token_type = verify_access_token(token_str)
+    assert user_id == verify_user_id
+    assert token_type == verify_token_type
+
+    # try to change a bit in signature part
+    token_bytes[-1] = token_bytes[-1] + 1
+    token_str_bad_signature = token_bytes.decode()
+    with pytest.raises(TokenError):
+        verify_access_token(token_str_bad_signature)
+
+    # expired
+    token_bytes_expired = generate_access_token(
+        user_id=user_id, token_type=token_type, expire_delta=relativedelta(hours=-10)
+    )
+    token_str_expired = token_bytes_expired.decode()
+    with pytest.raises(TokenError):
+        verify_access_token(token_str_expired)
