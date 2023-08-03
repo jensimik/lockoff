@@ -33,7 +33,7 @@ send_funcs = {
 
 
 @router.post(
-    "/request-totp", dependencies=[Depends(RateLimiter(times=105, seconds=300))]
+    "/request-totp", dependencies=[Depends(RateLimiter(times=10, seconds=300))]
 )
 async def request_totp(
     rt: schemas.RequestTOTP, conn: DBcon, background_tasks: BackgroundTasks
@@ -44,15 +44,7 @@ async def request_totp(
     )
     user_ids = [u["user_id"] for u in users]
     if user_ids:
-        totp_secret = pyotp.random_base32()
-        totp = pyotp.TOTP(totp_secret)
-        await getattr(queries, f"update_user_by_{rt.username_type}_set_totp_secret")(
-            conn,
-            totp_secret=totp_secret,
-            **{rt.username_type: simple_hash(rt.username)},
-        )
-        await conn.commit()
-
+        totp = pyotp.TOTP(users[0]["totp_secret"])
         log.info(
             f"send_{rt.username_type}(user_id={user_ids[0]}, message={totp.now()})"
         )
@@ -62,10 +54,12 @@ async def request_totp(
             user_id=user_ids[0],
             message=f"code is {code}\n\n@nkk.dk #{code}",
         )
+    else:
+        log.error("no users found!?")
     return schemas.StatusReply(status=f"{rt.username_type} message sent")
 
 
-@router.post("/login", dependencies=[Depends(RateLimiter(times=105, seconds=300))])
+@router.post("/login", dependencies=[Depends(RateLimiter(times=10, seconds=300))])
 async def login(
     login_data: schemas.RequestLogin,
     conn: DBcon,
@@ -74,13 +68,13 @@ async def login(
     users = await getattr(queries, f"get_active_users_by_{login_data.username_type}")(
         conn, **{login_data.username_type: username_hash}
     )
-    totp_secrets = [u["totp_secret"] for u in users]
-    user_ids = [u["user_id"] for u in users]
-    if not totp_secrets:
+    if not users:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="mobile not found or code expired or not valid",
+            detail="code is expired or not valid",
         )
+    totp_secrets = [u["totp_secret"] for u in users]
+    user_ids = [u["user_id"] for u in users]
     totp = pyotp.TOTP(totp_secrets[0])
     if not totp.verify(otp=login_data.totp, valid_window=2):
         raise HTTPException(

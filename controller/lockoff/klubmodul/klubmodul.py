@@ -7,6 +7,7 @@ from types import TracebackType
 
 import aiosqlite
 import httpx
+import pyotp
 
 from ..config import settings
 from ..misc import queries, simple_hash
@@ -311,6 +312,7 @@ async def refresh():
                     email=simple_hash(email),
                     mobile=simple_hash(mobile),
                     batch_id=batch_id,
+                    totp_secret=pyotp.random_base32(),
                     active=True,
                 )
             # mark old data as inactive

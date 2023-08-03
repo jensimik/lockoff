@@ -87,8 +87,8 @@ where active == True
 
 -- name: upsert_user!
 -- upsert a user in the database
-insert into users(user_id, name, member_type, mobile, email, batch_id, active)
-values (:user_id, :name, :member_type, :mobile, :email, :batch_id, :active)
+insert into users(user_id, name, member_type, mobile, email, batch_id, totp_secret, active)
+values (:user_id, :name, :member_type, :mobile, :email, :batch_id, :totp_secret, :active)
 on conflict(user_id) do 
 update set name=excluded.name, member_type=excluded.member_type, mobile=excluded.mobile, email=excluded.email, batch_id=excluded.batch_id, active=excluded.active;
 
@@ -142,7 +142,7 @@ create table if not exists users (
     mobile text not null,
     email text not null,
     batch_id text not null,
-    totp_secret text not null default "",
+    totp_secret text not null,
     active integer not null
 );
 create table if not exists access_log (

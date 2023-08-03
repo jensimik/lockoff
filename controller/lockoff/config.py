@@ -38,18 +38,14 @@ class Settings(BaseSettings):
     jwt_secret: str = ""
     opticon_url: str = "loop://?logging=debug"
     display_url: str = "loop://?logging=debug"
-    admin_user_ids: list[int] = []
+    admin_user_ids: list[int] = [1]
     db_file: str = "/db/lockoff.db3"
     redis_url: str = "redis://localhost"
     certificate: bytes = ""
     key: bytes = ""
     certificate_password: bytes = ""
     wwdr_certificate: bytes = ""
-    mailtrap_token: str = ""
-    basic_auth_username: bytes = ""
-    basic_auth_password: bytes = ""
     current_season: int = 2023
-    prod: bool = False
     tz: tzfile = gettz("Europe/Copenhagen")
 
     @classmethod

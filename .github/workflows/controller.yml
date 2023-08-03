@@ -22,16 +22,6 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      redis:
-        image: redis
-        ports:
-          - "6379:6379"
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     defaults:
       run:
         working-directory: controller
@@ -48,6 +38,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8 pytest anyio
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names

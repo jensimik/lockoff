@@ -15,15 +15,29 @@ module_directory = pathlib.Path(__file__).resolve().parent
 queries = aiosql.from_path(module_directory / "queries.sql", "aiosqlite")
 
 
+class Watchdog:
+    def __init__(self):
+        self._watch = []
+
+    def watch(self, watch: asyncio.Task):
+        self._watch.append(watch)
+
+    def healthy(self):
+        if any([w.done() for w in self._watch]):
+            return False
+        return True
+
+
+watchdog = Watchdog()
+
+
 def simple_hash(data: str) -> str:
     return hashlib.sha256(f"{data}{settings.hash_salt}".encode()).hexdigest()
 
 
 class GFXDisplay:
-    async def setup(self):
-        _, display_w = await serial_asyncio.open_serial_connection(
-            url=settings.display_url
-        )
+    async def setup(self, url=settings.display_url):
+        _, display_w = await serial_asyncio.open_serial_connection(url=url)
         self.display_w = display_w
 
     async def runner(self):
@@ -49,16 +63,3 @@ class GFXDisplay:
                 await self.display_w.drain()
             else:
                 log.info(f"display send message {message.decode('utf-8')}")
-
-
-class Watchdog:
-    def __init__(self):
-        self._watch = []
-
-    def watch(self, watch: asyncio.Task):
-        self._watch.append(watch)
-
-    def healthy(self):
-        if any([w.done() for w in self._watch]):
-            return False
-        return True
