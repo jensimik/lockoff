@@ -48,9 +48,9 @@ def test_request_totp_mobile(user_id, ok, mocker, client: TestClient):
 @pytest.mark.parametrize(
     ["user_id", "ok"],
     (
-        ("test0@test.dk", True),  # normal user
-        ("test5@test.dk", True),  # morning user
-        ("test9@test.dk", False),  # inactive user
+        (0, True),  # normal user
+        (5, True),  # morning user
+        (9, False),  # inactive user
     ),
 )
 def test_request_totp_email(user_id, ok, mocker, client: TestClient):
