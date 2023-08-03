@@ -22,3 +22,12 @@ async def test_member(conn):
 
     with pytest.raises(TokenError):
         await check_member(user_id=1000, member_type=TokenType.NORMAL, conn=conn)
+
+
+@pytest.mark.asyncio
+async def test_dayticket(conn):
+    await check_dayticket(user_id=0, conn=conn)
+
+
+# @pytest.mark.asyncio
+# async def test_reader(conn, mock_serial):

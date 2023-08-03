@@ -89,7 +89,12 @@ def test_login_mobile(user_id, use_correct_totp, ok, client: TestClient):
         "totp": totp.now() if use_correct_totp else totp_wrong.now(),
     }
     response = client.post("/login", json=data)
+    json = response.json()
     if ok:
         assert response.status_code == status.HTTP_200_OK
+        assert "access_token" in json
+        assert "token_type" in json
     else:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "access_token" not in json
+        assert "token_type" not in json
