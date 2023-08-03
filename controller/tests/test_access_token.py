@@ -43,8 +43,10 @@ def test_token(user_id, token_type):
     assert token_type == verify_token_type
 
     # try to change a bit in signature part
-    token_bytes[-1] = token_bytes[-1] + 1
-    token_str_bad_signature = token_bytes.decode()
+    ba = bytearray(token_bytes)
+    ba[-1] = ba[-1] + 1
+    ba = bytes(ba)
+    token_str_bad_signature = ba.decode()
     with pytest.raises(TokenError):
         verify_access_token(token_str_bad_signature)
 
