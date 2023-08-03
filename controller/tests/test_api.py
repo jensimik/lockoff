@@ -81,8 +81,8 @@ def test_request_totp_email(user_id, ok, mocker, client: TestClient):
 )
 def test_login_mobile(user_id, use_correct_totp, ok, client: TestClient):
     mobile = f"1000100{user_id}"
-    totp = pyotp.TOTP("STATICVALUE")
-    totp_wrong = pyotp.TOTP("OTHERVALUE")
+    totp = pyotp.TOTP("H6IC425Q5IFZYAP4VINKRVHX7ZIEKO7E")
+    totp_wrong = pyotp.TOTP("6LRKMVJQR7T4GHQ5CZIVKBPMRFRBV7JR")
     data = {
         "username": mobile,
         "username_type": "mobile",
@@ -92,4 +92,4 @@ def test_login_mobile(user_id, use_correct_totp, ok, client: TestClient):
     if ok:
         assert response.status_code == status.HTTP_200_OK
     else:
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code == status.HTTP_400_BAD_REQUEST

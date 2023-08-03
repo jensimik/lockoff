@@ -45,7 +45,7 @@ async def testing_get_db():
             mobile=simple_hash(f"1000100{x}"),
             email=simple_hash(f"test{x}@test.dk"),
             batch_id=batch_id,
-            totp_secret="STATICVALUE",
+            totp_secret="H6IC425Q5IFZYAP4VINKRVHX7ZIEKO7E",
             active=True if x < 8 else False,
         )
         # insert some daytickets
