@@ -140,7 +140,7 @@ async def check_token(
     return schemas.TokenCheck(user_id=user_id, token_type=token_type.name, name=name)
 
 
-@router.get("/access_log")
+@router.get("/access-log")
 async def access_log(
     _: Annotated[
         list[aiosqlite.Row], Security(depends.get_current_users, scopes=["admin"])
