@@ -1,5 +1,5 @@
 import pytest
-from fastapi import status, BackgroundTasks
+from fastapi import BackgroundTasks, status
 from fastapi.testclient import TestClient
 from lockoff.routers.auth import send_email, send_mobile
 
@@ -32,3 +32,14 @@ def test_request_totp_mobile(mocker, client: TestClient):
     assert response.status_code == status.HTTP_200_OK
     assert mock.called_once()
     assert mock.called_with(mocker.ANY, send_mobile, mobile=mobile, message=mocker.ANY)
+
+
+def test_request_totp_email(mocker, client: TestClient):
+    email = "test1@test.dk"
+    mock = mocker.patch("fastapi.BackgroundTasks.add_task")
+    data = {"username": email, "username_type": "email"}
+    response = client.post("/request-totp", json=data)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert mock.called_once()
+    assert mock.called_with(mocker.ANY, send_email, email=email, message=mocker.ANY)
