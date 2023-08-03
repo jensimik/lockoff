@@ -11,16 +11,14 @@ from lockoff.reader import (
 
 
 @pytest.mark.asyncio
-async def test_check_qr_code(async_db):
-    async with async_db as conn:
-        with pytest.raises(TokenError):
-            await check_qrcode(qr_code="trash", conn=conn)
+async def test_check_qr_code(conn):
+    with pytest.raises(TokenError):
+        await check_qrcode(qr_code="trash", conn=conn)
 
 
 @pytest.mark.asyncio
-async def test_member(async_db):
-    async with async_db as conn:
-        await check_member(user_id=0, member_type=TokenType.NORMAL, conn=conn)
+async def test_member(conn):
+    await check_member(user_id=0, member_type=TokenType.NORMAL, conn=conn)
 
-        with pytest.raises(TokenError):
-            await check_member(user_id=1000, member_type=TokenType.NORMAL, conn=conn)
+    with pytest.raises(TokenError):
+        await check_member(user_id=1000, member_type=TokenType.NORMAL, conn=conn)

@@ -73,10 +73,8 @@ async def testing_get_db():
 
 
 @pytest.fixture
-@asynccontextmanager
-async def async_db() -> aiosqlite.Connection:
-    async with get_db() as db:
-        yield db
+async def conn() -> aiosqlite.Connection:
+    yield await anext(get_db())
 
 
 @pytest.fixture
