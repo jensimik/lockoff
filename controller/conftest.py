@@ -3,8 +3,8 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 
 import aiosqlite
-import pyotp
 import pytest
+import pytest_asyncio
 from fakeredis import aioredis
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -72,7 +72,7 @@ async def testing_get_db():
         await db.close()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def conn() -> aiosqlite.Connection:
     gen = testing_get_db()
     awaitable = anext(gen)
