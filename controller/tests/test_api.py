@@ -74,8 +74,8 @@ def test_request_totp_email(user_id, ok, mocker, client: TestClient):
         (0, True, True),  # normal user, correct_totp
         (5, True, True),  # morning user, correct totp
         (9, True, False),  # inactive user, correct totp
-        (0, False, True),  # normal user, wrong totp
-        (5, False, True),  # morning user, wrong totp
+        (0, False, False),  # normal user, wrong totp
+        (5, False, False),  # morning user, wrong totp
         (9, False, False),  # inactive user, wrong totp
     ),
 )
