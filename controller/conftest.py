@@ -1,4 +1,5 @@
 import random
+import typing
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 
@@ -21,7 +22,7 @@ async def testing_lifespan(app: FastAPI):
     yield
 
 
-async def setup_db():
+async def setup_db() -> aiosqlite.Connection:
     """Return a database connection for use as a dependency.
     This connection has the Row row factory automatically attached."""
 
@@ -64,9 +65,10 @@ async def setup_db():
             ),
         )
     await db.commit()
+    return db
 
 
-async def testing_get_db():
+async def testing_get_db() -> typing.AsyncGenerator[aiosqlite.Connection]:
     db = await setup_db()
     try:
         yield db
@@ -75,7 +77,7 @@ async def testing_get_db():
 
 
 @pytest_asyncio.fixture
-async def conn() -> aiosqlite.Connection:
+async def conn() -> typing.AsyncGenerator[aiosqlite.Connection]:
     db = await setup_db()
     try:
         yield db
