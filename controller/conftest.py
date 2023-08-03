@@ -14,6 +14,7 @@ from fastapi_limiter import FastAPILimiter
 from lockoff.access_token import TokenType
 from lockoff.depends import get_db
 from lockoff.misc import queries, simple_hash
+from lockoff.config import settings
 
 TOTP_SECRET = "H6IC425Q5IFZYAP4VINKRVHX7ZIEKO7E"
 
@@ -38,7 +39,7 @@ async def setup_db() -> aiosqlite.Connection:
     await queries.create_schema(db)
 
     # make some sample data in the database to run tests agains
-    batch_id = datetime.utcnow().isoformat(timespec="seconds")
+    batch_id = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
     for x in range(10):
         # insert test user
         await queries.upsert_user(
@@ -63,7 +64,8 @@ async def setup_db() -> aiosqlite.Connection:
             ).name,
             timestamp=int(
                 (
-                    datetime.utcnow() - timedelta(minutes=random.randint(0, 200))
+                    datetime.now(tz=settings.tz)
+                    - timedelta(minutes=random.randint(0, 200))
                 ).timestamp()
             ),
         )
