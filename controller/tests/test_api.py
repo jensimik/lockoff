@@ -24,14 +24,15 @@ def test_endpoint_generic(url, expected_status_code, client: TestClient):
 
 
 @pytest.mark.parametrize(
-    ["mobile", "ok"],
+    ["user_id", "ok"],
     (
-        ("10001000", True),  # normal user
-        ("10001005", True),  # morning user
-        ("10001009", False),  # inactive user
+        (0, True),  # normal user
+        (5, True),  # morning user
+        (9, False),  # inactive user
     ),
 )
-def test_request_totp_mobile(mobile, ok, mocker, client: TestClient):
+def test_request_totp_mobile(user_id, ok, mocker, client: TestClient):
+    mobile = f"1000100{user_id}"
     mock = mocker.patch("fastapi.BackgroundTasks.add_task")
     data = {"username": mobile, "username_type": "mobile"}
     response = client.post("/request-totp", json=data)
@@ -39,22 +40,21 @@ def test_request_totp_mobile(mobile, ok, mocker, client: TestClient):
     assert response.status_code == status.HTTP_200_OK
     if ok:
         mock.assert_called_once()
-        mock.assert_called_with(
-            mocker.ANY, send_mobile, mobile=mobile, message=mocker.ANY
-        )
+        mock.assert_called_with(send_mobile, user_id=user_id, message=mocker.ANY)
     else:
         mock.assert_not_called()
 
 
 @pytest.mark.parametrize(
-    ["email", "ok"],
+    ["user_id", "ok"],
     (
         ("test0@test.dk", True),  # normal user
         ("test5@test.dk", True),  # morning user
         ("test9@test.dk", False),  # inactive user
     ),
 )
-def test_request_totp_email(email, ok, mocker, client: TestClient):
+def test_request_totp_email(user_id, ok, mocker, client: TestClient):
+    email = f"test{user_id}@test.dk"
     mock = mocker.patch("fastapi.BackgroundTasks.add_task")
     data = {"username": email, "username_type": "email"}
     response = client.post("/request-totp", json=data)
@@ -62,7 +62,7 @@ def test_request_totp_email(email, ok, mocker, client: TestClient):
     assert response.status_code == status.HTTP_200_OK
     if ok:
         mock.assert_called_once()
-        mock.assert_called_with(mocker.ANY, send_email, email=email, message=mocker.ANY)
+        mock.assert_called_with(send_email, user_id=user_id, message=mocker.ANY)
     else:
         mock.assert_not_called()
 
