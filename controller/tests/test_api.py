@@ -19,3 +19,13 @@ from fastapi.testclient import TestClient
 def test_endpoint_generic(url, expected_status_code, client: TestClient):
     response = client.get(url)
     assert response.status_code == expected_status_code
+
+
+# class TestLogin:
+#     @pytest.fixtures(autouse=True)
+#     def
+
+# def test_request_totp_mobile(mocker, client: TestClient):
+#     mobile_send_mock = mocker.patch("lockoff.routers.auth.send_mobile")
+#     data = {}
+#     response = client.post("/request-totp")

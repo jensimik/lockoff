@@ -9,7 +9,6 @@ import serial_asyncio
 
 from .config import settings
 
-
 log = logging.getLogger(__name__)
 lock = asyncio.Lock()
 module_directory = pathlib.Path(__file__).resolve().parent
@@ -27,6 +26,9 @@ class Watchdog:
         if any([w.done() for w in self._watch]):
             return False
         return True
+
+
+watchdog = Watchdog()
 
 
 def simple_hash(data: str) -> str:

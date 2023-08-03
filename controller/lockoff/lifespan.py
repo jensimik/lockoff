@@ -8,10 +8,8 @@ from fastapi_limiter import FastAPILimiter
 
 from .config import settings
 from .klubmodul import klubmodul_runner
-from .misc import GFXDisplay, Watchdog, queries
+from .misc import GFXDisplay, watchdog, queries
 from .reader import opticon_reader
-
-watchdog = Watchdog()
 
 
 @asynccontextmanager
