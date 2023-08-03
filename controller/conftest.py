@@ -75,7 +75,7 @@ async def testing_get_db():
 @pytest.fixture
 async def conn() -> aiosqlite.Connection:
     async for c in testing_get_db():
-        yield c
+        return c
 
 
 @pytest.fixture
