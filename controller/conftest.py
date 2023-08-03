@@ -21,7 +21,6 @@ async def testing_lifespan(app: FastAPI):
     yield
 
 
-@pytest.fixture
 async def testing_get_db():
     """Return a database connection for use as a dependency.
     This connection has the Row row factory automatically attached."""
@@ -71,6 +70,11 @@ async def testing_get_db():
     finally:
         # test data is automatically cleared between tests
         await db.close()
+
+
+@pytest.fixture
+async def async_db() -> aiosqlite.Connection:
+    yield await anext(get_db())
 
 
 @pytest.fixture
