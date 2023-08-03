@@ -4,7 +4,7 @@ from lockoff.misc import GFXDisplay, simple_hash
 
 
 @pytest.mark.asyncio
-async def test_lcd(mock_serial):
+async def test_display(mock_serial):
     lcd = GFXDisplay()
     await lcd.setup(url=mock_serial.port)
 

@@ -73,6 +73,12 @@ async def testing_get_db():
 
 
 @pytest.fixture
+async def async_db() -> aiosqlite.Connection:
+    async with get_db as db:
+        yield db
+
+
+@pytest.fixture
 def client(mocker) -> TestClient:
     mocker.patch("lockoff.lifespan.lifespan", testing_lifespan)
     from lockoff.main import app

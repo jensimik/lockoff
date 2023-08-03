@@ -66,28 +66,26 @@ async def check_dayticket(user_id: int, conn: aiosqlite.Connection):
             log_and_raise_token_error("dayticket is expired", code=b"D")
 
 
-async def check_qrcode(qr_code: str):
-    async with aiosqlite.connect(settings.db_file) as conn:
-        conn.row_factory = aiosqlite.Row
-        user_id, token_type = verify_access_token(
-            token=qr_code
-        )  # it will raise TokenError if not valid
-        log.info(f"checking user {user_id} {token_type}")
-        # check in database
-        match token_type:
-            case TokenType.NORMAL | TokenType.MORNING:
-                await check_member(user_id=user_id, member_type=token_type, conn=conn)
-            case TokenType.DAY_TICKET:
-                await check_dayticket(user_id=user_id, conn=conn)
-        log.info(f"{user_id} {token_type} access granted")
-        # log in access_log db
-        await queries.log_entry(
-            conn,
-            user_id=user_id,
-            token_type=token_type.name,
-            timestamp=datetime.now(tz=settings.tz).isoformat(timespec="seconds"),
-        )
-        await conn.commit()
+async def check_qrcode(qr_code: str, conn: aiosqlite.Connection):
+    user_id, token_type = verify_access_token(
+        token=qr_code
+    )  # it will raise TokenError if not valid
+    log.info(f"checking user {user_id} {token_type}")
+    # check in database
+    match token_type:
+        case TokenType.NORMAL | TokenType.MORNING:
+            await check_member(user_id=user_id, member_type=token_type, conn=conn)
+        case TokenType.DAY_TICKET:
+            await check_dayticket(user_id=user_id, conn=conn)
+    log.info(f"{user_id} {token_type} access granted")
+    # log in access_log db
+    await queries.log_entry(
+        conn,
+        user_id=user_id,
+        token_type=token_type.name,
+        timestamp=datetime.now(tz=settings.tz).isoformat(timespec="seconds"),
+    )
+    await conn.commit()
 
 
 async def o_cmd(writer: asyncio.StreamWriter, cmds: list[bytes]):
@@ -104,7 +102,9 @@ async def opticon_reader(display: GFXDisplay):
         qr_code = (await _r.readuntil(separator=b"\r")).decode("utf-8").strip()
         try:
             # check the qr_code (raises exception on errors)
-            await check_qrcode(qr_code)
+            async with aiosqlite.connect(settings.db_file) as conn:
+                conn.row_factory = aiosqlite.Row
+                await check_qrcode(qr_code=qr_code, conn=conn)
             # buzz in
             asyncio.create_task(buzz_in())
             # show OK on display
