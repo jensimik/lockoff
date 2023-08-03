@@ -6,7 +6,6 @@ from fakeredis import aioredis
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from fastapi_limiter import FastAPILimiter
-from lockoff.main import app
 from lockoff.misc import queries
 from lockoff.config import settings
 
@@ -22,8 +21,10 @@ async def testing_lifespan(app: FastAPI):
 
 
 @pytest.fixture
-def client(monkeypatch) -> TestClient:
-    monkeypatch.setattr("lockoff.main.lifespan", testing_lifespan)
+def client(mocker) -> TestClient:
+    mocker.patch("lockoff.main.lifespan", testing_lifespan)
+    from lockoff.main import app
+
     with TestClient(
         app=app,
         base_url="http://test",
