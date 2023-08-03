@@ -36,7 +36,7 @@ log = logging.getLogger(__name__)
 
 
 @router.post("/generate-daytickets")
-async def klubmodul_force_resync(
+async def generate_daytickets(
     pages_to_print: schemas.PagesToPrint,
     _: Annotated[
         list[aiosqlite.Row], Security(depends.get_current_users, scopes=["admin"])
@@ -128,7 +128,7 @@ async def check_token(
                 case _ as expires if expires == 0:
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=f"dayticket has not been activated yet",
+                        detail="dayticket has not been activated yet",
                     )
                 case _ as expires if expires > 0:
                     expires = datetime.fromtimestamp(ticket["expires"], tz=settings.tz)
