@@ -103,3 +103,21 @@ def test_login_mobile(user_id, use_correct_totp, ok, client: TestClient):
 def test_me(aclient: TestClient):
     response = aclient.get("/me")
     assert response.status_code == status.HTTP_200_OK
+
+    json = response.json()
+    assert "users" in json
+
+    first_user = json["users"][0]
+
+    # now test qr code, pdf and pkpass endpoints with the dl_access_token
+
+    token = first_user["token"]
+
+    for x, content_type in [
+        ("qr-code.png", "image/png"),
+        ("membership-card.pdf", "application/pdf"),
+        ("membership-card.pkpass", "application/vnd.apple.pkpass"),
+    ]:
+        response2 = aclient.get(f"/{token}/{x}")
+        assert response2.status_code == status.HTTP_200_OK
+        assert content_type == response2.headers["content-type"]
