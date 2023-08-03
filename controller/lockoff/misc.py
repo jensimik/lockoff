@@ -2,26 +2,39 @@ import asyncio
 import hashlib
 import logging
 import pathlib
+from contextlib import asynccontextmanager
 from datetime import datetime
 
 import aiosql
-import serial_asyncio
-from contextlib import asynccontextmanager
-
 import aiosqlite
-from fastapi import FastAPI
 import redis.asyncio as redis
+import serial_asyncio
+from fastapi import FastAPI
 from fastapi_limiter import FastAPILimiter
-from .klubmodul import klubmodul_runner
-from .misc import GFXDisplay, Watchdog, queries
-from .reader import opticon_reader
 
 from .config import settings
+from .klubmodul import klubmodul_runner
+from .reader import opticon_reader
 
 log = logging.getLogger(__name__)
 lock = asyncio.Lock()
 module_directory = pathlib.Path(__file__).resolve().parent
 queries = aiosql.from_path(module_directory / "queries.sql", "aiosqlite")
+
+
+class Watchdog:
+    def __init__(self):
+        self._watch = []
+
+    def watch(self, watch: asyncio.Task):
+        self._watch.append(watch)
+
+    def healthy(self):
+        if any([w.done() for w in self._watch]):
+            return False
+        return True
+
+
 watchdog = Watchdog()
 
 
@@ -81,16 +94,3 @@ class GFXDisplay:
                 await self.display_w.drain()
             else:
                 log.info(f"display send message {message.decode('utf-8')}")
-
-
-class Watchdog:
-    def __init__(self):
-        self._watch = []
-
-    def watch(self, watch: asyncio.Task):
-        self._watch.append(watch)
-
-    def healthy(self):
-        if any([w.done() for w in self._watch]):
-            return False
-        return True
