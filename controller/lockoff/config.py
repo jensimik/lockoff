@@ -45,11 +45,7 @@ class Settings(BaseSettings):
     key: bytes = ""
     certificate_password: bytes = ""
     wwdr_certificate: bytes = ""
-    mailtrap_token: str = ""
-    basic_auth_username: bytes = ""
-    basic_auth_password: bytes = ""
     current_season: int = 2023
-    prod: bool = False
     tz: tzfile = gettz("Europe/Copenhagen")
 
     @classmethod
