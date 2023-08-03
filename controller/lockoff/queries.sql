@@ -142,7 +142,7 @@ create table if not exists users (
     mobile text not null,
     email text not null,
     batch_id text not null,
-    totp_secret text not null default "",
+    totp_secret text not null,
     active integer not null
 );
 create table if not exists access_log (

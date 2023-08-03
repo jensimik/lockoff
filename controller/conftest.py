@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 from fastapi_limiter import FastAPILimiter
 from lockoff.access_token import TokenType
 from lockoff.depends import get_db
-from lockoff.misc import queries
+from lockoff.misc import queries, simple_hash
 
 
 @asynccontextmanager
@@ -42,8 +42,8 @@ async def testing_get_db():
             user_id=x,
             name=f"test user {x}",
             member_type="FULL" if x in range(5) else "MORN",
-            mobile=f"1000100{x}",
-            email=f"test{x}@test.dk",
+            mobile=simple_hash(f"1000100{x}"),
+            email=simple_hash(f"test{x}@test.dk"),
             batch_id=batch_id,
             totp_secret=pyotp.random_base32(),
             active=True if x < 8 else False,

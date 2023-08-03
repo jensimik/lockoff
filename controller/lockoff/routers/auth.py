@@ -54,6 +54,8 @@ async def request_totp(
             user_id=user_ids[0],
             message=f"code is {code}\n\n@nkk.dk #{code}",
         )
+    else:
+        log.error("no users found!?")
     return schemas.StatusReply(status=f"{rt.username_type} message sent")
 
 
@@ -68,11 +70,6 @@ async def login(
     )
     totp_secrets = [u["totp_secret"] for u in users]
     user_ids = [u["user_id"] for u in users]
-    if not totp_secrets:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="mobile not found or code expired or not valid",
-        )
     totp = pyotp.TOTP(totp_secrets[0])
     if not totp.verify(otp=login_data.totp, valid_window=2):
         raise HTTPException(
