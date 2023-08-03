@@ -68,7 +68,7 @@ async def setup_db() -> aiosqlite.Connection:
     return db
 
 
-async def testing_get_db() -> typing.AsyncGenerator[aiosqlite.Connection]:
+async def testing_get_db() -> typing.AsyncGenerator[aiosqlite.Connection, None]:
     db = await setup_db()
     try:
         yield db
@@ -77,7 +77,7 @@ async def testing_get_db() -> typing.AsyncGenerator[aiosqlite.Connection]:
 
 
 @pytest_asyncio.fixture
-async def conn() -> typing.AsyncGenerator[aiosqlite.Connection]:
+async def conn() -> typing.AsyncGenerator[aiosqlite.Connection, None]:
     db = await setup_db()
     try:
         yield db
