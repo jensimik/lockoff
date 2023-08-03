@@ -98,3 +98,8 @@ def test_login_mobile(user_id, use_correct_totp, ok, client: TestClient):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "access_token" not in json
         assert "token_type" not in json
+
+
+def test_me(aclient: TestClient):
+    response = aclient.get("/me")
+    assert response.status_code == status.HTTP_200_OK

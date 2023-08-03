@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import aiosqlite
 import pytest
 import pytest_asyncio
+import pyotp
 from fakeredis import aioredis
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -13,6 +14,8 @@ from fastapi_limiter import FastAPILimiter
 from lockoff.access_token import TokenType
 from lockoff.depends import get_db
 from lockoff.misc import queries, simple_hash
+
+TOTP_SECRET = "H6IC425Q5IFZYAP4VINKRVHX7ZIEKO7E"
 
 
 @asynccontextmanager
@@ -46,7 +49,7 @@ async def setup_db() -> aiosqlite.Connection:
             mobile=simple_hash(f"1000100{x}"),
             email=simple_hash(f"test{x}@test.dk"),
             batch_id=batch_id,
-            totp_secret="H6IC425Q5IFZYAP4VINKRVHX7ZIEKO7E",
+            totp_secret=TOTP_SECRET,
             active=True if x < 8 else False,
         )
         # insert some daytickets
@@ -87,6 +90,7 @@ async def conn() -> typing.AsyncGenerator[aiosqlite.Connection, None]:
 
 @pytest.fixture
 def client(mocker) -> TestClient:
+    """unauthenticated client"""
     mocker.patch("lockoff.lifespan.lifespan", testing_lifespan)
     from lockoff.main import app
 
@@ -96,4 +100,28 @@ def client(mocker) -> TestClient:
         app=app,
         base_url="http://test",
     ) as client:
+        yield client
+
+
+@pytest.fixture
+def aclient(mocker) -> TestClient:
+    """authenticated client"""
+    mocker.patch("lockoff.lifespan.lifespan", testing_lifespan)
+    from lockoff.main import app
+
+    app.dependency_overrides[get_db] = testing_get_db
+
+    with TestClient(
+        app=app,
+        base_url="http://test",
+    ) as client:
+        totp = pyotp.TOTP(TOTP_SECRET)
+        data = {"username": "10001000", "username_type": "mobile", "totp": totp.now()}
+        response = client.post("/login", json=data)
+        json = response.json()
+
+        client.headers = {
+            "Authorization": f"{json['token_type']} {json['access_token']}"
+        }
+
         yield client
