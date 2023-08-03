@@ -76,7 +76,8 @@ async def testing_get_db():
 async def conn() -> aiosqlite.Connection:
     gen = testing_get_db()
     awaitable = anext(gen)
-    yield await awaitable
+    res = await awaitable
+    yield res
 
 
 @pytest.fixture
