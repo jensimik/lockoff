@@ -26,8 +26,8 @@ def test_endpoint_generic(url, expected_status_code, client: TestClient):
 @pytest.mark.parametrize(
     ["mobile", "ok"],
     (
-        ("10001000", True),
-        ("10001008", True),
+        ("10001000", True),  # normal user
+        ("10001005", True),  # morning user
         ("10001009", False),  # inactive user
     ),
 )
@@ -48,7 +48,11 @@ def test_request_totp_mobile(mobile, ok, mocker, client: TestClient):
 
 @pytest.mark.parametrize(
     ["email", "ok"],
-    (("test0@test.dk", True), ("test1@test.dk", True), ("test9@test.dk", False)),
+    (
+        ("test0@test.dk", True),  # normal user
+        ("test5@test.dk", True),  # morning user
+        ("test9@test.dk", False),  # inactive user
+    ),
 )
 def test_request_totp_email(email, ok, mocker, client: TestClient):
     mock = mocker.patch("fastapi.BackgroundTasks.add_task")

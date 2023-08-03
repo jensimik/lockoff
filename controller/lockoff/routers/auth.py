@@ -33,7 +33,7 @@ send_funcs = {
 
 
 @router.post(
-    "/request-totp", dependencies=[Depends(RateLimiter(times=105, seconds=300))]
+    "/request-totp", dependencies=[Depends(RateLimiter(times=10, seconds=300))]
 )
 async def request_totp(
     rt: schemas.RequestTOTP, conn: DBcon, background_tasks: BackgroundTasks
@@ -57,7 +57,7 @@ async def request_totp(
     return schemas.StatusReply(status=f"{rt.username_type} message sent")
 
 
-@router.post("/login", dependencies=[Depends(RateLimiter(times=105, seconds=300))])
+@router.post("/login", dependencies=[Depends(RateLimiter(times=10, seconds=300))])
 async def login(
     login_data: schemas.RequestLogin,
     conn: DBcon,
