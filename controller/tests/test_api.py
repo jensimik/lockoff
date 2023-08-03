@@ -1,6 +1,7 @@
 import pytest
 from fastapi import status, BackgroundTasks
 from fastapi.testclient import TestClient
+from lockoff.routers.auth import send_email, send_mobile
 
 
 @pytest.mark.parametrize(
@@ -30,4 +31,4 @@ def test_request_totp_mobile(mocker, client: TestClient):
     response = client.post("/request-totp", json=data)
 
     assert response.status_code == status.HTTP_200_OK
-    spy.assert_called_with(mocker.ANY, mobile=mobile, message=mocker.ANY)
+    spy.assert_called_with(mocker.ANY, send_email, mobile=mobile, message=mocker.ANY)
