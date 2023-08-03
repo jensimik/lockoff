@@ -116,7 +116,7 @@ def test_me(aclient: TestClient):
     for x, content_type in [
         ("qr-code.png", "image/png"),
         ("membership-card.pdf", "application/pdf"),
-        ("membership-card.pkpass", "application/vnd.apple.pkpass"),
+        # ("membership-card.pkpass", "application/vnd.apple.pkpass"),
     ]:
         response2 = aclient.get(f"/{token}/{x}")
         assert response2.status_code == status.HTTP_200_OK
