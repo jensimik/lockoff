@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="127.78mm" height="248.35mm" viewBox="0.0 0.0 127.78 248.35" xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+<!--
+FrontPanel - Mounting Holes and cutouts for all your holy needs.
+
+
+
+<script type="module" src="https://md-block.verou.me/md-block.js"></script>
+<md-block>
+
+
+This will help you create font (and side and top) panels for your
+boxes that are pre-configured for all the bits and bobs you'd like to
+install
+
+    The layout can create several types of holes including rectangles,
+    circles and mounting holes.  The default shows an example layout with all
+    currently supported objects.
+
+#### 
+`rect x y w h [cr=0] [cx=True] [cy=True]`
+
+     x: x position
+     y: y position
+     w: width
+     h: height
+    cr: optional, Corner radius, default=0
+    cx: optional, Center x.  the x position denotes the center of the rectangle.
+        accepts t, T, 1, or other true-like values.
+    cy: optional, Center y.  the y position denotes the center of the rectangle.
+
+#### outline
+`rect w h`
+
+    w: width
+    h: height
+
+`outline` has a special meaning: You can create multiple panel outlines with one command.  
+This has the effect of making it easy to manage all the holes on all the sides of
+your boxes.
+
+#### circle
+`circle x y r`
+
+    x: x position
+    y: y position
+    r: radius
+
+#### mountinghole
+mountinghole x y d_shaft [d_head=0] [angle=0]
+
+          x: x position
+          y: y position
+    d_shaft: diameter of the shaft part of the mounting hole
+     d_head: optional. diameter of the head
+      angle: optional. angle of the mounting hole
+
+#### text
+`text x y size "some text" [angle=0] [align=bottom|left]`
+
+        x: x position
+        y: y position
+     size: size, in mm
+     text: text to render.  This *must* be in quotation marks
+    angle: angle (in degrees)
+    align: string with combinations of (top|middle|bottom) and (left|center|right),
+           separated by '|'.  Default is 'bottom|left'
+
+
+
+#### nema
+`nema x y size [screwhole_size=0]`
+
+        x: x position (center of shaft)
+        y: y position (center of shaft)
+     size: nema size.  One of [8, 11, 14, 16, 17, 23, 24, 34, 42]
+    screw: screw size, in mm.  Optional.  Default=0, which means the default size
+</md-block>
+    
+
+
+Created with Boxes.py (https://festi.info/boxes.py)
+Creation date: 2023-08-01 12:02:38
+Command line (remove spaces between dashes): boxes FrontPanel '- -layout=outline 106 215\nrect 53 180 60 42 0 True True\nrect 53 10 86 126 5 True False' - -thickness=5.0
+Url: http://www.festi.info/boxes.py/FrontPanel?layout=outline+106+215%0D%0Arect+53+180+60+42+0+True+True%0D%0Arect+53+10+86+126+5+True+False&thickness=5.0&format=svg&tabs=0.0&qr_code=0&debug=0&labels=0&labels=1&reference=100&inner_corners=loop&burn=0.1&language=en&render=1
+Url short: http://www.festi.info/boxes.py/FrontPanel?layout=outline+106+215%0D%0Arect+53+180+60+42+0+True+True%0D%0Arect+53+10+86+126+5+True+False&thickness=5.0
+SettingsUrl: http://www.festi.info/boxes.py/FrontPanel?layout=outline+106+215%0D%0Arect+53+180+60+42+0+True+True%0D%0Arect+53+10+86+126+5+True+False&thickness=5.0&format=svg&tabs=0.0&qr_code=0&debug=0&labels=0&labels=1&reference=100&inner_corners=loop&burn=0.1&language=en
+SettingsUrl short: http://www.festi.info/boxes.py/FrontPanel?layout=outline+106+215%0D%0Arect+53+180+60+42+0+True+True%0D%0Arect+53+10+86+126+5+True+False&thickness=5.0
+-->
+<title>FrontPanel</title>
+<metadata>
+<rdf:RDF><cc:Work>
+<dc:title>Holes - FrontPanel</dc:title>
+<dc:date>2023-08-01 12:02:38</dc:date>
+<dc:source>http://www.festi.info/boxes.py/FrontPanel?layout=outline+106+215%0D%0Arect+53+180+60+42+0+True+True%0D%0Arect+53+10+86+126+5+True+False&amp;thickness=5.0&amp;format=svg&amp;tabs=0.0&amp;qr_code=0&amp;debug=0&amp;labels=0&amp;labels=1&amp;reference=100&amp;inner_corners=loop&amp;burn=0.1&amp;language=en&amp;render=1</dc:source>
+<dc:source>http://www.festi.info/boxes.py/FrontPanel?layout=outline+106+215%0D%0Arect+53+180+60+42+0+True+True%0D%0Arect+53+10+86+126+5+True+False&amp;thickness=5.0</dc:source>
+<dc:description>Mounting Holes and cutouts for all your holy needs.
+
+
+&lt;script type="module" src="https://md-block.verou.me/md-block.js"&gt;&lt;/script&gt;
+&lt;md-block&gt;
+
+
+This will help you create font (and side and top) panels for your
+boxes that are pre-configured for all the bits and bobs you'd like to
+install
+
+    The layout can create several types of holes including rectangles,
+    circles and mounting holes.  The default shows an example layout with all
+    currently supported objects.
+
+#### 
+`rect x y w h [cr=0] [cx=True] [cy=True]`
+
+     x: x position
+     y: y position
+     w: width
+     h: height
+    cr: optional, Corner radius, default=0
+    cx: optional, Center x.  the x position denotes the center of the rectangle.
+        accepts t, T, 1, or other true-like values.
+    cy: optional, Center y.  the y position denotes the center of the rectangle.
+
+#### outline
+`rect w h`
+
+    w: width
+    h: height
+
+`outline` has a special meaning: You can create multiple panel outlines with one command.  
+This has the effect of making it easy to manage all the holes on all the sides of
+your boxes.
+
+#### circle
+`circle x y r`
+
+    x: x position
+    y: y position
+    r: radius
+
+#### mountinghole
+mountinghole x y d_shaft [d_head=0] [angle=0]
+
+          x: x position
+          y: y position
+    d_shaft: diameter of the shaft part of the mounting hole
+     d_head: optional. diameter of the head
+      angle: optional. angle of the mounting hole
+
+#### text
+`text x y size "some text" [angle=0] [align=bottom|left]`
+
+        x: x position
+        y: y position
+     size: size, in mm
+     text: text to render.  This *must* be in quotation marks
+    angle: angle (in degrees)
+    align: string with combinations of (top|middle|bottom) and (left|center|right),
+           separated by '|'.  Default is 'bottom|left'
+
+
+
+#### nema
+`nema x y size [screwhole_size=0]`
+
+        x: x position (center of shaft)
+        y: y position (center of shaft)
+     size: nema size.  One of [8, 11, 14, 16, 17, 23, 24, 34, 42]
+    screw: screw size, in mm.  Optional.  Default=0, which means the default size
+&lt;/md-block&gt;
+    
+
+Created with Boxes.py (https://festi.info/boxes.py)
+Command line: boxes FrontPanel '--layout=outline 106 215\nrect 53 180 60 42 0 True True\nrect 53 10 86 126 5 True False' --thickness=5.0 --format=svg --tabs=0.0 --qr_code=0 --debug=0 --labels=0 --labels=1 --reference=100 --inner_corners=loop --burn=0.1
+Command line short: boxes FrontPanel '--layout=outline 106 215\nrect 53 180 60 42 0 True True\nrect 53 10 86 126 5 True False' --thickness=5.0
+Url: http://www.festi.info/boxes.py/FrontPanel?layout=outline+106+215%0D%0Arect+53+180+60+42+0+True+True%0D%0Arect+53+10+86+126+5+True+False&amp;thickness=5.0&amp;format=svg&amp;tabs=0.0&amp;qr_code=0&amp;debug=0&amp;labels=0&amp;labels=1&amp;reference=100&amp;inner_corners=loop&amp;burn=0.1&amp;language=en&amp;render=1
+Url short: http://www.festi.info/boxes.py/FrontPanel?layout=outline+106+215%0D%0Arect+53+180+60+42+0+True+True%0D%0Arect+53+10+86+126+5+True+False&amp;thickness=5.0
+SettingsUrl: http://www.festi.info/boxes.py/FrontPanel?layout=outline+106+215%0D%0Arect+53+180+60+42+0+True+True%0D%0Arect+53+10+86+126+5+True+False&amp;thickness=5.0&amp;format=svg&amp;tabs=0.0&amp;qr_code=0&amp;debug=0&amp;labels=0&amp;labels=1&amp;reference=100&amp;inner_corners=loop&amp;burn=0.1&amp;language=en
+SettingsUrl short: http://www.festi.info/boxes.py/FrontPanel?layout=outline+106+215%0D%0Arect+53+180+60+42+0+True+True%0D%0Arect+53+10+86+126+5+True+False&amp;thickness=5.0
+</dc:description>
+</cc:Work></rdf:RDF></metadata>
+<g id="p-0" style="fill:none;stroke-linecap:round;stroke-linejoin:round;">
+  <path d="M 11.734 238.350 H 111.734 V 228.350 H 11.734 V 238.350 Z" stroke="rgb(0,0,0)" stroke-width="0.20"/>
+  <text transform="matrix( 1.000 0.000 0.000 1.000 61.734 229.350 )" style="font-family: sans-serif ; font-weight: normal; font-style: normal; fill: rgb(255,0,0)" font-size="8px" text-anchor="middle" dominant-baseline="hanging">100mm, burn:0.10mm</text>
+</g>
+<g id="p-1" style="fill:none;stroke-linecap:round;stroke-linejoin:round;">
+  <path d="M 10.384 227.000 H 116.384 V 12.000 H 10.384 V 227.000 Z" stroke="rgb(255,0,0)" stroke-width="0.20"/>
+  <path d="M 10.784 227.000 C 10.784 227.077 10.762 227.152 10.720 227.216 C 10.679 227.281 10.620 227.332 10.550 227.364 C 10.480 227.396 10.403 227.407 10.327 227.396 C 10.251 227.385 10.180 227.353 10.122 227.302 C 10.064 227.252 10.022 227.186 10.000 227.113 C 9.978 227.039 9.978 226.961 10.000 226.887 C 10.022 226.814 10.064 226.748 10.122 226.698 C 10.180 226.647 10.251 226.615 10.327 226.604 C 10.403 226.593 10.480 226.604 10.550 226.636 C 10.620 226.668 10.679 226.719 10.720 226.784 C 10.762 226.848 10.784 226.923 10.784 227.000 Z" stroke="rgb(255,0,0)" stroke-width="0.20"/>
+  <text transform="matrix( 1.000 0.000 0.000 1.000 10.384 225.000 )" style="font-family: sans-serif ; font-weight: normal; font-style: normal; fill: rgb(255,0,0)" font-size="2px" text-anchor="left" dominant-baseline="hanging">1</text><path d="M 116.784 227.000 C 116.784 227.077 116.762 227.152 116.720 227.216 C 116.679 227.281 116.620 227.332 116.550 227.364 C 116.480 227.396 116.403 227.407 116.327 227.396 C 116.251 227.385 116.180 227.353 116.122 227.302 C 116.064 227.252 116.022 227.186 116.000 227.113 C 115.978 227.039 115.978 226.961 116.000 226.887 C 116.022 226.814 116.064 226.748 116.122 226.698 C 116.180 226.647 116.251 226.615 116.327 226.604 C 116.403 226.593 116.480 226.604 116.550 226.636 C 116.620 226.668 116.679 226.719 116.720 226.784 C 116.762 226.848 116.784 226.923 116.784 227.000 Z" stroke="rgb(255,0,0)" stroke-width="0.20"/>
+  <text transform="matrix( 1.000 0.000 0.000 1.000 116.384 225.000 )" style="font-family: sans-serif ; font-weight: normal; font-style: normal; fill: rgb(255,0,0)" font-size="2px" text-anchor="left" dominant-baseline="hanging">2</text><path d="M 116.784 12.000 C 116.784 12.077 116.762 12.152 116.720 12.216 C 116.679 12.281 116.620 12.332 116.550 12.364 C 116.480 12.396 116.403 12.407 116.327 12.396 C 116.251 12.385 116.180 12.353 116.122 12.302 C 116.064 12.252 116.022 12.186 116.000 12.113 C 115.978 12.039 115.978 11.961 116.000 11.887 C 116.022 11.814 116.064 11.748 116.122 11.698 C 116.180 11.647 116.251 11.615 116.327 11.604 C 116.403 11.593 116.480 11.604 116.550 11.636 C 116.620 11.668 116.679 11.719 116.720 11.784 C 116.762 11.848 116.784 11.923 116.784 12.000 Z" stroke="rgb(255,0,0)" stroke-width="0.20"/>
+  <text transform="matrix( 1.000 0.000 0.000 1.000 116.384 10.000 )" style="font-family: sans-serif ; font-weight: normal; font-style: normal; fill: rgb(255,0,0)" font-size="2px" text-anchor="left" dominant-baseline="hanging">3</text><path d="M 10.784 12.000 C 10.784 12.077 10.762 12.152 10.720 12.216 C 10.679 12.281 10.620 12.332 10.550 12.364 C 10.480 12.396 10.403 12.407 10.327 12.396 C 10.251 12.385 10.180 12.353 10.122 12.302 C 10.064 12.252 10.022 12.186 10.000 12.113 C 9.978 12.039 9.978 11.961 10.000 11.887 C 10.022 11.814 10.064 11.748 10.122 11.698 C 10.180 11.647 10.251 11.615 10.327 11.604 C 10.403 11.593 10.480 11.604 10.550 11.636 C 10.620 11.668 10.679 11.719 10.720 11.784 C 10.762 11.848 10.784 11.923 10.784 12.000 Z" stroke="rgb(255,0,0)" stroke-width="0.20"/>
+  <text transform="matrix( 1.000 0.000 0.000 1.000 10.384 10.000 )" style="font-family: sans-serif ; font-weight: normal; font-style: normal; fill: rgb(255,0,0)" font-size="2px" text-anchor="left" dominant-baseline="hanging">4</text><path d="M 10.784 227.000 C 10.784 227.077 10.762 227.152 10.720 227.216 C 10.679 227.281 10.620 227.332 10.550 227.364 C 10.480 227.396 10.403 227.407 10.327 227.396 C 10.251 227.385 10.180 227.353 10.122 227.302 C 10.064 227.252 10.022 227.186 10.000 227.113 C 9.978 227.039 9.978 226.961 10.000 226.887 C 10.022 226.814 10.064 226.748 10.122 226.698 C 10.180 226.647 10.251 226.615 10.327 226.604 C 10.403 226.593 10.480 226.604 10.550 226.636 C 10.620 226.668 10.679 226.719 10.720 226.784 C 10.762 226.848 10.784 226.923 10.784 227.000 Z" stroke="rgb(255,0,0)" stroke-width="0.20"/>
+  <text transform="matrix( 1.000 0.000 0.000 1.000 10.384 225.000 )" style="font-family: sans-serif ; font-weight: normal; font-style: normal; fill: rgb(255,0,0)" font-size="2px" text-anchor="left" dominant-baseline="hanging">5</text><path d="M 63.384 67.900 H 33.484 C 33.384 67.900 33.484 68.000 33.484 67.900 V 26.100 C 33.484 26.000 33.384 26.100 33.484 26.100 H 93.284 C 93.384 26.100 93.284 26.000 93.284 26.100 V 67.900 C 93.284 68.000 93.384 67.900 93.284 67.900 H 63.384 Z" stroke="rgb(0,0,255)" stroke-width="0.20"/>
+  <path d="M 63.384 216.900 H 25.384 C 24.524 216.900 23.679 216.674 22.934 216.244 C 22.189 215.813 21.570 215.195 21.140 214.450 C 20.710 213.705 20.484 212.860 20.484 212.000 V 96.000 C 20.484 95.140 20.710 94.295 21.140 93.550 C 21.570 92.805 22.189 92.187 22.934 91.756 C 23.679 91.326 24.524 91.100 25.384 91.100 H 101.384 C 102.244 91.100 103.089 91.326 103.834 91.756 C 104.579 92.187 105.197 92.805 105.627 93.550 C 106.057 94.295 106.284 95.140 106.284 96.000 V 212.000 C 106.284 212.860 106.057 213.705 105.627 214.450 C 105.197 215.195 104.579 215.813 103.834 216.244 C 103.089 216.674 102.244 216.900 101.384 216.900 H 63.384 Z" stroke="rgb(0,0,255)" stroke-width="0.20"/>
+</g>
+</svg>
