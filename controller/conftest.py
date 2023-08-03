@@ -26,7 +26,7 @@ def client() -> TestClient:
     with TestClient(
         app=app,
         base_url="http://test",
-        lifespan=testing_lifespan,
+        startup=testing_lifespan,
         shutdown=testing_lifespan,
     ) as client:
         yield client
