@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 
 
 @pytest.mark.parametrize(
-    ["user_id"],
+    "user_id",
     (0, 1, 2, 3),
 )
 def test_dl_token(user_id):
