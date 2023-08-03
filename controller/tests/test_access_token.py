@@ -1,4 +1,5 @@
 import pytest
+from fastapi import HTTPException
 from lockoff.access_token import verify_dl_token, generate_dl_token, TokenError
 from dateutil.relativedelta import relativedelta
 
@@ -12,5 +13,5 @@ def test_dl_token(user_id):
     assert verify_dl_token(token) == user_id
 
     token_expired = generate_dl_token(user_id, expire_delta=relativedelta(hours=-10))
-    with pytest.raises(TokenError):
+    with pytest.raises(HTTPException):
         verify_dl_token(token_expired)
