@@ -21,14 +21,9 @@ async def testing_lifespan(app: FastAPI):
     yield
 
 
-@pytest.fixture(autouse=True)
-def mock_lifespan(monkeypatch):
-    """patch lifespan for testing"""
-    monkeypatch.setattr("lockoff.main.lifespan", testing_lifespan)
-
-
 @pytest.fixture
-def client() -> TestClient:
+def client(monkeypatch) -> TestClient:
+    monkeypatch.setattr("lockoff.main.lifespan", testing_lifespan)
     with TestClient(
         app=app,
         base_url="http://test",
