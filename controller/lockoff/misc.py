@@ -20,10 +20,8 @@ def simple_hash(data: str) -> str:
 
 
 class GFXDisplay:
-    async def setup(self):
-        _, display_w = await serial_asyncio.open_serial_connection(
-            url=settings.display_url
-        )
+    async def setup(self, url=settings.display_url):
+        _, display_w = await serial_asyncio.open_serial_connection(url=url)
         self.display_w = display_w
 
     async def runner(self):
