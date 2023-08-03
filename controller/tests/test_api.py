@@ -24,7 +24,7 @@ def test_endpoint_generic(url, expected_status_code, client: TestClient):
 
 
 @pytest.mark.parametrize(
-    ["mobile", "sc"],
+    ["mobile", "ok"],
     (
         ("10001000", True),
         ("10001008", True),
@@ -47,7 +47,7 @@ def test_request_totp_mobile(mobile, ok, mocker, client: TestClient):
 
 
 @pytest.mark.parametrize(
-    ["email"],
+    ["email", "ok"],
     (("test0@test.dk", True), ("test1@test.dk", True), ("test9@test.dk", False)),
 )
 def test_request_totp_email(email, ok, mocker, client: TestClient):
