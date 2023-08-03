@@ -32,7 +32,6 @@ async def testing_get_db():
 
     # setup schemas
     await queries.create_schema(db)
-    await db.commit()
 
     # make some sample data in the database to run tests agains
     batch_id = datetime.utcnow().isoformat(timespec="seconds")
@@ -40,17 +39,19 @@ async def testing_get_db():
         # insert test user
         await queries.upsert_user(
             db,
-            user_id=100 + x,
+            user_id=x,
             name=f"test user {x}",
             mobile=f"1000100{x}",
             email=f"test{x}@test.dk",
             batch_id=batch_id,
-            active=True,
+            active=True if x < 8 else False,
         )
+        # insert some daytickets
+        await queries.insert_dayticket(db, batch_id=batch_id)
         # insert some log entry
         await queries.log_entry(
             db,
-            user_id=random.randint(100, 110),
+            user_id=random.randint(0, 9),
             token_type=random.choice(
                 [TokenType.NORMAL, TokenType.MORNING, TokenType.DAY_TICKET]
             ).name,
@@ -60,6 +61,7 @@ async def testing_get_db():
                 ).timestamp()
             ),
         )
+    await db.commit()
 
     try:
         yield db

@@ -1,4 +1,5 @@
 import pytest
+from fastapi import status
 from fastapi.testclient import TestClient
 
 
@@ -21,11 +22,9 @@ def test_endpoint_generic(url, expected_status_code, client: TestClient):
     assert response.status_code == expected_status_code
 
 
-# class TestLogin:
-#     @pytest.fixtures(autouse=True)
-#     def
-
-# def test_request_totp_mobile(mocker, client: TestClient):
-#     mobile_send_mock = mocker.patch("lockoff.routers.auth.send_mobile")
-#     data = {}
-#     response = client.post("/request-totp")
+def test_request_totp_mobile(mocker, client: TestClient):
+    mobile_send_mock = mocker.patch("lockoff.routers.auth.send_mobile")
+    data = {"username": "10001000", "username_type": "mobile"}
+    response = client.post("/request-totp", json=data)
+    assert response.status_code == status.HTTP_200_OK
+    assert mobile_send_mock.assert_called_once()
