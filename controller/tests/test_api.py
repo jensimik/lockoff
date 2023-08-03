@@ -122,7 +122,7 @@ def test_me(a0client: TestClient):
         assert response2.status_code == status.HTTP_200_OK
         assert content_type == response2.headers["content-type"]
 
-    # normal use do not have access to admin
+    # normal user do not have access to admin
     response = a0client.get("/admin/system-status")
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
