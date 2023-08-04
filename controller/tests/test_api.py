@@ -2,11 +2,7 @@ import pyotp
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
-from lockoff.access_token import (
-    generate_access_token,
-    generate_dl_admin_token,
-    TokenType,
-)
+from lockoff.access_token import generate_access_token, generate_dl_admin_token
 from lockoff.routers.auth import send_email, send_mobile
 
 
@@ -35,7 +31,7 @@ def test_endpoint_generic(url, expected_status_code, client: TestClient):
         ("/admin/system-status", 401),
     ),
 )
-def test_endpoint_generic(url, expected_status_code, a0client: TestClient):
+def test_endpoint_generic_admin(url, expected_status_code, a0client: TestClient):
     response = a0client.get(url)
     assert response.status_code == expected_status_code
 

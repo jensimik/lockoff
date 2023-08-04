@@ -10,7 +10,7 @@ from lockoff.klubmodul import KMClient, refresh, KlubmodulException
 async def test_login_timeout(httpx_mock):
     httpx_mock.add_exception(httpx.ReadTimeout("Unable to read within timeout"))
     with pytest.raises(KlubmodulException):
-        async with KMClient() as km:
+        async with KMClient() as _:
             pass
 
 

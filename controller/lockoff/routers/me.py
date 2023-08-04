@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Security
 
 from .. import schemas
-from ..access_token import generate_dl_member_token, TokenType
+from ..access_token import generate_dl_member_token
 from ..depends import get_current_users
 
 router = APIRouter(tags=["me"])
