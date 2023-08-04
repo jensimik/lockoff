@@ -3,7 +3,7 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 from lockoff.access_token import (
-    generate_dl_member_token,
+    generate_access_token,
     generate_dl_admin_token,
     TokenType,
 )
@@ -144,3 +144,13 @@ def test_admin(a1client: TestClient):
     dl_token = generate_dl_admin_token(user_id=1)
     response = a1client.get(f"/admin/{dl_token}/qr-code.png")
     assert response.status_code == status.HTTP_200_OK
+
+    # check token
+    token = generate_access_token(user_id=1).decode()
+    response = a1client.post("/admin/check-token", json={"token": token})
+    assert response.status_code == status.HTTP_200_OK
+
+    # check wrong token
+    token = token[:-1] + "A"
+    response = a1client.post("/admin/check-token", json={"token": token})
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
