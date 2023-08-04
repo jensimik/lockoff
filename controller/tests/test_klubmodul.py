@@ -1,8 +1,17 @@
 from contextlib import asynccontextmanager
 
+import httpx
 import pytest
 from lockoff.config import settings
-from lockoff.klubmodul import KMClient, refresh
+from lockoff.klubmodul import KMClient, refresh, KlubmodulException
+
+
+@pytest.mark.asyncio
+async def test_login_timeout(httpx_mock):
+    httpx_mock.add_exception(httpx.ReadTimeout("Unable to read within timeout"))
+    with pytest.raises(KlubmodulException):
+        async with KMClient() as km:
+            pass
 
 
 @pytest.mark.asyncio
