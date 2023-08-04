@@ -148,7 +148,7 @@ def test_me(a0client: TestClient):
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-def test_admin(a1client: TestClient):
+def test_admin(a1client: TestClient, mocker):
     # system-status
     response = a1client.get("/admin/system-status")
     assert response.status_code == status.HTTP_200_OK
@@ -193,3 +193,9 @@ def test_admin(a1client: TestClient):
     token = token[:-1] + "A"
     response = a1client.post("/admin/check-token", json={"token": token})
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    # test force-resync-klubmodul
+    refresh = mocker.patch("lockoff.routers.admin.refresh")
+    response = a1client.post("/admin/klubmodul-force-resync")
+    assert response.status_code == status.HTTP_200_OK
+    refresh.assert_awaited_once()
