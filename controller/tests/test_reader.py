@@ -73,7 +73,9 @@ async def test_reader_bad_token(mocker, conn, mock_serial):
     buzz_in = mocker.patch("lockoff.reader.buzz_in")
     ok_token = generate_access_token(user_id=1, token_type=TokenType.NORMAL)
     bad_token = bytearray(ok_token)
-    bad_token[-1] = bad_token[-1] - 1
+    bad_token[-1] = bad_token[-4]
+    bad_token[-2] = bad_token[-5]
+    bad_token[-3] = bad_token[-6]
     bad_token = bytes(bad_token)
 
     async def fake_readuntil(*args, **kwargs):
