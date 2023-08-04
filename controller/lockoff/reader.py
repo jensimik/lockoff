@@ -13,7 +13,7 @@ from .access_token import (
     verify_access_token,
 )
 from .config import settings
-from .misc import O_CMD, GFXDisplay, buzz_in, queries
+from .misc import O_CMD, GFXDisplay, buzz_in, queries, DISPLAY_CODES
 
 log = logging.getLogger(__name__)
 
@@ -23,7 +23,9 @@ async def check_member(
 ):
     user = await queries.get_active_user_by_user_id(conn, user_id=user_id)
     if not user:
-        log_and_raise_token_error("did you cancel your membership?", code=b"C")
+        log_and_raise_token_error(
+            "did you cancel your membership?", code=DISPLAY_CODES.NO_MEMBER
+        )
     if member_type == TokenType.MORNING:
         # TODO: check if morning member has access in current hour?
         pass
@@ -44,7 +46,9 @@ async def check_dayticket(user_id: int, conn: aiosqlite.Connection):
         elif datetime.now(tz=settings.tz) > datetime.fromtimestamp(
             ticket["expires"], tz=settings.tz
         ):
-            log_and_raise_token_error("dayticket is expired", code=b"D")
+            log_and_raise_token_error(
+                "dayticket is expired", code=DISPLAY_CODES.DAYTICKET_EXPIRED
+            )
 
 
 async def check_qrcode(qr_code: str, conn: aiosqlite.Connection):
@@ -95,7 +99,7 @@ class Reader:
                 self.background_tasks.add(task)
                 task.add_done_callback(self.background_tasks.discard)
                 # show OK on display
-                await self.display.send_message(b"K")
+                await self.display.send_message(DISPLAY_CODES.OK)
                 # give good sound+led on opticon now qr code is verified
                 await self.o_cmd(cmds=[O_CMD.OK_SOUND, O_CMD.OK_LED])
             except TokenError as ex:
@@ -106,7 +110,7 @@ class Reader:
             # generic error? show system error on display
             except Exception:
                 log.exception("generic error in reader")
-                await self.display.send_message(b"E")
+                await self.display.send_message(DISPLAY_CODES.GENERIC_ERROR)
                 await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
             # one_time_run is used for testing
             if one_time_run:

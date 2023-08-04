@@ -11,6 +11,7 @@ from dateutil.relativedelta import relativedelta
 from fastapi import HTTPException, status
 
 from .config import settings
+from .misc import DISPLAY_CODES
 
 log = logging.getLogger(__name__)
 door_log = logging.getLogger("door")
@@ -23,12 +24,12 @@ class TokenType(Enum):
 
 
 class TokenError(Exception):
-    def __init__(self, message, code=b"Q"):
+    def __init__(self, message, code=DISPLAY_CODES.QR_ERROR):
         super().__init__(message)
         self.code = code
 
 
-def log_and_raise_token_error(message, code=b"Q", level=logging.WARN):
+def log_and_raise_token_error(message, code=DISPLAY_CODES.QR_ERROR, level=logging.WARN):
     log.log(level=level, msg=message)
     raise TokenError(message, code=code)
 
@@ -81,7 +82,7 @@ def verify_access_token(token: str) -> tuple[int, TokenType]:
         raw_token = base45.b45decode(token)
     except Exception as ex:
         log_and_raise_token_error(
-            f"could not base45 decode token data: {ex}", code=b"Q"
+            f"could not base45 decode token data: {ex}", code=DISPLAY_CODES.QR_ERROR
         )
 
     try:
@@ -92,16 +93,22 @@ def verify_access_token(token: str) -> tuple[int, TokenType]:
         token_type = TokenType(type_)
         expires_datetime = datetime.fromtimestamp(expires, tz=settings.tz)
     except Exception as ex:
-        log_and_raise_token_error(f"could not unpack data: {ex}", code=b"Q")
+        log_and_raise_token_error(
+            f"could not unpack data: {ex}", code=DISPLAY_CODES.QR_ERROR
+        )
 
     if not secrets.compare_digest(
         hashlib.shake_256(data + settings.secret).digest(settings.digest_size),
         signature,
     ):
-        log_and_raise_token_error("could not verify signature", code=b"S")
+        log_and_raise_token_error(
+            "could not verify signature", code=DISPLAY_CODES.QR_ERROR_SIGNATURE
+        )
 
     if datetime.now(tz=settings.tz) > expires_datetime:
-        log_and_raise_token_error("token is expired", code=b"X")
+        log_and_raise_token_error(
+            "token is expired", code=DISPLAY_CODES.QR_ERROR_EXPIRED
+        )
 
     return user_id, token_type
 

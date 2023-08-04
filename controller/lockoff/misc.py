@@ -18,6 +18,16 @@ queries = aiosql.from_path(module_directory / "queries.sql", "aiosqlite")
 relay = LED(16)
 
 
+class DISPLAY_CODES:
+    OK = b"K"
+    GENERIC_ERROR = b"E"
+    DAYTICKET_EXPIRED = b"D"
+    NO_MEMBER = b"C"
+    QR_ERROR = b"Q"
+    QR_ERROR_SIGNATURE = b"S"
+    QR_ERROR_EXPIRED = b"X"
+
+
 class O_CMD:
     OK_SOUND = bytes([0x1B, 0x42, 0xD])
     OK_LED = bytes([0x1B, 0x4C, 0xD])
