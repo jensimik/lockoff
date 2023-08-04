@@ -33,8 +33,8 @@ async def test_dayticket(conn):
 
 @pytest.mark.asyncio
 async def test_reader(mocker, conn, mock_serial):
-    display = GFXDisplay()
-    send_message = mocker.patch("display.send_message")
+    gfxdisplay = mocker.patch("lockoff.misc.GFXDisplay")
+    display = mocker.async_stub(name="display")
     buzz_in = mocker.patch("lockoff.reader.buzz_in")
     mocker.patch("aiosqlite.connect", lambda _: conn)
 
@@ -44,7 +44,7 @@ async def test_reader(mocker, conn, mock_serial):
         send_bytes=ok_token + b"\r",
         receive_bytes=O_CMD.OK_SOUND + O_CMD.OK_LED,
     )
-    await opticon_reader(display=display, run_infinite=False, url=mock_serial.port)
+    await opticon_reader(display=gfxdisplay, run_infinite=False, url=mock_serial.port)
 
-    assert send_message.called_once_with(b"K")
+    assert gfxdisplay.send_message.called_once_with(b"K")
     assert buzz_in.called_once()
