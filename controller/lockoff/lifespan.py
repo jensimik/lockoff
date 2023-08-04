@@ -9,7 +9,7 @@ from fastapi_limiter import FastAPILimiter
 from .config import settings
 from .klubmodul import klubmodul_runner
 from .misc import GFXDisplay, watchdog, queries
-from .reader import opticon_reader
+from .reader import Reader
 
 
 @asynccontextmanager
@@ -26,7 +26,9 @@ async def lifespan(app: FastAPI):
     display_task = asyncio.create_task(display.runner())
     watchdog.watch(display_task)
     # start opticon reader
-    opticon_task = asyncio.create_task(opticon_reader(display=display))
+    reader = Reader()
+    await reader.setup(display=display)
+    opticon_task = asyncio.create_task(reader.runner())
     watchdog.watch(opticon_task)
     # start klubmodul runner
     klubmodul_task = asyncio.create_task(klubmodul_runner())
