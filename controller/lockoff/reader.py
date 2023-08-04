@@ -95,11 +95,11 @@ async def o_cmd(writer: asyncio.StreamWriter, cmds: list[bytes]):
 
 
 async def opticon_reader(
-    display: GFXDisplay, run_infinite: bool = True, url=settings.opticon_url
+    display: GFXDisplay, one_time_run: bool = False, url=settings.opticon_url
 ):
     _r, _w = await serial_asyncio.open_serial_connection(url=url)
     # TODO: should i send opticon configuration by serial to ensure it is correct before starting?
-    while run_infinite:
+    while True:
         # read a scan from the barcode reader read until carriage return CR
         qr_code = (await _r.readuntil(separator=b"\r")).decode("utf-8").strip()
         try:
@@ -123,3 +123,6 @@ async def opticon_reader(
             log.exception("generic error in reader")
             asyncio.create_task(display.send_message(b"E"))
             asyncio.create_task(o_cmd(_w, cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED]))
+        # one_time_run is used for testing
+        if one_time_run:
+            break

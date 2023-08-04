@@ -47,11 +47,11 @@ async def test_reader_ok_token(mocker, conn, mock_serial):
         send_bytes=ok_token + b"\r",
         receive_bytes=O_CMD.OK_LED + O_CMD.OK_SOUND,
     )
-    await opticon_reader(display=display, run_infinite=False, url=mock_serial.port)
+    await opticon_reader(display=display, one_time_run=True, url=mock_serial.port)
 
-    await asyncio.sleep(0.5)
+    # await asyncio.sleep(0.5)
 
-    # send_message.assert_awaited_once_with(b"K")
+    send_message.assert_awaited_once_with(b"K")
     buzz_in.assert_awaited_once()
 
 
@@ -73,9 +73,7 @@ async def test_reader_bad_token(mocker, conn, mock_serial):
         send_bytes=bad_token + b"\r",
         receive_bytes=O_CMD.ERROR_SOUND + O_CMD.ERROR_LED,
     )
-    await opticon_reader(display=display, run_infinite=False, url=mock_serial.port)
+    await opticon_reader(display=display, one_time_run=True, url=mock_serial.port)
 
-    await asyncio.sleep(0.5)
-
-    # send_message.assert_awaited_once_with(b"S")
+    send_message.assert_awaited_once_with(b"S")
     buzz_in.assert_not_awaited()
