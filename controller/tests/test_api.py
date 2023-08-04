@@ -40,6 +40,11 @@ def test_endpoint_generic(url, expected_status_code, a0client: TestClient):
     assert response.status_code == expected_status_code
 
 
+def test_bad_jwt(client: TestClient):
+    response = client.get("/me", headers={"Authorization": "bearer badjwt"})
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
 @pytest.mark.parametrize(
     ["user_id", "ok"],
     (
