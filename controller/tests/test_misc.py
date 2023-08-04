@@ -2,7 +2,7 @@ import pytest
 import asyncio
 from datetime import datetime
 from lockoff.config import settings
-from lockoff.misc import GFXDisplay, simple_hash
+from lockoff.misc import GFXDisplay, simple_hash, buzz_in
 
 
 @pytest.mark.asyncio
@@ -42,3 +42,11 @@ def test_simple_hash():
     hash1_again = simple_hash(test_data1)
     assert hash1 != hash2
     assert hash1 == hash1_again
+
+
+@pytest.mark.asyncio
+async def test_buzz_in(mocker):
+    relay = mocker.patch("lockoff.misc.relay")
+    await buzz_in(sleep=0)
+    relay.on.assert_called_once()
+    relay.off.assert_called_once()

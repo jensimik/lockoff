@@ -37,10 +37,10 @@ class O_CMD:
     DETRIGGER = bytes([0x1B, 0x59, 0xD])
 
 
-async def buzz_in():
+async def buzz_in(sleep: int = 4):
     print("buzzing in")
     relay.on()
-    await asyncio.sleep(4)
+    await asyncio.sleep(sleep)
     relay.off()
 
 
