@@ -15,7 +15,7 @@ async def test_display(mock_serial):
         receive_bytes=test_message,
     )
     await lcd.send_message(test_message)
-    await asyncio.sleep(0.1)
+    # await asyncio.sleep(0.1)
 
     assert stub.called
     assert stub.calls == 1
