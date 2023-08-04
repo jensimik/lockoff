@@ -69,26 +69,23 @@ class GFXDisplay:
         _, display_w = await serial_asyncio.open_serial_connection(url=url)
         self.display_w = display_w
 
-    async def runner(self):
+    async def runner(self, one_time_run: bool = False):
         # send idle
         while True:
             now = datetime.now(tz=settings.tz)
             async with lock:
-                if settings.display_url:
-                    # show screensaver at nightime idle
-                    if now.hour < 7:
-                        self.display_w.write(b",")
-                    else:
-                        self.display_w.write(b".")
-                    await self.display_w.drain()
+                # show screensaver at nightime idle
+                if now.hour < 7:
+                    self.display_w.write(b",")
                 else:
-                    log.info("display send idle message")
+                    self.display_w.write(b".")
+                await self.display_w.drain()
+            if one_time_run:
+                break
             await asyncio.sleep(1.5)
 
     async def send_message(self, message: bytes):
         async with lock:
-            if settings.display_url:
-                self.display_w.write(message)
-                await self.display_w.drain()
-            else:
-                log.info(f"display send message {message.decode('utf-8')}")
+            log.info(f"display send message {message.decode('utf-8')}")
+            self.display_w.write(message)
+            await self.display_w.drain()

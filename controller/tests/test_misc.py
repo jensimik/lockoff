@@ -1,5 +1,7 @@
 import pytest
 import asyncio
+from datetime import datetime
+from lockoff.config import settings
 from lockoff.misc import GFXDisplay, simple_hash
 
 
@@ -17,6 +19,17 @@ async def test_display(mock_serial):
     await lcd.send_message(test_message)
     await asyncio.sleep(0.1)
 
+    assert stub.called
+    assert stub.calls == 1
+
+    now = datetime.now(tz=settings.tz)
+    stub = mock_serial.stub(
+        send_bytes=b"",
+        receive_bytes=b"," if now.hour < 7 else b".",
+    )
+    await lcd.runner(one_time_run=True)
+
+    await asyncio.sleep(0.1)
     assert stub.called
     assert stub.calls == 1
 
