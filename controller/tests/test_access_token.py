@@ -66,3 +66,7 @@ def test_token(user_id, token_type):
     # gibberish
     with pytest.raises(TokenError):
         verify_access_token("gibberish")
+
+    # giberish base45 encoded
+    with pytest.raises(TokenError):
+        verify_access_token("D3DVJC5$C+EDE2")
