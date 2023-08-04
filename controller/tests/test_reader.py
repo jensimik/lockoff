@@ -6,10 +6,9 @@ from lockoff.reader import (
     check_dayticket,
     check_member,
     check_qrcode,
-    o_cmd,
     opticon_reader,
-    buzz_in,
 )
+from lockoff.misc import GFXDisplay
 
 
 @pytest.mark.asyncio
@@ -34,8 +33,6 @@ async def test_dayticket(conn):
 @pytest.mark.asyncio
 async def test_reader_ok_token(mocker, conn, mock_serial):
     send_message = mocker.patch("lockoff.misc.GFXDisplay.send_message")
-    from lockoff.misc import GFXDisplay
-
     display = GFXDisplay()
     buzz_in = mocker.patch("lockoff.reader.buzz_in")
     # inject test db
@@ -58,8 +55,6 @@ async def test_reader_ok_token(mocker, conn, mock_serial):
 @pytest.mark.asyncio
 async def test_reader_bad_token(mocker, conn, mock_serial):
     send_message = mocker.patch("lockoff.misc.GFXDisplay.send_message")
-    from lockoff.misc import GFXDisplay
-
     display = GFXDisplay()
     buzz_in = mocker.patch("lockoff.reader.buzz_in")
     mocker.patch("aiosqlite.connect", lambda _: conn)
