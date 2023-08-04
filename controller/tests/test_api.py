@@ -29,6 +29,18 @@ def test_endpoint_generic(url, expected_status_code, client: TestClient):
 
 
 @pytest.mark.parametrize(
+    ["url", "expected_status_code"],
+    (
+        ("/admin/wrongtoken/qr-code.png", 400),
+        ("/admin/system-status", 401),
+    ),
+)
+def test_endpoint_generic(url, expected_status_code, a0client: TestClient):
+    response = a0client.get(url)
+    assert response.status_code == expected_status_code
+
+
+@pytest.mark.parametrize(
     ["user_id", "ok"],
     (
         (0, True),  # normal user
