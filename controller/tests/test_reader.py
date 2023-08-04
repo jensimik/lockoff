@@ -45,7 +45,7 @@ async def test_reader_ok_token(mocker, conn, mock_serial):
 
     mock_serial.stub(
         send_bytes=ok_token + b"\r",
-        receive_bytes=O_CMD.OK_SOUND + O_CMD.OK_LED,
+        receive_bytes=O_CMD.OK_LED + O_CMD.OK_SOUND,
     )
     await opticon_reader(display=display, run_infinite=False, url=mock_serial.port)
 
