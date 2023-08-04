@@ -33,9 +33,8 @@ async def test_dayticket(conn):
 
 @pytest.mark.asyncio
 async def test_reader_ok_token(mocker, conn, mock_serial):
-    class display:
-        send_message = mocker.async_stub(name="display")
-
+    send_message = mocker.patch("lockoff.misc.GFXDisplay.send_message")
+    display = GFXDisplay()
     buzz_in = mocker.patch("lockoff.reader.buzz_in")
     # inject test db
     mocker.patch("aiosqlite.connect", lambda _: conn)
@@ -48,15 +47,14 @@ async def test_reader_ok_token(mocker, conn, mock_serial):
     )
     await opticon_reader(display=display, run_infinite=False, url=mock_serial.port)
 
-    display.send_message.assert_awaited_once_with(b"K")
+    send_message.assert_awaited_once_with(b"K")
     buzz_in.assert_awaited_once()
 
 
 @pytest.mark.asyncio
 async def test_reader_bad_token(mocker, conn, mock_serial):
-    class display:
-        send_message = mocker.async_stub(name="display")
-
+    send_message = mocker.patch("lockoff.misc.GFXDisplay.send_message")
+    display = GFXDisplay()
     buzz_in = mocker.patch("lockoff.reader.buzz_in")
     mocker.patch("aiosqlite.connect", lambda _: conn)
 
@@ -71,5 +69,5 @@ async def test_reader_bad_token(mocker, conn, mock_serial):
     )
     await opticon_reader(display=display, run_infinite=False, url=mock_serial.port)
 
-    display.send_message.assert_awaited_once_with(b"S")
+    send_message.assert_awaited_once_with(b"S")
     buzz_in.assert_not_awaited()
