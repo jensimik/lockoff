@@ -88,16 +88,16 @@ async def check_qrcode(qr_code: str, conn: aiosqlite.Connection):
     await conn.commit()
 
 
-async def o_cmd(writer: asyncio.StreamWriter, cmds: list[bytes]):
-    for cmd in cmds:
-        writer.write(cmd)
-    await writer.drain()
-
-
 class Reader:
     async def setup(self, display: GFXDisplay, url=settings.opticon_url):
         self.display = display
         self._r, self._w = await serial_asyncio.open_serial_connection(url=url)
+
+    # write opticon command to serial
+    async def o_cmd(self, cmds: list[bytes]):
+        for cmd in cmds:
+            self._w.write(cmd)
+        await self._w.drain()
 
     async def runner(self, one_time_run: bool = False):
         while True:
@@ -113,17 +113,17 @@ class Reader:
                 # show OK on display
                 asyncio.create_task(self.display.send_message(b"K"))
                 # give good sound+led on opticon now qr code is verified
-                await o_cmd(self._w, cmds=[O_CMD.OK_SOUND, O_CMD.OK_LED])
+                await self.o_cmd(cmds=[O_CMD.OK_SOUND, O_CMD.OK_LED])
             except TokenError as ex:
                 # show error message on display
                 log.warning(ex)
                 asyncio.create_task(self.display.send_message(ex.code))
-                await o_cmd(self._w, cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
+                await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
             # generic error? show system error on display
             except Exception:
                 log.exception("generic error in reader")
                 asyncio.create_task(self.display.send_message(b"E"))
-                await o_cmd(self._w, cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
+                await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
             # one_time_run is used for testing
             if one_time_run:
                 break
