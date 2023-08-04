@@ -152,11 +152,11 @@ class ApplePass:
         return zip_file
 
 
-if __name__ == "__main__":
-    pkpass = ApplePass.create(
-        user_id=100,
-        name="Jens Davidsen",
-        level="Normal",
-        expires=datetime(2024, 1, 1, 12, 0, 0),
-        barcode_data="test1234",
-    )
+# if __name__ == "__main__":
+#     pkpass = ApplePass.create(
+#         user_id=100,
+#         name="Test Testersen",
+#         level="Normal",
+#         expires=datetime(2024, 1, 1, 12, 0, 0),
+#         barcode_data="test1234",
+#     )
