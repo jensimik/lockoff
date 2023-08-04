@@ -94,8 +94,10 @@ async def o_cmd(writer: asyncio.StreamWriter, cmds: list[bytes]):
     await writer.drain()
 
 
-async def opticon_reader(display: GFXDisplay, run_infinite: bool = True):
-    _r, _w = await serial_asyncio.open_serial_connection(url=settings.opticon_url)
+async def opticon_reader(
+    display: GFXDisplay, run_infinite: bool = True, url=settings.opticon_url
+):
+    _r, _w = await serial_asyncio.open_serial_connection(url=url)
     # TODO: should i send opticon configuration by serial to ensure it is correct before starting?
     while run_infinite:
         # read a scan from the barcode reader read until carriage return CR
