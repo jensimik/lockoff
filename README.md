@@ -18,4 +18,4 @@ Display:
 - [Pico GFX pack](https://shop.pimoroni.com/products/pico-gfx-pack?variant=40414469062739)
 - Show status messages from the controller (connected and powered with USB)
 
-[![Lockoff-Testing](https://github.com/jensimik/lockoff/actions/workflows/controller.yml/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/controller.yml) [![CodeQL](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql)
+[![Lockoff-Testing](https://github.com/jensimik/lockoff/actions/workflows/controller.yml/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/controller.yml) [![codecov](https://codecov.io/gh/jensimik/lockoff/branch/main/graph/badge.svg?token=6ZCJSY0L7K)](https://codecov.io/gh/jensimik/lockoff) [![CodeQL](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/github-code-scanning/codeql)

@@ -5,7 +5,6 @@ from datetime import datetime
 import aiosqlite
 import serial_asyncio
 from dateutil.relativedelta import relativedelta
-from gpiozero import LED
 
 from .access_token import (
     TokenError,
@@ -14,27 +13,9 @@ from .access_token import (
     verify_access_token,
 )
 from .config import settings
-from .misc import GFXDisplay, queries
+from .misc import O_CMD, GFXDisplay, buzz_in, queries, DISPLAY_CODES
 
 log = logging.getLogger(__name__)
-
-# automation hat mini relay 1 is on gpio pin 16
-relay = LED(16)
-
-
-class O_CMD:
-    OK_SOUND = bytes([0x1B, 0x42, 0xD])
-    OK_LED = bytes([0x1B, 0x4C, 0xD])
-    ERROR_SOUND = bytes([0x1B, 0x45, 0xD])
-    ERROR_LED = bytes([0x1B, 0x4E, 0xD])
-    TRIGGER = bytes([0x1B, 0x5A, 0xD])
-    DETRIGGER = bytes([0x1B, 0x59, 0xD])
-
-
-async def buzz_in():
-    relay.on()
-    await asyncio.sleep(4)
-    relay.off()
 
 
 async def check_member(
@@ -42,7 +23,9 @@ async def check_member(
 ):
     user = await queries.get_active_user_by_user_id(conn, user_id=user_id)
     if not user:
-        log_and_raise_token_error("did you cancel your membership?", code=b"C")
+        log_and_raise_token_error(
+            "did you cancel your membership?", code=DISPLAY_CODES.NO_MEMBER
+        )
     if member_type == TokenType.MORNING:
         # TODO: check if morning member has access in current hour?
         pass
@@ -63,7 +46,9 @@ async def check_dayticket(user_id: int, conn: aiosqlite.Connection):
         elif datetime.now(tz=settings.tz) > datetime.fromtimestamp(
             ticket["expires"], tz=settings.tz
         ):
-            log_and_raise_token_error("dayticket is expired", code=b"D")
+            log_and_raise_token_error(
+                "dayticket is expired", code=DISPLAY_CODES.DAYTICKET_EXPIRED
+            )
 
 
 async def check_qrcode(qr_code: str, conn: aiosqlite.Connection):
@@ -88,36 +73,45 @@ async def check_qrcode(qr_code: str, conn: aiosqlite.Connection):
     await conn.commit()
 
 
-async def o_cmd(writer: asyncio.StreamWriter, cmds: list[bytes]):
-    for cmd in cmds:
-        writer.write(cmd)
-    await writer.drain()
+class Reader:
+    async def setup(self, display: GFXDisplay, url=settings.opticon_url):
+        self.display = display
+        self._r, self._w = await serial_asyncio.open_serial_connection(url=url)
+        self.background_tasks = set()
 
+    # write opticon command to serial
+    async def o_cmd(self, cmds: list[bytes]):
+        for cmd in cmds:
+            self._w.write(cmd)
+        await self._w.drain()
 
-async def opticon_reader(display: GFXDisplay, run_infinite: bool = True):
-    _r, _w = await serial_asyncio.open_serial_connection(url=settings.opticon_url)
-    # TODO: should i send opticon configuration by serial to ensure it is correct before starting?
-    while run_infinite:
-        # read a scan from the barcode reader read until carriage return CR
-        qr_code = (await _r.readuntil(separator=b"\r")).decode("utf-8").strip()
-        try:
-            # check the qr_code (raises exception on errors)
-            async with aiosqlite.connect(settings.db_file) as conn:
-                conn.row_factory = aiosqlite.Row
-                await check_qrcode(qr_code=qr_code, conn=conn)
-            # buzz in
-            asyncio.create_task(buzz_in())
-            # show OK on display
-            asyncio.create_task(display.send_message(message=b"K"))
-            # give good sound+led on opticon now qr code is verified
-            asyncio.create_task(o_cmd(_w, cmds=[O_CMD.OK_SOUND, O_CMD.OK_LED]))
-        except TokenError as ex:
-            # show error message on display
-            log.warning(ex)
-            asyncio.create_task(display.send_message(ex.code))
-            asyncio.create_task(o_cmd(_w, cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED]))
-        # generic error? show system error on display
-        except Exception:
-            log.exception("generic error in reader")
-            asyncio.create_task(display.send_message(b"E"))
-            asyncio.create_task(o_cmd(_w, cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED]))
+    async def runner(self, one_time_run: bool = False):
+        while True:
+            # read a scan from the barcode reader read until carriage return CR
+            qr_code = (await self._r.readuntil(separator=b"\r")).decode("utf-8").strip()
+            try:
+                # check the qr_code (raises exception on errors)
+                async with aiosqlite.connect(settings.db_file) as conn:
+                    conn.row_factory = aiosqlite.Row
+                    await check_qrcode(qr_code=qr_code, conn=conn)
+                # buzz in
+                task = asyncio.create_task(buzz_in())
+                self.background_tasks.add(task)
+                task.add_done_callback(self.background_tasks.discard)
+                # show OK on display
+                await self.display.send_message(DISPLAY_CODES.OK)
+                # give good sound+led on opticon now qr code is verified
+                await self.o_cmd(cmds=[O_CMD.OK_SOUND, O_CMD.OK_LED])
+            except TokenError as ex:
+                # show error message on display
+                log.warning(ex)
+                await self.display.send_message(ex.code)
+                await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
+            # generic error? show system error on display
+            except Exception:
+                log.exception("generic error in reader")
+                await self.display.send_message(DISPLAY_CODES.GENERIC_ERROR)
+                await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
+            # one_time_run is used for testing
+            if one_time_run:
+                break

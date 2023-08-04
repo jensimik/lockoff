@@ -163,7 +163,7 @@ class KMClient:
         save_id = response.json()["savedId"]
 
         # cleanup after ourself again by removing the sms in klubmodul mail/sms overview
-        await asyncio.sleep(5)
+        await asyncio.sleep(10)
         try:
             response = await self.client.request(
                 method="DELETE",
@@ -264,7 +264,7 @@ class KMClient:
         save_id = response.json()["savedId"]
 
         # cleanup after ourself again by removing the sms in klubmodul mail/sms overview
-        await asyncio.sleep(5)
+        await asyncio.sleep(10)
         try:
             response = await self.client.request(
                 method="DELETE",
