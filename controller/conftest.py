@@ -69,6 +69,14 @@ async def setup_db() -> aiosqlite.Connection:
                 ).timestamp()
             ),
         )
+    expired = datetime.now(tz=settings.tz) - timedelta(hours=1)
+    valid = datetime.now(tz=settings.tz) + timedelta(hours=1)
+    await queries.update_dayticket_expire(
+        db, ticket_id=2, expires=int(expired.timestamp())
+    )
+    await queries.update_dayticket_expire(
+        db, ticket_id=3, expires=int(valid.timestamp())
+    )
     await db.commit()
     return db
 

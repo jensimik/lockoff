@@ -7,10 +7,24 @@ from lockoff.misc import O_CMD, GFXDisplay
 from lockoff.reader import Reader, check_dayticket, check_member, check_qrcode
 
 
+@pytest.mark.parametrize(
+    ["qr_code", "_raise"],
+    (
+        ("trash", TokenError),
+        (generate_access_token(user_id=1, token_type=TokenType.NORMAL), False),
+        (generate_access_token(user_id=1, token_type=TokenType.MORNING), False),
+        (generate_access_token(user_id=1, token_type=TokenType.DAY_TICKET), False),
+        (generate_access_token(user_id=2, token_type=TokenType.DAY_TICKET), TokenError),
+        (generate_access_token(user_id=3, token_type=TokenType.DAY_TICKET), False),
+    ),
+)
 @pytest.mark.asyncio
-async def test_check_qr_code(conn):
-    with pytest.raises(TokenError):
-        await check_qrcode(qr_code="trash", conn=conn)
+async def test_check_qr_code(qr_code, _raise, conn):
+    if _raise:
+        with pytest.raises(_raise):
+            await check_qrcode(qr_code=qr_code, conn=conn)
+    else:
+        await check_qrcode(qr_code=qr_code, conn=conn)
 
 
 @pytest.mark.asyncio

@@ -2,7 +2,11 @@ import pyotp
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
-from lockoff.access_token import generate_access_token, generate_dl_admin_token
+from lockoff.access_token import (
+    generate_access_token,
+    generate_dl_admin_token,
+    TokenType,
+)
 from lockoff.routers.auth import send_email, send_mobile
 
 
@@ -144,7 +148,7 @@ def test_me(a0client: TestClient):
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-def test_admin(a1client: TestClient):
+def test_admin(a1client: TestClient, mocker):
     # system-status
     response = a1client.get("/admin/system-status")
     assert response.status_code == status.HTTP_200_OK
@@ -163,7 +167,35 @@ def test_admin(a1client: TestClient):
     response = a1client.post("/admin/check-token", json={"token": token})
     assert response.status_code == status.HTTP_200_OK
 
+    # check dayticket token not activated yet
+    token = generate_access_token(user_id=1, token_type=TokenType.DAY_TICKET).decode()
+    response = a1client.post("/admin/check-token", json={"token": token})
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    # check dayticket not found
+    token = generate_access_token(
+        user_id=1000, token_type=TokenType.DAY_TICKET
+    ).decode()
+    response = a1client.post("/admin/check-token", json={"token": token})
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    # check expired dayticket
+    token = generate_access_token(user_id=2, token_type=TokenType.DAY_TICKET).decode()
+    response = a1client.post("/admin/check-token", json={"token": token})
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    # check valid dayticket
+    token = generate_access_token(user_id=3, token_type=TokenType.DAY_TICKET).decode()
+    response = a1client.post("/admin/check-token", json={"token": token})
+    assert response.status_code == status.HTTP_200_OK
+
     # check wrong token
     token = token[:-1] + "A"
     response = a1client.post("/admin/check-token", json={"token": token})
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    # test force-resync-klubmodul
+    refresh = mocker.patch("lockoff.routers.admin.refresh")
+    response = a1client.post("/admin/klubmodul-force-resync")
+    assert response.status_code == status.HTTP_200_OK
+    refresh.assert_awaited_once()
