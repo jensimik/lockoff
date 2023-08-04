@@ -1,6 +1,8 @@
+from contextlib import asynccontextmanager
+
 import pytest
-from lockoff.klubmodul import KMClient
 from lockoff.config import settings
+from lockoff.klubmodul import KMClient, refresh
 
 
 @pytest.mark.asyncio
@@ -72,7 +74,35 @@ async def test_klubmodul_get_members(httpx_mock):
         i = 0
         async for user_id, name, member_type, email, mobile in km.get_members():
             assert user_id > 0
-            print(user_id)
             i += 1
         # only show 4 as user_id 4 is not a member (not in a hold)
         assert i == 4
+
+
+@pytest.mark.asyncio
+async def test_klubmodul_refresh(httpx_mock, conn, mocker):
+    # login
+    httpx_mock.add_response(
+        method="POST", url=f"{settings.klubmodul_base_url}/default.aspx"
+    )
+    # get csv
+    httpx_mock.add_response(
+        method="POST",
+        url=f"{settings.klubmodul_base_url}/Adminv2/SearchProfile/ExportCsv",
+        text="""Id;Fornavn;Efternavn;Email;Mobil;NogetAndet;Hold
+1;F1;E;f1@e.dk;80808081;adsf;1
+2;F2;E;f2@e.dk;80808082;asdf;2
+3;F3;E;f3@e.dk;80808083;asdf;1
+4;F5;E;f5@e.dk;80808085;asdf;
+5;F4;E;f4@e.dk;80808084;asdf;2
+""",
+    )
+
+    # inject test db
+    @asynccontextmanager
+    async def get_conn(*args, **kwargs):
+        yield conn
+
+    mocker.patch("aiosqlite.connect", get_conn)
+
+    await refresh()
