@@ -5,7 +5,7 @@ from typing import Annotated
 from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
-from ..access_token import TokenType, generate_access_token, verify_dl_token
+from ..access_token import TokenType, generate_access_token, verify_dl_member_token
 from ..card import ApplePass, generate_png, generate_pdf
 from ..config import settings
 from ..depends import DBcon
@@ -22,7 +22,7 @@ router = APIRouter(tags=["card"])
     },
 )
 async def get_qr_code_png(
-    user_id: Annotated[int, Depends(verify_dl_token)],
+    user_id: Annotated[int, Depends(verify_dl_member_token)],
     conn: DBcon,
 ):
     user = await queries.get_active_user_by_user_id(conn, user_id=user_id)
@@ -48,7 +48,7 @@ async def get_qr_code_png(
     },
 )
 async def get_card_pdf(
-    user_id: Annotated[int, Depends(verify_dl_token)],
+    user_id: Annotated[int, Depends(verify_dl_member_token)],
     conn: DBcon,
 ):
     user = await queries.get_active_user_by_user_id(conn, user_id=user_id)
@@ -83,7 +83,7 @@ async def get_card_pdf(
     },
 )
 async def get_pkpass(
-    user_id: Annotated[int, Depends(verify_dl_token)],
+    user_id: Annotated[int, Depends(verify_dl_member_token)],
     conn: DBcon,
 ):
     user = await queries.get_active_user_by_user_id(conn, user_id=user_id)

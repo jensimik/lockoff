@@ -2,6 +2,11 @@ import pyotp
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
+from lockoff.access_token import (
+    generate_dl_member_token,
+    generate_dl_admin_token,
+    TokenType,
+)
 from lockoff.routers.auth import send_email, send_mobile
 
 
@@ -15,7 +20,6 @@ from lockoff.routers.auth import send_email, send_mobile
         ("/wrongtoken/membership-card.pkpass", 400),
         ("/me", 401),
         ("/admin/wrongtoken/qr-code.png", 400),
-        ("/admin/access-log", 401),
         ("/admin/system-status", 401),
     ),
 )
@@ -128,5 +132,15 @@ def test_me(a0client: TestClient):
 
 
 def test_admin(a1client: TestClient):
+    # system-status
     response = a1client.get("/admin/system-status")
+    assert response.status_code == status.HTTP_200_OK
+
+    # generate daytickets
+    response = a1client.post("/admin/generate-daytickets", json={"pages_to_print": 1})
+    assert response.status_code == status.HTTP_200_OK
+
+    # check qr-codes on the dayticket print
+    dl_token = generate_dl_admin_token(user_id=1)
+    response = a1client.get(f"/admin/{dl_token}/qr-code.png")
     assert response.status_code == status.HTTP_200_OK
