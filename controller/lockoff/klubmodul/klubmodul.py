@@ -85,7 +85,9 @@ class KMClient:
             if member_type:
                 yield user_id, name, member_type, email, mobile
 
-    async def send_sms(self, user_id: int, message: str) -> None:
+    async def send_sms(
+        self, user_id: int, message: str, delete_delay: int = 10
+    ) -> None:
         data = {
             "rowData": [
                 {"columnName": "broadcast_media", "value": "sms"},
@@ -163,7 +165,8 @@ class KMClient:
         save_id = response.json()["savedId"]
 
         # cleanup after ourself again by removing the sms in klubmodul mail/sms overview
-        await asyncio.sleep(10)
+        if delete_delay:
+            await asyncio.sleep(delete_delay)
         try:
             response = await self.client.request(
                 method="DELETE",
@@ -176,7 +179,9 @@ class KMClient:
         if response.is_error:
             raise KlubmodulException("send sms remove trail: " + response.reason_phrase)
 
-    async def send_email(self, user_id: int, subject: str, message: str) -> None:
+    async def send_email(
+        self, user_id: int, subject: str, message: str, delete_delay: int = 10
+    ) -> None:
         data = {
             "rowData": [
                 {"columnName": "broadcast_media", "value": "email"},
@@ -264,7 +269,8 @@ class KMClient:
         save_id = response.json()["savedId"]
 
         # cleanup after ourself again by removing the sms in klubmodul mail/sms overview
-        await asyncio.sleep(10)
+        if delete_delay:
+            await asyncio.sleep(delete_delay)
         try:
             response = await self.client.request(
                 method="DELETE",
