@@ -39,14 +39,14 @@ async def test_reader_ok_token(mocker, conn, mock_serial):
 
     ok_token = generate_access_token(user_id=1, token_type=TokenType.NORMAL)
 
-    stub = mock_serial.stub(
+    mock_serial.stub(
         send_bytes=ok_token + b"\r",
         receive_bytes=O_CMD.OK_SOUND + O_CMD.OK_LED,
     )
     await opticon_reader(display=gfxdisplay, run_infinite=False, url=mock_serial.port)
 
     assert gfxdisplay.send_message.called_once_with(b"K")
-    assert await buzz_in.called_once()
+    buzz_in.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -60,11 +60,11 @@ async def test_reader_bad_token(mocker, conn, mock_serial):
     bad_token[-1] = bad_token[-1] + 1
     bad_token = bytes(bad_token)
 
-    stub = mock_serial.stub(
+    mock_serial.stub(
         send_bytes=bad_token + b"\r",
         receive_bytes=O_CMD.ERROR_SOUND + O_CMD.ERROR_LED,
     )
     await opticon_reader(display=gfxdisplay, run_infinite=False, url=mock_serial.port)
 
     assert gfxdisplay.send_message.called_once_with(b"S")
-    assert await buzz_in.assert_not_called()
+    buzz_in.assert_not_called()
