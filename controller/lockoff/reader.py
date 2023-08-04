@@ -5,7 +5,6 @@ from datetime import datetime
 import aiosqlite
 import serial_asyncio
 from dateutil.relativedelta import relativedelta
-from gpiozero import LED
 
 from .access_token import (
     TokenError,
@@ -14,27 +13,9 @@ from .access_token import (
     verify_access_token,
 )
 from .config import settings
-from .misc import GFXDisplay, queries
+from .misc import O_CMD, GFXDisplay, buzz_in, queries
 
 log = logging.getLogger(__name__)
-
-# automation hat mini relay 1 is on gpio pin 16
-relay = LED(16)
-
-
-class O_CMD:
-    OK_SOUND = bytes([0x1B, 0x42, 0xD])
-    OK_LED = bytes([0x1B, 0x4C, 0xD])
-    ERROR_SOUND = bytes([0x1B, 0x45, 0xD])
-    ERROR_LED = bytes([0x1B, 0x4E, 0xD])
-    TRIGGER = bytes([0x1B, 0x5A, 0xD])
-    DETRIGGER = bytes([0x1B, 0x59, 0xD])
-
-
-async def buzz_in():
-    relay.on()
-    await asyncio.sleep(4)
-    relay.off()
 
 
 async def check_member(
@@ -92,6 +73,7 @@ class Reader:
     async def setup(self, display: GFXDisplay, url=settings.opticon_url):
         self.display = display
         self._r, self._w = await serial_asyncio.open_serial_connection(url=url)
+        self.background_tasks = set()
 
     # write opticon command to serial
     async def o_cmd(self, cmds: list[bytes]):
@@ -109,20 +91,22 @@ class Reader:
                     conn.row_factory = aiosqlite.Row
                     await check_qrcode(qr_code=qr_code, conn=conn)
                 # buzz in
-                asyncio.create_task(buzz_in())
+                task = asyncio.create_task(buzz_in())
+                self.background_tasks.add(task)
+                task.add_done_callback(self.background_tasks.discard)
                 # show OK on display
-                asyncio.create_task(self.display.send_message(b"K"))
+                await self.display.send_message(b"K")
                 # give good sound+led on opticon now qr code is verified
                 await self.o_cmd(cmds=[O_CMD.OK_SOUND, O_CMD.OK_LED])
             except TokenError as ex:
                 # show error message on display
                 log.warning(ex)
-                asyncio.create_task(self.display.send_message(ex.code))
+                await self.display.send_message(ex.code)
                 await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
             # generic error? show system error on display
             except Exception:
                 log.exception("generic error in reader")
-                asyncio.create_task(self.display.send_message(b"E"))
+                await self.display.send_message(b"E")
                 await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
             # one_time_run is used for testing
             if one_time_run:

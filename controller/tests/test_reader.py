@@ -1,15 +1,10 @@
-import pytest
 import asyncio
 from contextlib import asynccontextmanager
-from lockoff.access_token import generate_access_token, TokenType, TokenError
-from lockoff.reader import (
-    O_CMD,
-    check_dayticket,
-    check_member,
-    check_qrcode,
-    Reader,
-)
-from lockoff.misc import GFXDisplay
+
+import pytest
+from lockoff.access_token import TokenError, TokenType, generate_access_token
+from lockoff.misc import O_CMD, GFXDisplay
+from lockoff.reader import Reader, check_dayticket, check_member, check_qrcode
 
 
 @pytest.mark.asyncio
@@ -34,7 +29,6 @@ async def test_dayticket(conn):
 @pytest.mark.asyncio
 async def test_reader_ok_token(mocker, conn, mock_serial):
     send_message = mocker.patch("lockoff.misc.GFXDisplay.send_message")
-    display = GFXDisplay()
     buzz_in = mocker.patch("lockoff.reader.buzz_in")
     ok_token = generate_access_token(user_id=1, token_type=TokenType.NORMAL)
 
@@ -43,6 +37,7 @@ async def test_reader_ok_token(mocker, conn, mock_serial):
 
     mocker.patch("asyncio.StreamReader.readuntil", fake_readuntil)
     stream_writer = mocker.patch("asyncio.StreamWriter.write")
+    display = GFXDisplay()
 
     # inject test db
     @asynccontextmanager
@@ -69,7 +64,6 @@ async def test_reader_ok_token(mocker, conn, mock_serial):
 @pytest.mark.asyncio
 async def test_reader_bad_token(mocker, conn, mock_serial):
     send_message = mocker.patch("lockoff.misc.GFXDisplay.send_message")
-    display = GFXDisplay()
     buzz_in = mocker.patch("lockoff.reader.buzz_in")
     ok_token = generate_access_token(user_id=1, token_type=TokenType.NORMAL)
     bad_token = bytearray(ok_token)
@@ -83,6 +77,7 @@ async def test_reader_bad_token(mocker, conn, mock_serial):
 
     mocker.patch("asyncio.StreamReader.readuntil", fake_readuntil)
     stream_writer = mocker.patch("asyncio.StreamWriter.write")
+    display = GFXDisplay()
 
     # inject test db
     @asynccontextmanager

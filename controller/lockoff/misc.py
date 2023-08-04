@@ -6,6 +6,7 @@ from datetime import datetime
 
 import aiosql
 import serial_asyncio
+from gpiozero import LED
 
 from .config import settings
 
@@ -13,6 +14,24 @@ log = logging.getLogger(__name__)
 lock = asyncio.Lock()
 module_directory = pathlib.Path(__file__).resolve().parent
 queries = aiosql.from_path(module_directory / "queries.sql", "aiosqlite")
+# automation hat mini relay 1 is on gpio pin 16
+relay = LED(16)
+
+
+class O_CMD:
+    OK_SOUND = bytes([0x1B, 0x42, 0xD])
+    OK_LED = bytes([0x1B, 0x4C, 0xD])
+    ERROR_SOUND = bytes([0x1B, 0x45, 0xD])
+    ERROR_LED = bytes([0x1B, 0x4E, 0xD])
+    TRIGGER = bytes([0x1B, 0x5A, 0xD])
+    DETRIGGER = bytes([0x1B, 0x59, 0xD])
+
+
+async def buzz_in():
+    print("buzzing in")
+    relay.on()
+    await asyncio.sleep(4)
+    relay.off()
 
 
 class Watchdog:
