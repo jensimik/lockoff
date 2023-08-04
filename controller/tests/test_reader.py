@@ -1,4 +1,5 @@
 import pytest
+import asyncio
 from lockoff.access_token import generate_access_token, TokenType, TokenError
 from lockoff.reader import (
     O_CMD,
@@ -47,6 +48,8 @@ async def test_reader_ok_token(mocker, conn, mock_serial):
     )
     await opticon_reader(display=display, run_infinite=False, url=mock_serial.port)
 
+    await asyncio.sleep(0.5)
+
     send_message.assert_awaited_once_with(b"K")
     buzz_in.assert_awaited_once()
 
@@ -68,6 +71,8 @@ async def test_reader_bad_token(mocker, conn, mock_serial):
         receive_bytes=O_CMD.ERROR_SOUND + O_CMD.ERROR_LED,
     )
     await opticon_reader(display=display, run_infinite=False, url=mock_serial.port)
+
+    await asyncio.sleep(0.5)
 
     send_message.assert_awaited_once_with(b"S")
     buzz_in.assert_not_awaited()
