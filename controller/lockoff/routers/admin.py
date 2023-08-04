@@ -21,8 +21,8 @@ from ..access_token import (
     TokenError,
     generate_access_token,
     verify_access_token,
-    generate_dl_token,
-    verify_dl_token,
+    generate_dl_admin_token,
+    verify_dl_admin_token,
 )
 from ..card import generate_png
 from ..config import settings
@@ -52,7 +52,7 @@ async def generate_daytickets(
     return [
         {
             "dayticket_id": dayticket_id,
-            "dl_token": generate_dl_token(user_id=dayticket_id),
+            "dl_token": generate_dl_admin_token(user_id=dayticket_id),
         }
         for dayticket_id in dayticket_ids
     ]
@@ -66,13 +66,13 @@ async def generate_daytickets(
     },
 )
 async def get_qr_code_png(
-    ticket_id: Annotated[int, Depends(verify_dl_token)],
+    ticket_id: Annotated[int, Depends(verify_dl_admin_token)],
     conn: DBcon,
 ):
-    log.info("getting qr code for ticket_id {ticket_id}")
+    log.info(f"getting qr code for ticket_id {ticket_id}")
     ticket = await queries.get_dayticket_by_id(conn, ticket_id=ticket_id)
     if not ticket:
-        log.error("could not find ticket with id {ticket_id}")
+        log.error(f"could not find ticket with id {ticket_id}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     access_token = generate_access_token(
         user_id=ticket_id,
@@ -140,14 +140,14 @@ async def check_token(
     return schemas.TokenCheck(user_id=user_id, token_type=token_type.name, name=name)
 
 
-@router.get("/access-log")
-async def access_log(
-    _: Annotated[
-        list[aiosqlite.Row], Security(depends.get_current_users, scopes=["admin"])
-    ],
-    conn: DBcon,
-):
-    return await queries.last_log_entries(conn, limit=30)
+# @router.get("/access-log")
+# async def access_log(
+#     _: Annotated[
+#         list[aiosqlite.Row], Security(depends.get_current_users, scopes=["admin"])
+#     ],
+#     conn: DBcon,
+# ):
+#     return await queries.last_log_entries(conn, limit=30)
 
 
 # from dateutil.rrule import rrulestr

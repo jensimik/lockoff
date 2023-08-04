@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Security
 
 from .. import schemas
-from ..access_token import generate_dl_token
+from ..access_token import generate_dl_member_token
 from ..depends import get_current_users
 
 router = APIRouter(tags=["me"])
@@ -26,7 +26,7 @@ async def me(
             {
                 "user_id": user["user_id"],
                 "name": user["name"],
-                "token": generate_dl_token(user["user_id"]),
+                "token": generate_dl_member_token(user["user_id"]),
                 "member_type": user["member_type"].lower(),
                 "expires": "{0:%m/%y}".format(expires_display),
             }

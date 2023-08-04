@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     app_name: str = "lockoff"
     klubmodul_username: str = ""
     klubmodul_password: str = ""
-    klubmodul_base_url: str = ""
+    klubmodul_base_url: str = "https://changeme.klub-modul.dk"
     klubmodul_admin_user_id: int = 3535  # change to your own user_id for the admin user
     hash_salt: str = "changeme"
     nonce_size: int = 4

@@ -2,6 +2,7 @@ import pyotp
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
+from lockoff.access_token import generate_access_token, generate_dl_admin_token
 from lockoff.routers.auth import send_email, send_mobile
 
 
@@ -15,13 +16,29 @@ from lockoff.routers.auth import send_email, send_mobile
         ("/wrongtoken/membership-card.pkpass", 400),
         ("/me", 401),
         ("/admin/wrongtoken/qr-code.png", 400),
-        ("/admin/access-log", 401),
         ("/admin/system-status", 401),
     ),
 )
 def test_endpoint_generic(url, expected_status_code, client: TestClient):
     response = client.get(url)
     assert response.status_code == expected_status_code
+
+
+@pytest.mark.parametrize(
+    ["url", "expected_status_code"],
+    (
+        ("/admin/wrongtoken/qr-code.png", 400),
+        ("/admin/system-status", 401),
+    ),
+)
+def test_endpoint_generic_admin(url, expected_status_code, a0client: TestClient):
+    response = a0client.get(url)
+    assert response.status_code == expected_status_code
+
+
+def test_bad_jwt(client: TestClient):
+    response = client.get("/me", headers={"Authorization": "bearer badjwt"})
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 @pytest.mark.parametrize(
@@ -128,5 +145,25 @@ def test_me(a0client: TestClient):
 
 
 def test_admin(a1client: TestClient):
+    # system-status
     response = a1client.get("/admin/system-status")
     assert response.status_code == status.HTTP_200_OK
+
+    # generate daytickets
+    response = a1client.post("/admin/generate-daytickets", json={"pages_to_print": 1})
+    assert response.status_code == status.HTTP_200_OK
+
+    # check qr-codes on the dayticket print
+    dl_token = generate_dl_admin_token(user_id=1)
+    response = a1client.get(f"/admin/{dl_token}/qr-code.png")
+    assert response.status_code == status.HTTP_200_OK
+
+    # check token
+    token = generate_access_token(user_id=1).decode()
+    response = a1client.post("/admin/check-token", json={"token": token})
+    assert response.status_code == status.HTTP_200_OK
+
+    # check wrong token
+    token = token[:-1] + "A"
+    response = a1client.post("/admin/check-token", json={"token": token})
+    assert response.status_code == status.HTTP_400_BAD_REQUEST

@@ -5,23 +5,39 @@ from lockoff.access_token import (
     TokenError,
     TokenType,
     generate_access_token,
-    generate_dl_token,
+    generate_dl_admin_token,
+    generate_dl_member_token,
     verify_access_token,
-    verify_dl_token,
+    verify_dl_admin_token,
+    verify_dl_member_token,
 )
 
 
 @pytest.mark.parametrize(
-    "user_id",
-    (0, 1, 2, 3),
+    ["user_id", "gen_func", "ver_func"],
+    (
+        (0, generate_dl_member_token, verify_dl_member_token),
+        (1, generate_dl_member_token, verify_dl_member_token),
+        (2, generate_dl_member_token, verify_dl_member_token),
+        (3, generate_dl_member_token, verify_dl_member_token),
+        (0, generate_dl_admin_token, verify_dl_admin_token),
+        (1, generate_dl_admin_token, verify_dl_admin_token),
+        (2, generate_dl_admin_token, verify_dl_admin_token),
+        (3, generate_dl_admin_token, verify_dl_admin_token),
+    ),
 )
-def test_dl_token(user_id):
-    token = generate_dl_token(user_id=user_id)
-    assert verify_dl_token(token) == user_id
+def test_dl_token(user_id, gen_func, ver_func):
+    token = gen_func(user_id=user_id)
+    assert ver_func(token) == user_id
 
-    token_expired = generate_dl_token(user_id, expire_delta=relativedelta(hours=-10))
+    token_expired = gen_func(user_id, expire_delta=relativedelta(hours=-10))
     with pytest.raises(HTTPException):
-        verify_dl_token(token_expired)
+        ver_func(token_expired)
+
+    # modify signature
+    token = token[:-1] + "A"
+    with pytest.raises(HTTPException):
+        ver_func(token)
 
 
 @pytest.mark.parametrize(
@@ -57,3 +73,11 @@ def test_token(user_id, token_type):
     token_str_expired = token_bytes_expired.decode()
     with pytest.raises(TokenError):
         verify_access_token(token_str_expired)
+
+    # gibberish
+    with pytest.raises(TokenError):
+        verify_access_token("gibberish")
+
+    # giberish base45 encoded
+    with pytest.raises(TokenError):
+        verify_access_token("D3DVJC5$C+EDE2")

@@ -113,13 +113,11 @@ def verify_access_token(token: str) -> tuple[int, TokenType]:
     return user_id, token_type
 
 
-# this token is only for download of pdf/pkpass files - signed with user and expire time set to two hours
-def generate_dl_token(
-    user_id: int,
-    expire_delta: relativedelta = relativedelta(hours=2),
-) -> str:
+def _generate_dl_token(
+    user_id: int, scope: int, expire_delta: relativedelta = relativedelta(hours=2)
+):
     expires = int((datetime.now(tz=settings.tz) + expire_delta).timestamp())
-    data = struct.pack(">II", user_id, expires)
+    data = struct.pack(">IHI", user_id, scope, expires)
     nonce = secrets.token_bytes(settings.dl_nonce_size)
     signature = hashlib.shake_256(data + nonce + settings.dl_secret).digest(
         settings.dl_digest_size
@@ -127,18 +125,19 @@ def generate_dl_token(
     return base64.urlsafe_b64encode(data + nonce + signature).decode("utf-8")
 
 
-# depends for download files - see below
-def verify_dl_token(token: str) -> int:
+def _verify_dl_token(token: str, required_scope: int) -> int:
     token_exception = HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
         detail="could not verify signature or link has expired",
     )
     try:
         raw_token = base64.urlsafe_b64decode(token)
-        user_id, expires, _, signature = struct.unpack(
-            f">II{settings.dl_nonce_size}s{settings.dl_digest_size}s", raw_token
+        user_id, scope, expires, _, signature = struct.unpack(
+            f">IHI{settings.dl_nonce_size}s{settings.dl_digest_size}s", raw_token
         )
         data = raw_token[: -settings.dl_digest_size]
+        if scope != required_scope:
+            raise token_exception
         expires_datetime = datetime.fromtimestamp(expires, tz=settings.tz)
         if not secrets.compare_digest(
             hashlib.shake_256(data + settings.dl_secret).digest(
@@ -154,5 +153,27 @@ def verify_dl_token(token: str) -> int:
     return user_id
 
 
-if __name__ == "__main__":
-    print(generate_access_token(1))
+# this token is only for download of pdf/pkpass files - signed with user and expire time set to two hours
+def generate_dl_member_token(
+    user_id: int,
+    expire_delta: relativedelta = relativedelta(hours=2),
+) -> str:
+    return _generate_dl_token(user_id=user_id, scope=1, expire_delta=expire_delta)
+
+
+# depends for download files - see below
+def verify_dl_member_token(token: str) -> int:
+    return _verify_dl_token(token=token, required_scope=1)
+
+
+# this token is only for download of pdf/pkpass files - signed with user and expire time set to two hours
+def generate_dl_admin_token(
+    user_id: int,
+    expire_delta: relativedelta = relativedelta(hours=2),
+) -> str:
+    return _generate_dl_token(user_id=user_id, scope=2, expire_delta=expire_delta)
+
+
+# depends for download files - see below
+def verify_dl_admin_token(token: str) -> int:
+    return _verify_dl_token(token=token, required_scope=2)
