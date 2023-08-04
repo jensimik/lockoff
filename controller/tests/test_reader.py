@@ -34,6 +34,8 @@ async def test_dayticket(conn):
 @pytest.mark.asyncio
 async def test_reader_ok_token(mocker, conn, mock_serial):
     send_message = mocker.patch("lockoff.misc.GFXDisplay.send_message")
+    from lockoff.misc import GFXDisplay
+
     display = GFXDisplay()
     buzz_in = mocker.patch("lockoff.reader.buzz_in")
     # inject test db
