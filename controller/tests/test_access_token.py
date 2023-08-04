@@ -23,6 +23,11 @@ def test_dl_token(user_id):
     with pytest.raises(HTTPException):
         verify_dl_token(token_expired)
 
+    # modify signature
+    token = token[:-1] + "A"
+    with pytest.raises(HTTPException):
+        verify_dl_token(token)
+
 
 @pytest.mark.parametrize(
     ["user_id", "token_type"],
@@ -57,3 +62,7 @@ def test_token(user_id, token_type):
     token_str_expired = token_bytes_expired.decode()
     with pytest.raises(TokenError):
         verify_access_token(token_str_expired)
+
+    # gibberish
+    with pytest.raises(TokenError):
+        verify_access_token("gibberish")

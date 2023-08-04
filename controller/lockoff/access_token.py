@@ -152,7 +152,3 @@ def verify_dl_token(token: str) -> int:
     except Exception:
         raise token_exception
     return user_id
-
-
-if __name__ == "__main__":
-    print(generate_access_token(1))
