@@ -5,12 +5,14 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from jose import JWTError, jwt
 from pydantic import ValidationError
+from contextlib import asynccontextmanager
 
 from . import schemas
 from .config import settings
 from .misc import queries
 
 
+@asynccontextmanager
 async def get_db():
     """Return a database connection for use as a dependency.
     This connection has the Row row factory automatically attached."""
