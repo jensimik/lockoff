@@ -89,6 +89,24 @@ def test_request_totp_email(user_id, ok, mocker, client: TestClient):
         mock.assert_not_called()
 
 
+@pytest.mark.asyncio
+async def test_send_sms(mocker):
+    km_login = mocker.patch("lockoff.routers.auth.KMClient._km_login")
+    km_send_sms = mocker.patch("lockoff.routers.auth.KMClient.send_sms")
+    await send_mobile(user_id=1, message="test")
+    km_login.assert_awaited_once()
+    km_send_sms.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_send_email(mocker):
+    km_login = mocker.patch("lockoff.routers.auth.KMClient._km_login")
+    km_send_email = mocker.patch("lockoff.routers.auth.KMClient.send_email")
+    await send_email(user_id=1, message="test")
+    km_login.assert_awaited_once()
+    km_send_email.assert_awaited_once()
+
+
 @pytest.mark.parametrize(
     ["user_id", "use_correct_totp", "ok"],
     (
