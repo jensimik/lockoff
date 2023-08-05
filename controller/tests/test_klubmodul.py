@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 import httpx
 import pytest
 from lockoff.config import settings
-from lockoff.klubmodul import KMClient, refresh, KlubmodulException
+from lockoff.klubmodul import KlubmodulException, KMClient, refresh, klubmodul_runner
 
 
 @pytest.mark.asyncio
@@ -115,3 +115,14 @@ async def test_klubmodul_refresh(httpx_mock, conn, mocker):
     mocker.patch("aiosqlite.connect", get_conn)
 
     await refresh()
+
+
+@pytest.mark.asyncio
+async def test_klubmodul_runner(mocker):
+    refresh = mocker.patch("lockoff.klubmodul.klubmodul.refresh")
+    sleep = mocker.patch("asyncio.sleep")
+
+    await klubmodul_runner(one_time_run=True)
+
+    sleep.assert_awaited()
+    refresh.assert_awaited_once()

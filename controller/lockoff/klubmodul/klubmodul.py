@@ -326,7 +326,7 @@ async def refresh():
             await conn.commit()
 
 
-async def klubmodul_runner():
+async def klubmodul_runner(one_time_run: bool = False):
     # a bit of initial sleeping for two hours
     await asyncio.sleep(2 * 60 * 60)
     while True:
@@ -339,6 +339,8 @@ async def klubmodul_runner():
         except (KlubmodulException, Exception) as ex:
             log.error(f"failed to fetch klubmodul data retry in an hour {ex}")
             await asyncio.sleep(60 * 60)
+        if one_time_run:
+            break
 
 
 # async def tester():
