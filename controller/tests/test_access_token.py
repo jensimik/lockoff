@@ -35,7 +35,8 @@ def test_dl_token(user_id, gen_func, ver_func):
         ver_func(token_expired)
 
     # modify signature
-    token = token[:-1] + "A"
+    modify = "A" if token[-1] != "A" else "B"
+    token = token[:-1] + modify
     with pytest.raises(HTTPException):
         ver_func(token)
 

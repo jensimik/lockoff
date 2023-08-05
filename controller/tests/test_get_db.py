@@ -1,5 +1,4 @@
 import sqlite3
-from contextlib import asynccontextmanager
 
 import pytest
 from lockoff.depends import get_db
