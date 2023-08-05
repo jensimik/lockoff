@@ -208,7 +208,8 @@ def test_admin(a1client: TestClient, mocker):
     assert response.status_code == status.HTTP_200_OK
 
     # check wrong token
-    token = token[:-1] + "A"
+    modify = "A" if token[-1] != "A" else "B"
+    token = token[:-1] + modify
     response = a1client.post("/admin/check-token", json={"token": token})
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
