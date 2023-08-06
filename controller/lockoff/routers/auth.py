@@ -8,9 +8,9 @@ from jose import jwt
 
 from .. import schemas
 from ..config import settings
-from ..depends import DBcon
+from ..db import User
 from ..klubmodul import KMClient
-from ..misc import queries, simple_hash
+from ..misc import simple_hash
 
 router = APIRouter(tags=["auth"])
 log = logging.getLogger(__name__)
@@ -38,12 +38,16 @@ send_funcs = {
     "/request-totp", dependencies=[Depends(RateLimiter(times=10, seconds=300))]
 )
 async def request_totp(
-    rt: schemas.RequestTOTP, conn: DBcon, background_tasks: BackgroundTasks
+    rt: schemas.RequestTOTP, background_tasks: BackgroundTasks
 ) -> schemas.StatusReply:
-    # support either mobile or email as username_type
-    users = await getattr(queries, f"get_active_users_by_{rt.username_type}")(
-        conn, **{rt.username_type: simple_hash(rt.username)}
-    )
+    if rt.username_type == "email":
+        users = await User.select(User.user_id, User.totp_secret).where(
+            User.email == simple_hash(rt.username), User.active == True
+        )
+    elif rt.username_type == "mobile":
+        users = await User.select(User.user_id, User.totp_secret).where(
+            User.mobile == simple_hash(rt.username), User.active == True
+        )
     user_ids = [u["user_id"] for u in users]
     if user_ids:
         totp = pyotp.TOTP(users[0]["totp_secret"])
@@ -64,16 +68,20 @@ async def request_totp(
 @router.post("/login", dependencies=[Depends(RateLimiter(times=10, seconds=300))])
 async def login(
     login_data: schemas.RequestLogin,
-    conn: DBcon,
 ) -> schemas.JWTToken:
     username_hash = simple_hash(login_data.username)
-    users = await getattr(queries, f"get_active_users_by_{login_data.username_type}")(
-        conn, **{login_data.username_type: username_hash}
-    )
+    if login_data.username_type == "email":
+        users = await User.select(User.user_id, User.totp_secret).where(
+            User.email == username_hash, User.active == True
+        )
+    elif login_data.username_type == "mobile":
+        users = await User.select(User.user_id, User.totp_secret).where(
+            User.mobile == username_hash, User.active == True
+        )
     if not users:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="code is expired or not valid",
+            detail="no such user, code is expired or not valid",
         )
     totp_secrets = [u["totp_secret"] for u in users]
     user_ids = [u["user_id"] for u in users]
@@ -81,7 +89,7 @@ async def login(
     if not totp.verify(otp=login_data.totp, valid_window=2):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="code is expired or not valid",
+            detail="no such user, code is expired or not valid",
         )
     # give basic scope to all
     scopes = ["basic"]

@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     opticon_url: str = "loop://?logging=debug"
     display_url: str = "loop://?logging=debug"
     admin_user_ids: list[int] = [1]
-    db_file: str = "/db/lockoff.db3"
+    db_file: str = "/tmp/lockoff.db3"
     redis_url: str = "redis://localhost"
     certificate: bytes = ""
     key: bytes = ""

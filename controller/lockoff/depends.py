@@ -1,35 +1,13 @@
 from typing import Annotated
 
-import aiosqlite
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from jose import JWTError, jwt
 from pydantic import ValidationError
-from contextlib import asynccontextmanager
 
 from . import schemas
 from .config import settings
-from .misc import queries
-
-
-@asynccontextmanager
-async def get_db():
-    """Return a database connection for use as a dependency.
-    This connection has the Row row factory automatically attached."""
-
-    db = await aiosqlite.connect(settings.db_file)
-    # Provide a smarter version of the results. This keeps from having to unpack
-    # tuples manually.
-    db.row_factory = aiosqlite.Row
-
-    try:
-        yield db
-    finally:
-        await db.close()
-
-
-DBcon = Annotated[aiosqlite.Connection, Depends(get_db)]
-
+from .db import User, UserModel
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="login",
@@ -43,7 +21,6 @@ oauth2_scheme = OAuth2PasswordBearer(
 async def get_current_users(
     security_scopes: SecurityScopes,
     token: Annotated[str, Depends(oauth2_scheme)],
-    conn: DBcon,
 ):
     if security_scopes.scopes:
         authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
@@ -73,6 +50,13 @@ async def get_current_users(
                 detail="Not enough permissions",
                 headers={"WWW-Authenticate": authenticate_value},
             )
-    return await getattr(queries, f"get_active_users_by_{token_data.username_type}")(
-        conn, **{token_data.username_type: token_data.username}
-    )
+    if token_data.username_type == "email":
+        return [
+            UserModel(**u)
+            for u in await User.select().where(User.email == token_data.username)
+        ]
+    elif token_data.username_type == "mobile":
+        return [
+            UserModel(**u)
+            for u in await User.select().where(User.mobile == token_data.username)
+        ]

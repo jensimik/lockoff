@@ -6,10 +6,9 @@ from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from ..access_token import TokenType, generate_access_token, verify_dl_member_token
-from ..card import ApplePass, generate_png, generate_pdf
+from ..card import ApplePass, generate_pdf, generate_png
 from ..config import settings
-from ..depends import DBcon
-from ..misc import queries
+from ..db import User
 
 router = APIRouter(tags=["card"])
 
@@ -23,15 +22,13 @@ router = APIRouter(tags=["card"])
 )
 async def get_qr_code_png(
     user_id: Annotated[int, Depends(verify_dl_member_token)],
-    conn: DBcon,
 ):
-    user = await queries.get_active_user_by_user_id(conn, user_id=user_id)
+    user = await User.select().where(User.user_id == user_id).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    token_type = (
-        TokenType.MORNING if user["member_type"] == "MORN" else TokenType.NORMAL
+    access_token = generate_access_token(
+        user_id=user["user_id"], token_type=TokenType(user["token_type"])
     )
-    access_token = generate_access_token(user_id=user["user_id"], token_type=token_type)
     img = generate_png(qr_code_data=access_token.decode())
     with io.BytesIO() as f:
         img.save(f, format="png")
@@ -49,18 +46,16 @@ async def get_qr_code_png(
 )
 async def get_card_pdf(
     user_id: Annotated[int, Depends(verify_dl_member_token)],
-    conn: DBcon,
 ):
-    user = await queries.get_active_user_by_user_id(conn, user_id=user_id)
+    user = await User.select().where(User.user_id == user_id).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    token_type = (
-        TokenType.MORNING if user["member_type"] == "MORN" else TokenType.NORMAL
+    access_token = generate_access_token(
+        user_id=user["user_id"], token_type=TokenType(user["token_type"])
     )
-    access_token = generate_access_token(user_id=user["user_id"], token_type=token_type)
     pdf_file = generate_pdf(
         name=user["name"],
-        level=f"{token_type.name.capitalize()} {settings.current_season}",
+        level=f"{TokenType(user['token_type']).name.capitalize()} {settings.current_season}",
         qr_code_data=access_token.decode(),
     )
     return Response(
@@ -84,22 +79,20 @@ async def get_card_pdf(
 )
 async def get_pkpass(
     user_id: Annotated[int, Depends(verify_dl_member_token)],
-    conn: DBcon,
 ):
-    user = await queries.get_active_user_by_user_id(conn, user_id=user_id)
+    user = await User.select().where(User.user_id == user_id).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    token_type = (
-        TokenType.MORNING if user["member_type"] == "MORN" else TokenType.NORMAL
+    access_token = generate_access_token(
+        user_id=user["user_id"], token_type=TokenType(user["token_type"])
     )
-    access_token = generate_access_token(user_id=user["user_id"], token_type=token_type)
     expires_display = datetime.utcnow() + relativedelta(
         day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
     )
     pkpass_file = ApplePass.create(
         user_id=user_id,
         name=user["name"],
-        level=token_type.name.capitalize(),
+        level=TokenType(user["token_type"]).name.capitalize(),
         expires=expires_display,
         qr_code_data=access_token.decode(),
     )

@@ -2,7 +2,6 @@ import asyncio
 import logging
 from datetime import datetime
 
-import aiosqlite
 import serial_asyncio
 from dateutil.relativedelta import relativedelta
 
@@ -13,15 +12,14 @@ from .access_token import (
     verify_access_token,
 )
 from .config import settings
-from .misc import O_CMD, GFXDisplay, buzz_in, queries, DISPLAY_CODES
+from .db import DB, Dayticket, User, AccessLog
+from .misc import DISPLAY_CODES, O_CMD, GFXDisplay, buzz_in
 
 log = logging.getLogger(__name__)
 
 
-async def check_member(
-    user_id: int, member_type: TokenType, conn: aiosqlite.Connection
-):
-    user = await queries.get_active_user_by_user_id(conn, user_id=user_id)
+async def check_member(user_id: int, member_type: TokenType):
+    user = await User.select(User.user_id).where(User.user_id == user_id).first()
     if not user:
         log_and_raise_token_error(
             "did you cancel your membership?", code=DISPLAY_CODES.NO_MEMBER
@@ -31,18 +29,17 @@ async def check_member(
         pass
 
 
-async def check_dayticket(user_id: int, conn: aiosqlite.Connection):
-    if ticket := await queries.get_dayticket_by_id(conn, ticket_id=user_id):
+async def check_dayticket(user_id: int):
+    if ticket := await Dayticket.select().where(Dayticket.id == user_id).first():
         if ticket["expires"] == 0:
             # first use - set expire at midnight of current day
             expire = datetime.now(tz=settings.tz) + relativedelta(
                 hour=23, minute=59, second=59, microsecond=0
             )
-            await queries.update_dayticket_expire(
-                conn,
-                ticket_id=user_id,
-                expires=int(expire.timestamp()),
-            )
+            async with DB.transaction():
+                await Dayticket.update(
+                    {Dayticket.expires: int(expire.timestamp())}
+                ).where(Dayticket.id == user_id)
         elif datetime.now(tz=settings.tz) > datetime.fromtimestamp(
             ticket["expires"], tz=settings.tz
         ):
@@ -51,7 +48,7 @@ async def check_dayticket(user_id: int, conn: aiosqlite.Connection):
             )
 
 
-async def check_qrcode(qr_code: str, conn: aiosqlite.Connection):
+async def check_qrcode(qr_code: str):
     user_id, token_type = verify_access_token(
         token=qr_code
     )  # it will raise TokenError if not valid
@@ -59,18 +56,20 @@ async def check_qrcode(qr_code: str, conn: aiosqlite.Connection):
     # check in database
     match token_type:
         case TokenType.NORMAL | TokenType.MORNING:
-            await check_member(user_id=user_id, member_type=token_type, conn=conn)
+            await check_member(user_id=user_id, member_type=token_type)
         case TokenType.DAY_TICKET:
-            await check_dayticket(user_id=user_id, conn=conn)
+            await check_dayticket(user_id=user_id)
     log.info(f"{user_id} {token_type} access granted")
     # log in access_log db
-    await queries.log_entry(
-        conn,
-        user_id=user_id,
-        token_type=token_type.name,
-        timestamp=datetime.now(tz=settings.tz).isoformat(timespec="seconds"),
-    )
-    await conn.commit()
+    async with DB.transaction():
+        await AccessLog.insert(
+            AccessLog(
+                id=None,
+                obj_id=user_id,
+                token_type=token_type,
+                timestamp=datetime.now(tz=settings.tz).isoformat(timespec="seconds"),
+            )
+        )
 
 
 class Reader:
@@ -91,9 +90,7 @@ class Reader:
             qr_code = (await self._r.readuntil(separator=b"\r")).decode("utf-8").strip()
             try:
                 # check the qr_code (raises exception on errors)
-                async with aiosqlite.connect(settings.db_file) as conn:
-                    conn.row_factory = aiosqlite.Row
-                    await check_qrcode(qr_code=qr_code, conn=conn)
+                await check_qrcode(qr_code=qr_code)
                 # buzz in
                 task = asyncio.create_task(buzz_in())
                 self.background_tasks.add(task)

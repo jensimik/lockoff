@@ -1,20 +1,18 @@
 import random
-import typing
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 
-import aiosqlite
+import pyotp
 import pytest
 import pytest_asyncio
-import pyotp
 from fakeredis import aioredis
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from fastapi_limiter import FastAPILimiter
 from lockoff.access_token import TokenType
-from lockoff.depends import get_db
-from lockoff.misc import queries, simple_hash
 from lockoff.config import settings
+from lockoff.db import DB, AccessLog, Dayticket, User
+from lockoff.misc import simple_hash
 
 TOTP_SECRET = "H6IC425Q5IFZYAP4VINKRVHX7ZIEKO7E"
 
@@ -26,76 +24,85 @@ async def testing_lifespan(app: FastAPI):
     yield
 
 
-async def setup_db() -> aiosqlite.Connection:
-    """Return a database connection for use as a dependency.
-    This connection has the Row row factory automatically attached."""
-
-    db = await aiosqlite.connect(":memory:")
-    # Provide a smarter version of the results. This keeps from having to unpack
-    # tuples manually.
-    db.row_factory = aiosqlite.Row
-
-    # setup schemas
-    await queries.create_schema(db)
-
+@pytest_asyncio.fixture(autouse=True)
+async def sample_data():
+    # create tables
+    async with DB.transaction():
+        await User.create_table(if_not_exists=True)
+        await Dayticket.create_table(if_not_exists=True)
+        await AccessLog.create_table(if_not_exists=True)
     # make some sample data in the database to run tests agains
     batch_id = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
-    for x in range(10):
-        # insert test user
-        await queries.upsert_user(
-            db,
-            user_id=x,
-            name=f"test user {x}",
-            member_type="FULL" if x in range(5) else "MORN",
-            mobile=simple_hash(f"1000100{x}"),
-            email=simple_hash(f"test{x}@test.dk"),
-            batch_id=batch_id,
-            totp_secret=TOTP_SECRET,
-            active=True if x < 8 else False,
+    async with DB.transaction():
+        for x in range(10):
+            # insert test user
+            try:
+                await User.insert(
+                    User(
+                        user_id=x,
+                        name=f"test user {x}",
+                        token_type=TokenType.NORMAL
+                        if x in range(5)
+                        else TokenType.MORNING,
+                        mobile=simple_hash(f"1000100{x}"),
+                        email=simple_hash(f"test{x}@test.dk"),
+                        batch_id=batch_id,
+                        totp_secret=TOTP_SECRET,
+                        active=True if x < 8 else False,
+                    )
+                ).on_conflict(
+                    target=User.user_id,
+                    action="DO UPDATE",
+                    values=[
+                        User.name,
+                        User.token_type,
+                        User.mobile,
+                        User.email,
+                        User.batch_id,
+                        User.totp_secret,
+                        User.active,
+                    ],
+                )
+            except Exception as ex:
+                print(f"failed user inser with {ex}")
+            try:
+                await AccessLog.insert(
+                    AccessLog(
+                        id=None,
+                        obj_id=x,
+                        token_type=random.choice(
+                            [TokenType.NORMAL, TokenType.MORNING, TokenType.DAY_TICKET]
+                        ),
+                        timestamp=(
+                            (
+                                datetime.now(tz=settings.tz)
+                                - timedelta(minutes=random.randint(0, 200))
+                            ).isoformat(timespec="seconds")
+                        ),
+                    )
+                )
+            except Exception as ex:
+                print(f"failed create access log with {ex}")
+            try:
+                await Dayticket.insert(
+                    Dayticket(
+                        id=x,
+                        expires=0,
+                    )
+                ).on_conflict(
+                    action="DO UPDATE",
+                    values=[Dayticket.expires],
+                )
+            except Exception as ex:
+                print(f"failed create dayticket with {ex}")
+        expired = datetime.now(tz=settings.tz) - timedelta(hours=1)
+        valid = datetime.now(tz=settings.tz) + timedelta(hours=1)
+        await Dayticket.update({Dayticket.expires: int(expired.timestamp())}).where(
+            Dayticket.id == 2
         )
-        # insert some daytickets
-        await queries.insert_dayticket(db, batch_id=batch_id)
-        # insert some log entry
-        await queries.log_entry(
-            db,
-            user_id=random.randint(0, 9),
-            token_type=random.choice(
-                [TokenType.NORMAL, TokenType.MORNING, TokenType.DAY_TICKET]
-            ).name,
-            timestamp=int(
-                (
-                    datetime.now(tz=settings.tz)
-                    - timedelta(minutes=random.randint(0, 200))
-                ).timestamp()
-            ),
+        await Dayticket.update({Dayticket.expires: int(valid.timestamp())}).where(
+            Dayticket.id == 3
         )
-    expired = datetime.now(tz=settings.tz) - timedelta(hours=1)
-    valid = datetime.now(tz=settings.tz) + timedelta(hours=1)
-    await queries.update_dayticket_expire(
-        db, ticket_id=2, expires=int(expired.timestamp())
-    )
-    await queries.update_dayticket_expire(
-        db, ticket_id=3, expires=int(valid.timestamp())
-    )
-    await db.commit()
-    return db
-
-
-async def testing_get_db() -> typing.AsyncGenerator[aiosqlite.Connection, None]:
-    db = await setup_db()
-    try:
-        yield db
-    finally:
-        await db.close()
-
-
-@pytest_asyncio.fixture
-async def conn() -> typing.AsyncGenerator[aiosqlite.Connection, None]:
-    db = await setup_db()
-    try:
-        yield db
-    finally:
-        await db.close()
 
 
 @pytest.fixture
@@ -103,8 +110,6 @@ def client(mocker) -> TestClient:
     """unauthenticated client"""
     mocker.patch("lockoff.lifespan.lifespan", testing_lifespan)
     from lockoff.main import app
-
-    app.dependency_overrides[get_db] = testing_get_db
 
     with TestClient(
         app=app,
@@ -118,8 +123,6 @@ def a0client(mocker) -> TestClient:
     """authenticated client without admin scope"""
     mocker.patch("lockoff.lifespan.lifespan", testing_lifespan)
     from lockoff.main import app
-
-    app.dependency_overrides[get_db] = testing_get_db
 
     with TestClient(
         app=app,
@@ -142,8 +145,6 @@ def a1client(mocker) -> TestClient:
     """authenticated client with admin scope"""
     mocker.patch("lockoff.lifespan.lifespan", testing_lifespan)
     from lockoff.main import app
-
-    app.dependency_overrides[get_db] = testing_get_db
 
     with TestClient(
         app=app,

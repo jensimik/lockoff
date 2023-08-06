@@ -5,12 +5,13 @@ import typing
 from datetime import datetime
 from types import TracebackType
 
-import aiosqlite
 import httpx
 import pyotp
 
 from ..config import settings
-from ..misc import queries, simple_hash
+from ..db import DB, User
+from ..misc import simple_hash
+from ..access_token import TokenType
 from .klubmodul_login_data import data as login_data
 
 log = logging.getLogger(__name__)
@@ -77,7 +78,11 @@ class KMClient:
         for row in csv.DictReader(response.iter_lines(), delimiter=";", quotechar='"'):
             user_id = int(row["Id"])
             member_type = (
-                "FULL" if "1" in row["Hold"] else "MORN" if "2" in row["Hold"] else None
+                TokenType.NORMAL
+                if "1" in row["Hold"]
+                else TokenType.MORNING
+                if "2" in row["Hold"]
+                else None
             )
             name = row["Fornavn"].capitalize() + " " + row["Efternavn"].capitalize()
             email = row["Email"].lower()
@@ -308,22 +313,31 @@ class KlubmodulException(Exception):
 async def refresh():
     async with refresh_lock:
         batch_id = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
-        async with KMClient() as client, aiosqlite.connect(settings.db_file) as conn:
+        async with KMClient() as client, DB.transaction():
             async for user_id, name, member_type, email, mobile in client.get_members():
-                await queries.upsert_user(
-                    conn,
-                    user_id=user_id,
-                    name=name,
-                    member_type=member_type,
-                    email=simple_hash(email),
-                    mobile=simple_hash(mobile),
-                    batch_id=batch_id,
-                    totp_secret=pyotp.random_base32(),
-                    active=True,
+                await User.insert(
+                    User(
+                        user_id=user_id,
+                        name=name,
+                        token_type=member_type,
+                        email=simple_hash(email),
+                        mobile=simple_hash(mobile),
+                        batch_id=batch_id,
+                        totp_secret=pyotp.random_base32(),
+                        active=True,
+                    )
+                ).on_conflict(
+                    action="DO UPDATE",
+                    values=[
+                        User.name,
+                        User.email,
+                        User.mobile,
+                        User.batch_id,
+                        User.active,
+                    ],
                 )
             # mark old data as inactive
-            await queries.inactivate_old_batch(conn, batch_id=batch_id)
-            await conn.commit()
+            await User.update({User.active: False}).where(User.batch_id < batch_id)
 
 
 async def klubmodul_runner(one_time_run: bool = False):

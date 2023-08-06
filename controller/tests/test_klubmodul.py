@@ -1,9 +1,7 @@
-from contextlib import asynccontextmanager
-
 import httpx
 import pytest
 from lockoff.config import settings
-from lockoff.klubmodul import KlubmodulException, KMClient, refresh, klubmodul_runner
+from lockoff.klubmodul import KlubmodulException, KMClient, klubmodul_runner, refresh
 
 
 @pytest.mark.asyncio
@@ -89,7 +87,7 @@ async def test_klubmodul_get_members(httpx_mock):
 
 
 @pytest.mark.asyncio
-async def test_klubmodul_refresh(httpx_mock, conn, mocker):
+async def test_klubmodul_refresh(httpx_mock, mocker):
     # login
     httpx_mock.add_response(
         method="POST", url=f"{settings.klubmodul_base_url}/default.aspx"
@@ -106,13 +104,6 @@ async def test_klubmodul_refresh(httpx_mock, conn, mocker):
 5;F4;E;f4@e.dk;80808084;asdf;2
 """,
     )
-
-    # inject test db
-    @asynccontextmanager
-    async def get_conn(*args, **kwargs):
-        yield conn
-
-    mocker.patch("aiosqlite.connect", get_conn)
 
     await refresh()
 

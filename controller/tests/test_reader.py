@@ -1,5 +1,4 @@
 import asyncio
-from contextlib import asynccontextmanager
 
 import pytest
 from lockoff.access_token import TokenError, TokenType, generate_access_token
@@ -19,29 +18,29 @@ from lockoff.reader import Reader, check_dayticket, check_member, check_qrcode
     ),
 )
 @pytest.mark.asyncio
-async def test_check_qr_code(qr_code, _raise, conn):
+async def test_check_qr_code(qr_code, _raise):
     if _raise:
         with pytest.raises(_raise):
-            await check_qrcode(qr_code=qr_code, conn=conn)
+            await check_qrcode(qr_code=qr_code)
     else:
-        await check_qrcode(qr_code=qr_code, conn=conn)
+        await check_qrcode(qr_code=qr_code)
 
 
 @pytest.mark.asyncio
-async def test_member(conn):
-    await check_member(user_id=0, member_type=TokenType.NORMAL, conn=conn)
+async def test_member():
+    await check_member(user_id=0, member_type=TokenType.NORMAL)
 
     with pytest.raises(TokenError):
-        await check_member(user_id=1000, member_type=TokenType.NORMAL, conn=conn)
+        await check_member(user_id=1000, member_type=TokenType.NORMAL)
 
 
 @pytest.mark.asyncio
-async def test_dayticket(conn):
-    await check_dayticket(user_id=0, conn=conn)
+async def test_dayticket():
+    await check_dayticket(user_id=0)
 
 
 @pytest.mark.asyncio
-async def test_reader_ok_token(mocker, conn, mock_serial):
+async def test_reader_ok_token(mocker, mock_serial):
     send_message = mocker.patch("lockoff.misc.GFXDisplay.send_message")
     buzz_in = mocker.patch("lockoff.reader.buzz_in")
     ok_token = generate_access_token(user_id=1, token_type=TokenType.NORMAL)
@@ -52,13 +51,6 @@ async def test_reader_ok_token(mocker, conn, mock_serial):
     mocker.patch("asyncio.StreamReader.readuntil", fake_readuntil)
     stream_writer = mocker.patch("asyncio.StreamWriter.write")
     display = GFXDisplay()
-
-    # inject test db
-    @asynccontextmanager
-    async def get_conn(*args, **kwargs):
-        yield conn
-
-    mocker.patch("aiosqlite.connect", get_conn)
 
     reader = Reader()
     await reader.setup(display=display, url=mock_serial.port)
@@ -76,7 +68,7 @@ async def test_reader_ok_token(mocker, conn, mock_serial):
 
 
 @pytest.mark.asyncio
-async def test_reader_bad_token(mocker, conn, mock_serial):
+async def test_reader_bad_token(mocker, mock_serial):
     send_message = mocker.patch("lockoff.misc.GFXDisplay.send_message")
     buzz_in = mocker.patch("lockoff.reader.buzz_in")
     ok_token = generate_access_token(user_id=1, token_type=TokenType.NORMAL)
@@ -92,13 +84,6 @@ async def test_reader_bad_token(mocker, conn, mock_serial):
     mocker.patch("asyncio.StreamReader.readuntil", fake_readuntil)
     stream_writer = mocker.patch("asyncio.StreamWriter.write")
     display = GFXDisplay()
-
-    # inject test db
-    @asynccontextmanager
-    async def get_conn(*args, **kwargs):
-        yield conn
-
-    mocker.patch("aiosqlite.connect", get_conn)
 
     reader = Reader()
     await reader.setup(display=display, url=mock_serial.port)
