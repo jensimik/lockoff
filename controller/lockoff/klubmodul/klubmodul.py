@@ -348,7 +348,7 @@ async def refresh():
                         User(
                             id=user_id,
                             name=name,
-                            token_type=member_type,
+                            token_type=member_type.value,
                             email=simple_hash(email),
                             mobile=simple_hash(mobile),
                             batch_id=batch_id,
