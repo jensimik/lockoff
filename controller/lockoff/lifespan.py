@@ -17,9 +17,9 @@ async def lifespan(app: FastAPI):
     _redis = redis.from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
     await FastAPILimiter.init(_redis)
     # init db and create tables if not exists
-    async with aiosqlite.connect(settings.db_file) as conn:
-        await queries.create_schema(conn)
-        await conn.commit()
+    # async with aiosqlite.connect(settings.db_file) as conn:
+    #     await queries.create_schema(conn)
+    #     await conn.commit()
     # start display
     display = GFXDisplay()
     await display.setup()

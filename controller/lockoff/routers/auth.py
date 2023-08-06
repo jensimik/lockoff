@@ -11,6 +11,7 @@ from ..config import settings
 from ..depends import DBcon
 from ..klubmodul import KMClient
 from ..misc import queries, simple_hash
+from ..db import Users
 
 router = APIRouter(tags=["auth"])
 log = logging.getLogger(__name__)
@@ -40,10 +41,14 @@ send_funcs = {
 async def request_totp(
     rt: schemas.RequestTOTP, conn: DBcon, background_tasks: BackgroundTasks
 ) -> schemas.StatusReply:
-    # support either mobile or email as username_type
-    users = await getattr(queries, f"get_active_users_by_{rt.username_type}")(
-        conn, **{rt.username_type: simple_hash(rt.username)}
-    )
+    if rt.username_type == "email":
+        users = await Users.select(Users.user_id, Users.totp_secret).where(
+            Users.email == simple_hash(rt.username)
+        )
+    elif rt.username_type == "mobile":
+        users = await Users.select(Users.user_id, Users.totp_secret).where(
+            Users.mobile == simple_hash(rt.username)
+        )
     user_ids = [u["user_id"] for u in users]
     if user_ids:
         totp = pyotp.TOTP(users[0]["totp_secret"])
@@ -67,13 +72,18 @@ async def login(
     conn: DBcon,
 ) -> schemas.JWTToken:
     username_hash = simple_hash(login_data.username)
-    users = await getattr(queries, f"get_active_users_by_{login_data.username_type}")(
-        conn, **{login_data.username_type: username_hash}
-    )
+    if login_data.username_type == "email":
+        users = await Users.select(Users.user_id, Users.totp_secret).where(
+            Users.email == username_hash
+        )
+    elif login_data.username_type == "mobile":
+        users = await Users.select(Users.user_id, Users.totp_secret).where(
+            Users.mobile == username_hash
+        )
     if not users:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="code is expired or not valid",
+            detail="no such user, code is expired or not valid",
         )
     totp_secrets = [u["totp_secret"] for u in users]
     user_ids = [u["user_id"] for u in users]
@@ -81,7 +91,7 @@ async def login(
     if not totp.verify(otp=login_data.totp, valid_window=2):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="code is expired or not valid",
+            detail="no such user, code is expired or not valid",
         )
     # give basic scope to all
     scopes = ["basic"]
