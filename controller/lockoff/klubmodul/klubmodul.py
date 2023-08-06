@@ -362,10 +362,10 @@ async def refresh():
                     action="DO UPDATE",
                     values=[
                         User.name,
-                        User.email,
-                        User.mobile,
-                        User.batch_id,
-                        User.active,
+                        # User.email,
+                        # User.mobile,
+                        # User.batch_id,
+                        # User.active,
                     ],
                 )
             # mark old data as inactive
