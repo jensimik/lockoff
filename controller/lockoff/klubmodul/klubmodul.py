@@ -394,7 +394,7 @@ async def refresh():
                         User.batch_id,
                         User.active,
                     ],
-                )
+                ).run_sync()
             # mark old data as inactive
             try:
                 await User.update({User.active: False}).where(User.batch_id != batch_id)
