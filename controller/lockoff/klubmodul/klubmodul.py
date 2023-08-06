@@ -347,7 +347,7 @@ async def refresh():
                     async for user_id, name, member_type, email, mobile in client.get_members()
                 ]
             ).on_conflict(
-                target=User.id,
+                # target=User.id,
                 action="DO UPDATE",
                 values=[
                     User.name,
