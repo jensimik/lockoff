@@ -343,6 +343,33 @@ async def refresh():
                 i += 1
                 log.info(f"doing chunk {i}")
                 log.info(chunk)
+                print(
+                    User.insert(
+                        *[
+                            User(
+                                id=user_id,
+                                name=name,
+                                token_type=member_type.value,
+                                email=simple_hash(email),
+                                mobile=simple_hash(mobile),
+                                batch_id=batch_id,
+                                totp_secret=pyotp.random_base32(),
+                                active=True,
+                            )
+                            for user_id, name, member_type, email, mobile in chunk
+                        ]
+                    ).on_conflict(
+                        target=User.id,
+                        action="DO NOTHING",
+                        # values=[
+                        #     User.name,
+                        #     User.email,
+                        #     User.mobile,
+                        #     User.batch_id,
+                        #     User.active,
+                        # ],
+                    )
+                )
                 await User.insert(
                     *[
                         User(
