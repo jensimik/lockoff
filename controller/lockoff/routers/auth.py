@@ -41,14 +41,14 @@ async def request_totp(
     rt: schemas.RequestTOTP, background_tasks: BackgroundTasks
 ) -> schemas.StatusReply:
     if rt.username_type == "email":
-        users = await User.select(User.user_id, User.totp_secret).where(
+        users = await User.select(User.id, User.totp_secret).where(
             User.email == simple_hash(rt.username), User.active == True
         )
     elif rt.username_type == "mobile":
-        users = await User.select(User.user_id, User.totp_secret).where(
+        users = await User.select(User.id, User.totp_secret).where(
             User.mobile == simple_hash(rt.username), User.active == True
         )
-    user_ids = [u["user_id"] for u in users]
+    user_ids = [u["id"] for u in users]
     if user_ids:
         totp = pyotp.TOTP(users[0]["totp_secret"])
         log.info(
@@ -71,11 +71,11 @@ async def login(
 ) -> schemas.JWTToken:
     username_hash = simple_hash(login_data.username)
     if login_data.username_type == "email":
-        users = await User.select(User.user_id, User.totp_secret).where(
+        users = await User.select(User.id, User.totp_secret).where(
             User.email == username_hash, User.active == True
         )
     elif login_data.username_type == "mobile":
-        users = await User.select(User.user_id, User.totp_secret).where(
+        users = await User.select(User.id, User.totp_secret).where(
             User.mobile == username_hash, User.active == True
         )
     if not users:
@@ -84,7 +84,7 @@ async def login(
             detail="no such user, code is expired or not valid",
         )
     totp_secrets = [u["totp_secret"] for u in users]
-    user_ids = [u["user_id"] for u in users]
+    user_ids = [u["id"] for u in users]
     totp = pyotp.TOTP(totp_secrets[0])
     if not totp.verify(otp=login_data.totp, valid_window=2):
         raise HTTPException(

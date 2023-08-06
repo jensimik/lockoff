@@ -314,10 +314,11 @@ async def refresh():
     async with refresh_lock:
         batch_id = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
         async with KMClient() as client, DB.transaction():
-            async for user_id, name, member_type, email, mobile in client.get_members():
-                await User.insert(
+            # bulk upsert
+            await User.insert(
+                *[
                     User(
-                        user_id=user_id,
+                        id=user_id,
                         name=name,
                         token_type=member_type,
                         email=simple_hash(email),
@@ -326,18 +327,24 @@ async def refresh():
                         totp_secret=pyotp.random_base32(),
                         active=True,
                     )
-                ).on_conflict(
-                    action="DO UPDATE",
-                    values=[
-                        User.name,
-                        User.email,
-                        User.mobile,
-                        User.batch_id,
-                        User.active,
-                    ],
-                )
+                    async for user_id, name, member_type, email, mobile in client.get_members()
+                ]
+            ).on_conflict(
+                target=User.id,
+                action="DO UPDATE",
+                values=[
+                    User.name,
+                    User.email,
+                    User.mobile,
+                    User.batch_id,
+                    User.active,
+                ],
+            )
             # mark old data as inactive
-            await User.update({User.active: False}).where(User.batch_id < batch_id)
+            try:
+                await User.update({User.active: False}).where(User.batch_id != batch_id)
+            except Exception as ex:
+                log.exception("failed on update?")
 
 
 async def klubmodul_runner(one_time_run: bool = False):
@@ -351,7 +358,7 @@ async def klubmodul_runner(one_time_run: bool = False):
             # sleep until tomorrow
             await asyncio.sleep(24 * 60 * 60)
         except (KlubmodulException, Exception) as ex:
-            log.error(f"failed to fetch klubmodul data retry in an hour {ex}")
+            log.exception(f"failed to fetch klubmodul data retry in an hour {ex}")
             await asyncio.sleep(60 * 60)
         if one_time_run:
             break

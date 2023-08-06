@@ -22,9 +22,9 @@ async def me(
     return schemas.MeReply(
         users=[
             {
-                "user_id": user.user_id,
+                "user_id": user.id,
                 "name": user.name,
-                "token": generate_dl_member_token(user.user_id),
+                "token": generate_dl_member_token(user.id),
                 "member_type": TokenType(user.token_type).name.lower(),
                 "expires": "{0:%m/%y}".format(expires_display),
             }

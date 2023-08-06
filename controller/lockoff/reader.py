@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 
 async def check_member(user_id: int, member_type: TokenType):
-    user = await User.select(User.user_id).where(User.user_id == user_id).first()
+    user = await User.select(User.id).where(User.id == user_id).first()
     if not user:
         log_and_raise_token_error(
             "did you cancel your membership?", code=DISPLAY_CODES.NO_MEMBER

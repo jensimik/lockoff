@@ -39,7 +39,7 @@ async def sample_data():
             try:
                 await User.insert(
                     User(
-                        user_id=x,
+                        id=x,
                         name=f"test user {x}",
                         token_type=TokenType.NORMAL
                         if x in range(5)
@@ -51,7 +51,7 @@ async def sample_data():
                         active=True if x < 8 else False,
                     )
                 ).on_conflict(
-                    target=User.user_id,
+                    target=User.id,
                     action="DO UPDATE",
                     values=[
                         User.name,

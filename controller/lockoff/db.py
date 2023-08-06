@@ -12,7 +12,7 @@ DB = SQLiteEngine(path=settings.db_file)
 
 
 class User(Table, tablename="users", db=DB):
-    user_id = columns.Integer(primary_key=True)
+    id = columns.Integer(primary_key=True)
     name = columns.Varchar(length=100)
     token_type = columns.Integer(choices=TokenType)
     mobile = columns.Varchar(length=64)
