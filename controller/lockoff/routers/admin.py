@@ -3,7 +3,6 @@ import logging
 from datetime import datetime
 from typing import Annotated
 
-import aiosqlite
 from dateutil.relativedelta import relativedelta
 from fastapi import (
     APIRouter,
@@ -17,18 +16,17 @@ from fastapi import (
 
 from .. import depends, schemas
 from ..access_token import (
-    TokenType,
     TokenError,
+    TokenType,
     generate_access_token,
-    verify_access_token,
     generate_dl_admin_token,
+    verify_access_token,
     verify_dl_admin_token,
 )
 from ..card import generate_png
 from ..config import settings
-from ..depends import DBcon
+from ..db import DB, Count, Dayticket, Max, User, UserModel
 from ..klubmodul import refresh
-from ..misc import queries
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -39,16 +37,20 @@ log = logging.getLogger(__name__)
 async def generate_daytickets(
     pages_to_print: schemas.PagesToPrint,
     _: Annotated[
-        list[aiosqlite.Row], Security(depends.get_current_users, scopes=["admin"])
+        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
     ],
-    conn: DBcon,
 ):
     batch_id = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
-    dayticket_ids = [
-        await queries.insert_dayticket(conn, batch_id=batch_id)
-        for _ in range(30 * pages_to_print.pages_to_print)
-    ]
-    await conn.commit()
+    async with DB.transaction():
+        dayticket_ids = [
+            x["id"]
+            for x in await Dayticket.insert(
+                *[
+                    Dayticket(id=None, batch_id=batch_id)
+                    for _ in range(30 * pages_to_print.pages_to_print)
+                ]
+            ).returning(Dayticket.id)
+        ]
     return [
         {
             "dayticket_id": dayticket_id,
@@ -67,10 +69,9 @@ async def generate_daytickets(
 )
 async def get_qr_code_png(
     ticket_id: Annotated[int, Depends(verify_dl_admin_token)],
-    conn: DBcon,
 ):
     log.info(f"getting qr code for ticket_id {ticket_id}")
-    ticket = await queries.get_dayticket_by_id(conn, ticket_id=ticket_id)
+    ticket = await Dayticket.select().where(Dayticket.id == ticket_id)
     if not ticket:
         log.error(f"could not find ticket with id {ticket_id}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -90,9 +91,8 @@ async def get_qr_code_png(
 async def check_token(
     token_input: schemas.TokenCheckInput,
     _: Annotated[
-        list[aiosqlite.Row], Security(depends.get_current_users, scopes=["admin"])
+        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
     ],
-    conn: DBcon,
 ) -> schemas.TokenCheck:
     try:
         user_id, token_type = verify_access_token(token=token_input.token)
@@ -104,7 +104,11 @@ async def check_token(
         )
     match token_type:
         case TokenType.NORMAL | TokenType.MORNING:
-            user = await queries.get_user_by_user_id(conn, user_id=user_id)
+            user = (
+                await User.select(User.name, User.active, User.token_type)
+                .where(User.user_id == user_id)
+                .first()
+            )
             name = user["name"]
             if not user:
                 raise HTTPException(
@@ -118,7 +122,11 @@ async def check_token(
                 # TODO: do check for hours?
                 pass
         case TokenType.DAY_TICKET:
-            ticket = await queries.get_dayticket_by_id(conn, ticket_id=user_id)
+            ticket = (
+                await Dayticket.select(Dayticket.id, Dayticket.expires)
+                .where(Dayticket.id == user_id)
+                .first()
+            )
             if not ticket:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
@@ -172,7 +180,7 @@ async def check_token(
 @router.post("/klubmodul-force-resync")
 async def klubmodul_force_resync(
     _: Annotated[
-        list[aiosqlite.Row], Security(depends.get_current_users, scopes=["admin"])
+        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
     ],
     background_tasks: BackgroundTasks,
 ) -> schemas.StatusReply:
@@ -183,18 +191,22 @@ async def klubmodul_force_resync(
 @router.get("/system-status")
 async def system_status(
     _: Annotated[
-        list[aiosqlite.Row], Security(depends.get_current_users, scopes=["admin"])
+        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
     ],
-    conn: DBcon,
 ):
-    lsd = datetime.now(tz=settings.tz) - datetime.fromisoformat(
-        await queries.get_last_klubmodul_sync(conn),
-    )
+    last_batch_id = (
+        await User.select(Max(User.batch_id).as_alias("last_batch_id"))
+        .where(User.active == True)
+        .first()
+    )["last_batch_id"]
+    lsd = datetime.now(tz=settings.tz) - datetime.fromisoformat(last_batch_id)
     hours, remainder = divmod(lsd.total_seconds(), 3600)
     minutes, _ = divmod(remainder, 60)
-    active_users = await queries.count_active_users(conn)
-    member_access = await queries.last_log_entries(conn, limit=50)
-    dt_stats = await queries.get_dayticket_stats(conn)
+    active_users = (
+        await User.select(Count().as_alias("total")).where(User.active == True).first()
+    )["total"]
+    member_access = []
+    dt_stats = []
     dayticket_reception = sum([d["unused"] for d in dt_stats])
     dayticket_used = sum([d["used"] for d in dt_stats])
     return {

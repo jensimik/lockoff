@@ -8,10 +8,9 @@ from jose import jwt
 
 from .. import schemas
 from ..config import settings
-from ..depends import DBcon
+from ..db import User
 from ..klubmodul import KMClient
-from ..misc import queries, simple_hash
-from ..db import Users
+from ..misc import simple_hash
 
 router = APIRouter(tags=["auth"])
 log = logging.getLogger(__name__)
@@ -39,15 +38,15 @@ send_funcs = {
     "/request-totp", dependencies=[Depends(RateLimiter(times=10, seconds=300))]
 )
 async def request_totp(
-    rt: schemas.RequestTOTP, conn: DBcon, background_tasks: BackgroundTasks
+    rt: schemas.RequestTOTP, background_tasks: BackgroundTasks
 ) -> schemas.StatusReply:
     if rt.username_type == "email":
-        users = await Users.select(Users.user_id, Users.totp_secret).where(
-            Users.email == simple_hash(rt.username)
+        users = await User.select(User.user_id, User.totp_secret).where(
+            User.email == simple_hash(rt.username), User.active == True
         )
     elif rt.username_type == "mobile":
-        users = await Users.select(Users.user_id, Users.totp_secret).where(
-            Users.mobile == simple_hash(rt.username)
+        users = await User.select(User.user_id, User.totp_secret).where(
+            User.mobile == simple_hash(rt.username), User.active == True
         )
     user_ids = [u["user_id"] for u in users]
     if user_ids:
@@ -69,16 +68,15 @@ async def request_totp(
 @router.post("/login", dependencies=[Depends(RateLimiter(times=10, seconds=300))])
 async def login(
     login_data: schemas.RequestLogin,
-    conn: DBcon,
 ) -> schemas.JWTToken:
     username_hash = simple_hash(login_data.username)
     if login_data.username_type == "email":
-        users = await Users.select(Users.user_id, Users.totp_secret).where(
-            Users.email == username_hash
+        users = await User.select(User.user_id, User.totp_secret).where(
+            User.email == username_hash, User.active == True
         )
     elif login_data.username_type == "mobile":
-        users = await Users.select(Users.user_id, Users.totp_secret).where(
-            Users.mobile == username_hash
+        users = await User.select(User.user_id, User.totp_secret).where(
+            User.mobile == username_hash, User.active == True
         )
     if not users:
         raise HTTPException(

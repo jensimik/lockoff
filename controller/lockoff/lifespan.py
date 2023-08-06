@@ -1,15 +1,15 @@
 import asyncio
 from contextlib import asynccontextmanager
 
-import aiosqlite
 import redis.asyncio as redis
 from fastapi import FastAPI
 from fastapi_limiter import FastAPILimiter
 
 from .config import settings
 from .klubmodul import klubmodul_runner
-from .misc import GFXDisplay, queries, watchdog
+from .misc import GFXDisplay, watchdog
 from .reader import Reader
+from .db import User, Dayticket, AccessLog
 
 
 @asynccontextmanager
@@ -17,9 +17,9 @@ async def lifespan(app: FastAPI):
     _redis = redis.from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
     await FastAPILimiter.init(_redis)
     # init db and create tables if not exists
-    # async with aiosqlite.connect(settings.db_file) as conn:
-    #     await queries.create_schema(conn)
-    #     await conn.commit()
+    await User.create_table(if_not_exists=True)
+    await Dayticket.create_table(if_not_exists=True)
+    await AccessLog.create_table(if_not_exists=True)
     # start display
     display = GFXDisplay()
     await display.setup()

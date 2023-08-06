@@ -4,7 +4,6 @@ import logging
 import pathlib
 from datetime import datetime
 
-import aiosql
 import serial_asyncio
 from gpiozero import LED
 
@@ -13,7 +12,6 @@ from .config import settings
 log = logging.getLogger(__name__)
 lock = asyncio.Lock()
 module_directory = pathlib.Path(__file__).resolve().parent
-queries = aiosql.from_path(module_directory / "queries.sql", "aiosqlite")
 # automation hat mini relay 1 is on gpio pin 16
 relay = LED(16)
 
