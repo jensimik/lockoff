@@ -1,7 +1,7 @@
 FROM python:3.11-slim-bookworm
 
 # get curl for health check
-RUN apt-get update && apt-get install curl libpango-1.0-0 libpangoft2-1.0-0 sqlite3 libsqlite3-dev -y
+RUN apt-get update && apt-get install curl libpango-1.0-0 libpangoft2-1.0-0 sqlite3 libsqlite3-dev -y && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /code
 
