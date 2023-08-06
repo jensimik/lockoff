@@ -181,6 +181,9 @@ async def system_status(
         .order_by(AccessLog.timestamp, ascending=False)
         .limit(20)
     )
+    # fixup display of tokentype
+    for ma in member_access:
+        ma["token_type"] = TokenType(ma["token_type"]).name
     dt_stats = await Dayticket.select(
         Dayticket.batch_id,
         Min(Dayticket.id).as_alias("range_start"),
