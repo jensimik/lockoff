@@ -35,6 +35,39 @@ class O_CMD:
     DETRIGGER = bytes([0x1B, 0x59, 0xD])
 
 
+from typing import AsyncIterator, TypeVar
+
+T = TypeVar("T")
+
+
+async def async_chunks(
+    async_iterator: AsyncIterator[T],
+    size: int,
+) -> AsyncIterator[list[T]]:
+    """Generate chunks from an asynchronous sequence.
+
+    Chunks are lists consists of original ``T`` elements.
+    The chunk can't contain more than ``size`` elements.
+    The last chunk might contain less than ``size`` elements,
+    but can't be empty.
+    """
+    finished = False
+
+    while not finished:
+        results: list[T] = []
+
+        for _ in range(size):
+            try:
+                result = await anext(async_iterator)
+            except StopAsyncIteration:
+                finished = True
+            else:
+                results.append(result)
+
+        if results:
+            yield results
+
+
 async def buzz_in(sleep: int = 4):
     print("buzzing in")
     relay.on()

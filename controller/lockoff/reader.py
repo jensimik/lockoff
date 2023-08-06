@@ -46,6 +46,10 @@ async def check_dayticket(user_id: int):
             log_and_raise_token_error(
                 "dayticket is expired", code=DISPLAY_CODES.DAYTICKET_EXPIRED
             )
+    else:
+        log_and_raise_token_error(
+            "no such dayticket!?", code=DISPLAY_CODES.DAYTICKET_EXPIRED
+        )
 
 
 async def check_qrcode(qr_code: str):

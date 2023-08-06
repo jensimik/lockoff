@@ -87,7 +87,7 @@ async def test_klubmodul_get_members(httpx_mock):
 
 
 @pytest.mark.asyncio
-async def test_klubmodul_refresh(httpx_mock, mocker):
+async def test_klubmodul_refresh(httpx_mock):
     # login
     httpx_mock.add_response(
         method="POST", url=f"{settings.klubmodul_base_url}/default.aspx"
@@ -105,6 +105,9 @@ async def test_klubmodul_refresh(httpx_mock, mocker):
 """,
     )
 
+    await refresh()
+
+    # run again to verify upsert is working
     await refresh()
 
 
