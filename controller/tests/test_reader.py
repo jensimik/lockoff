@@ -1,5 +1,4 @@
 import asyncio
-from contextlib import asynccontextmanager
 
 import pytest
 from lockoff.access_token import TokenError, TokenType, generate_access_token

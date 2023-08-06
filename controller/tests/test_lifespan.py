@@ -1,5 +1,3 @@
-from contextlib import asynccontextmanager
-
 import pytest
 from fakeredis import aioredis
 

@@ -1,9 +1,7 @@
-from contextlib import asynccontextmanager
-
 import httpx
 import pytest
 from lockoff.config import settings
-from lockoff.klubmodul import KlubmodulException, KMClient, refresh, klubmodul_runner
+from lockoff.klubmodul import KlubmodulException, KMClient, klubmodul_runner, refresh
 
 
 @pytest.mark.asyncio
