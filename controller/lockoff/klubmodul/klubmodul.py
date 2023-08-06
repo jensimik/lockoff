@@ -340,7 +340,10 @@ async def refresh():
                 ],
             )
             # mark old data as inactive
-            await User.update({User.active: False}).where(User.batch_id != batch_id)
+            try:
+                await User.update({User.active: False}).where(User.batch_id != batch_id)
+            except Exception as ex:
+                log.exception("failed on update?")
 
 
 async def klubmodul_runner(one_time_run: bool = False):
