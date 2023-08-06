@@ -318,7 +318,7 @@ async def refresh():
             await User.insert(
                 *[
                     User(
-                        user_id=user_id,
+                        id=user_id,
                         name=name,
                         token_type=member_type,
                         email=simple_hash(email),
@@ -330,6 +330,7 @@ async def refresh():
                     async for user_id, name, member_type, email, mobile in client.get_members()
                 ]
             ).on_conflict(
+                target=User.id,
                 action="DO UPDATE",
                 values=[
                     User.name,

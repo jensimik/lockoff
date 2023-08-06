@@ -106,7 +106,7 @@ async def check_token(
         case TokenType.NORMAL | TokenType.MORNING:
             user = (
                 await User.select(User.name, User.active, User.token_type)
-                .where(User.user_id == user_id)
+                .where(User.id == user_id)
                 .first()
             )
             name = user["name"]
