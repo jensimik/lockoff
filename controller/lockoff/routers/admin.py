@@ -25,7 +25,7 @@ from ..access_token import (
 )
 from ..card import generate_png
 from ..config import settings
-from ..db import DB, Count, Dayticket, Max, User, UserModel
+from ..db import DB, AccessLog, Count, Dayticket, Min, Max, Sum, User, UserModel
 from ..klubmodul import refresh
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -148,35 +148,6 @@ async def check_token(
     return schemas.TokenCheck(user_id=user_id, token_type=token_type.name, name=name)
 
 
-# @router.get("/access-log")
-# async def access_log(
-#     _: Annotated[
-#         list[aiosqlite.Row], Security(depends.get_current_users, scopes=["admin"])
-#     ],
-#     conn: DBcon,
-# ):
-#     return await queries.last_log_entries(conn, limit=30)
-
-
-# from dateutil.rrule import rrulestr
-# from dateutil.relativedelta import relativedelta
-# from dateutil.tz import gettz
-# from datetime import datetime
-
-# tz = gettz("Europe/Copenhagen")
-
-# today = datetime.now(tz=tz) + relativedelta(hour=0, minute=0, second=0, microsecond=0)
-# a = """FREQ=HOURLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
-# FREQ=HOURLY;BYDAY=SA,SU;BYHOUR=9,10,11,12,13,14,15,16,17,18,19,20,21,22,23"""
-# aex = "FREQ=HOURLY;BYMONTH=7;BYDAY=MO,TU,WE,TH,FR;BYHOUR=9,10,11,12,13,14"
-# b = rrulestr(a, forceset=True, dtstart=today)
-# b.exrule(rrulestr(aex, dtstart=today, forceset=True))
-# c = datetime.now(tz=tz) + relativedelta(minute=0, second=0, microsecond=0)
-# today_end = today + relativedelta(days=1)
-# b.between(today, today_end)
-# c in b
-
-
 @router.post("/klubmodul-force-resync")
 async def klubmodul_force_resync(
     _: Annotated[
@@ -205,10 +176,26 @@ async def system_status(
     active_users = (
         await User.select(Count().as_alias("total")).where(User.active == True).first()
     )["total"]
-    member_access = []
-    dt_stats = []
-    dayticket_reception = sum([d["unused"] for d in dt_stats])
-    dayticket_used = sum([d["used"] for d in dt_stats])
+    member_access = (
+        await AccessLog.select()
+        .order_by(AccessLog.timestamp, ascending=False)
+        .limit(20)
+    )
+    dt_stats = await Dayticket.select(
+        Dayticket.batch_id,
+        Min(Dayticket.id).as_alias("range_start"),
+        Max(Dayticket.id).as_alias("range_end"),
+    ).group_by(Dayticket.batch_id)
+    dayticket_reception = (
+        await Dayticket.select(Count().as_alias("total"))
+        .where(Dayticket.expires == 0)
+        .first()
+    )["total"]
+    dayticket_used = (
+        await Dayticket.select(Count().as_alias("total"))
+        .where(Dayticket.expires > 0)
+        .first()
+    )["total"]
     return {
         "last_sync": f"{hours:.0f} hours and {minutes:.0f} minutes ago",
         "active_users": active_users,

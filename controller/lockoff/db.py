@@ -1,6 +1,6 @@
 from piccolo import columns
 from piccolo.engine import SQLiteEngine
-from piccolo.query import Max
+from piccolo.query import Min, Max, Sum
 from piccolo.query.methods.select import Count
 from piccolo.table import Table
 from piccolo.utils.pydantic import create_pydantic_model
@@ -29,9 +29,10 @@ class Dayticket(Table, tablename="dayticket", db=DB):
 
 
 class AccessLog(Table, tablename="accesslog", db=DB):
+    id = columns.Integer(primary_key=True)
     obj_id = columns.Integer()
     token_type = columns.Integer(choices=TokenType)
-    timestamp = columns.Integer()
+    timestamp = columns.Varchar(length=25)
 
 
 DayticketModel = create_pydantic_model(Dayticket)

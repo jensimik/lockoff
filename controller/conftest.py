@@ -68,15 +68,16 @@ async def sample_data():
             try:
                 await AccessLog.insert(
                     AccessLog(
+                        id=None,
                         obj_id=x,
                         token_type=random.choice(
                             [TokenType.NORMAL, TokenType.MORNING, TokenType.DAY_TICKET]
                         ),
-                        timestamp=int(
+                        timestamp=(
                             (
                                 datetime.now(tz=settings.tz)
                                 - timedelta(minutes=random.randint(0, 200))
-                            ).timestamp()
+                            ).isoformat(timespec="seconds")
                         ),
                     )
                 )

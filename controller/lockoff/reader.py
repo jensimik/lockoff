@@ -64,6 +64,7 @@ async def check_qrcode(qr_code: str):
     async with DB.transaction():
         await AccessLog.insert(
             AccessLog(
+                id=None,
                 obj_id=user_id,
                 token_type=token_type,
                 timestamp=datetime.now(tz=settings.tz).isoformat(timespec="seconds"),
