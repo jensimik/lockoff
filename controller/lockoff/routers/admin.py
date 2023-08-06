@@ -47,10 +47,9 @@ async def generate_daytickets(
                 await Dayticket.insert(Dayticket(id=None, batch_id=batch_id)).returning(
                     Dayticket.id
                 )
-            )
+            )[0]["id"]
             for _ in range(30 * pages_to_print.pages_to_print)
         ]
-    print(dayticket_ids)
     return [
         {
             "dayticket_id": dayticket_id,
