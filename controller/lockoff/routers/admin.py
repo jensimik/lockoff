@@ -25,7 +25,7 @@ from ..access_token import (
 )
 from ..card import generate_png
 from ..config import settings
-from ..db import DB, AccessLog, Count, Dayticket, Min, Max, Sum, User, UserModel
+from ..db import DB, AccessLog, Count, Dayticket, Min, Max, User, UserModel
 from ..klubmodul import refresh
 
 router = APIRouter(prefix="/admin", tags=["admin"])
