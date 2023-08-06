@@ -339,7 +339,7 @@ async def refresh():
             #     ]
             # )
             i = 0
-            async for chunk in async_chunks(client.get_members(), 100):
+            async for chunk in async_chunks(client.get_members(), 1):
                 i += 1
                 log.info(f"doing chunk {i}")
                 log.info(chunk)
