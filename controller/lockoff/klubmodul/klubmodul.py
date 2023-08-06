@@ -314,8 +314,9 @@ async def refresh():
     async with refresh_lock:
         batch_id = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
         async with KMClient() as client, DB.transaction():
-            async for user_id, name, member_type, email, mobile in client.get_members():
-                await User.insert(
+            # bulk upsert
+            await User.insert(
+                *[
                     User(
                         user_id=user_id,
                         name=name,
@@ -326,23 +327,25 @@ async def refresh():
                         totp_secret=pyotp.random_base32(),
                         active=True,
                     )
-                ).on_conflict(
-                    action="DO UPDATE",
-                    values=[
-                        User.name,
-                        User.email,
-                        User.mobile,
-                        User.batch_id,
-                        User.active,
-                    ],
-                )
+                    async for user_id, name, member_type, email, mobile in client.get_members()
+                ]
+            ).on_conflict(
+                action="DO UPDATE",
+                values=[
+                    User.name,
+                    User.email,
+                    User.mobile,
+                    User.batch_id,
+                    User.active,
+                ],
+            )
             # mark old data as inactive
-            await User.update({User.active: False}).where(User.batch_id < batch_id)
+            await User.update({User.active: False}).where(User.batch_id != batch_id)
 
 
 async def klubmodul_runner(one_time_run: bool = False):
     # a bit of initial sleeping for two hours
-    await asyncio.sleep(2 * 60 * 60)
+    # await asyncio.sleep(2 * 60 * 60)
     while True:
         try:
             log.info("klubmodul refreshing data")
