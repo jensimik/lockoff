@@ -342,6 +342,7 @@ async def refresh():
             async for chunk in async_chunks(client.get_members(), 100):
                 i += 1
                 log.info(f"doing chunk {i}")
+                log.info(chunk)
                 await User.insert(
                     *[
                         User(
