@@ -185,10 +185,13 @@ async def system_status(
         ma["token_type"] = TokenType(ma["token_type"]).name
     dt_stats = await Dayticket.raw(
         """
-SELECT batch_id, min(dayticket.id) as range_start, max(dayticket.id) as range_end, SUM(CASE WHEN expires = 0 THEN 1 ELSE 0 END) as unused,  SUM(CASE WHEN expires > 0 THEN 1 ELSE 0 END) as used
+SELECT batch_id,
+min(dayticket.id) as range_start,
+max(dayticket.id) as range_end, 
+SUM(CASE WHEN expires = 0 THEN 1 ELSE 0 END) as unused,
+SUM(CASE WHEN expires > 0 THEN 1 ELSE 0 END) as used
 from dayticket
-group by batch_id
-"""
+group by batch_id"""
     )
     dayticket_reception = (
         await Dayticket.select(Count().as_alias("total"))
