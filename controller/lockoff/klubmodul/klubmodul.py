@@ -88,6 +88,11 @@ class KMClient:
             email = row["Email"].lower()
             mobile = row["Mobil"]
             if member_type:
+                assert isinstance(user_id, int)
+                assert isinstance(name, str)
+                assert isinstance(member_type, TokenType)
+                assert isinstance(email, str)
+                assert isinstance(mobile, str)
                 yield user_id, name, member_type, email, mobile
 
     async def send_sms(
