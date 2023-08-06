@@ -4,15 +4,14 @@ import logging
 import typing
 from datetime import datetime
 from types import TracebackType
-from collections import Counter
 
 import httpx
 import pyotp
 
+from ..access_token import TokenType
 from ..config import settings
 from ..db import DB, User
-from ..misc import simple_hash
-from ..access_token import TokenType
+from ..misc import async_chunks, simple_hash
 from .klubmodul_login_data import data as login_data
 
 log = logging.getLogger(__name__)
@@ -333,45 +332,43 @@ async def refresh():
             #         ]
             #     )
             # )
-            c = Counter(
-                [
-                    user_id
-                    async for user_id, name, member_type, email, mobile in client.get_members()
-                ]
-            )
-            print(c)
-            print(c.most_common())
-
-            # await User.insert(
-            #     *[
-            #         User(
-            #             id=user_id,
-            #             name=name,
-            #             token_type=member_type,
-            #             email=simple_hash(email),
-            #             mobile=simple_hash(mobile),
-            #             batch_id=batch_id,
-            #             totp_secret=pyotp.random_base32(),
-            #             active=True,
-            #         )
+            # c = Counter(
+            #     [
+            #         user_id
             #         async for user_id, name, member_type, email, mobile in client.get_members()
             #     ]
-            # ).on_conflict(
-            #     target=User.id,
-            #     action="DO UPDATE",
-            #     values=[
-            #         User.name,
-            #         User.email,
-            #         User.mobile,
-            #         User.batch_id,
-            #         User.active,
-            #     ],
             # )
-            # # mark old data as inactive
-            # try:
-            #     await User.update({User.active: False}).where(User.batch_id != batch_id)
-            # except Exception as ex:
-            #     log.exception("failed on update?")
+            async for chunk in async_chunks(client.get_members(), 100):
+                await User.insert(
+                    *[
+                        User(
+                            id=user_id,
+                            name=name,
+                            token_type=member_type,
+                            email=simple_hash(email),
+                            mobile=simple_hash(mobile),
+                            batch_id=batch_id,
+                            totp_secret=pyotp.random_base32(),
+                            active=True,
+                        )
+                        for user_id, name, member_type, email, mobile in chunk
+                    ]
+                ).on_conflict(
+                    target=User.id,
+                    action="DO UPDATE",
+                    values=[
+                        User.name,
+                        User.email,
+                        User.mobile,
+                        User.batch_id,
+                        User.active,
+                    ],
+                )
+            # mark old data as inactive
+            try:
+                await User.update({User.active: False}).where(User.batch_id != batch_id)
+            except Exception as ex:
+                log.exception("failed on update?")
 
 
 async def klubmodul_runner(one_time_run: bool = False):
