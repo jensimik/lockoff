@@ -7,12 +7,13 @@ from dateutil.relativedelta import relativedelta
 
 from .access_token import (
     TokenError,
+    TokenMedia,
     TokenType,
     log_and_raise_token_error,
     verify_access_token,
 )
 from .config import settings
-from .db import DB, Dayticket, User, AccessLog
+from .db import DB, AccessLog, Dayticket, User
 from .misc import DISPLAY_CODES, O_CMD, GFXDisplay, buzz_in
 
 log = logging.getLogger(__name__)
@@ -53,7 +54,7 @@ async def check_dayticket(user_id: int):
 
 
 async def check_qrcode(qr_code: str):
-    user_id, token_type = verify_access_token(
+    user_id, token_type, token_media = verify_access_token(
         token=qr_code
     )  # it will raise TokenError if not valid
     log.info(f"checking user {user_id} {token_type}")
@@ -71,6 +72,7 @@ async def check_qrcode(qr_code: str):
                 id=None,
                 obj_id=user_id,
                 token_type=token_type,
+                token_media=token_media,
                 timestamp=datetime.now(tz=settings.tz).isoformat(timespec="seconds"),
             )
         )

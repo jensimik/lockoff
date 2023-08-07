@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from lockoff.access_token import (
     TokenError,
     TokenType,
+    TokenMedia,
     generate_access_token,
     generate_dl_admin_token,
     generate_dl_member_token,
@@ -42,22 +43,31 @@ def test_dl_token(user_id, gen_func, ver_func):
 
 
 @pytest.mark.parametrize(
-    ["user_id", "token_type"],
+    ["user_id", "token_type", "token_media"],
     (
-        (0, TokenType.NORMAL),
-        (1, TokenType.MORNING),
-        (2, TokenType.DAY_TICKET),
-        (3, TokenType.NORMAL),
+        (0, TokenType.NORMAL, TokenMedia.DIGITAL),
+        (1, TokenType.MORNING, TokenMedia.DIGITAL),
+        (2, TokenType.DAY_TICKET, TokenMedia.DIGITAL),
+        (3, TokenType.NORMAL, TokenMedia.DIGITAL),
+        (0, TokenType.NORMAL, TokenMedia.PRINT),
+        (1, TokenType.MORNING, TokenMedia.PRINT),
+        (2, TokenType.DAY_TICKET, TokenMedia.PRINT),
+        (3, TokenType.NORMAL, TokenMedia.PRINT),
     ),
 )
-def test_token(user_id, token_type):
+def test_token(user_id, token_type, token_media):
     # ok
-    token_bytes = generate_access_token(user_id=user_id, token_type=token_type)
+    token_bytes = generate_access_token(
+        user_id=user_id, token_type=token_type, token_media=token_media
+    )
     token_str = token_bytes.decode()
 
-    verify_user_id, verify_token_type = verify_access_token(token_str)
+    verify_user_id, verify_token_type, verify_token_media = verify_access_token(
+        token_str
+    )
     assert user_id == verify_user_id
     assert token_type == verify_token_type
+    assert token_media == verify_token_media
 
     # try to change a bit in signature part
     ba = bytearray(token_bytes)
@@ -69,7 +79,10 @@ def test_token(user_id, token_type):
 
     # expired
     token_bytes_expired = generate_access_token(
-        user_id=user_id, token_type=token_type, expire_delta=relativedelta(hours=-10)
+        user_id=user_id,
+        token_type=token_type,
+        token_media=token_media,
+        expire_delta=relativedelta(hours=-10),
     )
     token_str_expired = token_bytes_expired.decode()
     with pytest.raises(TokenError):

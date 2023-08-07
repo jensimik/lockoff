@@ -84,13 +84,17 @@ export default {
             <thead>
                 <tr>
                     <th>timestamp</th>
-                    <th>who</th>
+                    <th>id</th>
+                    <th>type</th>
+                    <th>media</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="log in data.member_access" :key="log.id">
                     <td>{{ log.timestamp }}</td>
-                    <td>{{ log.token_type }} / {{ log.obj_id }}</td>
+                    <td>{{ log.obj_id }}</td>
+                    <td>{{ log.token_type }}</td>
+                    <td>{{ log.token_media }}</td>
                 </tr>
             </tbody>
         </table>

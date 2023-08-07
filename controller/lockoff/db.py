@@ -5,7 +5,7 @@ from piccolo.query.methods.select import Count  # noqa: F401
 from piccolo.table import Table
 from piccolo.utils.pydantic import create_pydantic_model
 
-from .access_token import TokenType
+from .access_token import TokenType, TokenMedia
 from .config import settings
 
 DB = SQLiteEngine(path=settings.db_file)
@@ -34,6 +34,7 @@ class AccessLog(Table, tablename="accesslog", db=DB):
     id = columns.Integer(primary_key=True)
     obj_id = columns.Integer()
     token_type = columns.Integer(choices=TokenType)
+    token_media = columns.Integer(choices=TokenMedia)
     timestamp = columns.Varchar(length=25)
 
 

@@ -17,6 +17,7 @@ from fastapi import (
 from .. import depends, schemas
 from ..access_token import (
     TokenError,
+    TokenMedia,
     TokenType,
     generate_access_token,
     generate_dl_admin_token,
@@ -25,7 +26,7 @@ from ..access_token import (
 )
 from ..card import generate_png
 from ..config import settings
-from ..db import DB, AccessLog, Count, Dayticket, Min, Max, User, UserModel
+from ..db import DB, AccessLog, Dayticket, Max, User, UserModel
 from ..klubmodul import refresh
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -77,6 +78,7 @@ async def get_qr_code_png(
     access_token = generate_access_token(
         user_id=ticket_id,
         token_type=TokenType.DAY_TICKET,
+        token_media=TokenMedia.PRINT,
         expire_delta=relativedelta(months=3),
     )
     img = generate_png(qr_code_data=access_token.decode())
@@ -94,7 +96,7 @@ async def check_token(
     ],
 ) -> schemas.TokenCheck:
     try:
-        user_id, token_type = verify_access_token(token=token_input.token)
+        user_id, token_type, _ = verify_access_token(token=token_input.token)
         name = "n/a"
     except TokenError:
         raise HTTPException(
@@ -178,9 +180,10 @@ async def system_status(
         .order_by(AccessLog.timestamp, ascending=False)
         .limit(20)
     )
-    # fixup display of tokentype
+    # fixup display of tokentype and tokenmedia
     for ma in member_access:
         ma["token_type"] = TokenType(ma["token_type"]).name
+        ma["token_media"] = TokenMedia(ma["token_media"]).name
     dt_stats = await Dayticket.raw(
         """
 SELECT batch_id,

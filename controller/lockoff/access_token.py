@@ -23,6 +23,12 @@ class TokenType(Enum):
     DAY_TICKET = 3
 
 
+class TokenMedia(Enum):
+    PRINT = 1
+    DIGITAL = 2
+    UNKNOWN = 3
+
+
 class TokenError(Exception):
     def __init__(self, message, code=DISPLAY_CODES.QR_ERROR):
         super().__init__(message)
@@ -37,6 +43,7 @@ def log_and_raise_token_error(message, code=DISPLAY_CODES.QR_ERROR, level=loggin
 def generate_access_token(
     user_id: int,
     token_type: TokenType = TokenType.NORMAL,
+    token_media: TokenMedia = TokenMedia.PRINT,
     expire_delta: relativedelta = relativedelta(
         day=20, month=1, years=1, hour=12, minute=0, second=0, microsecond=0
     ),
@@ -54,10 +61,11 @@ def generate_access_token(
 
     expire = datetime.now(tz=settings.tz) + expire_delta
     data = struct.pack(
-        ">IIH",
+        ">IIHH",
         user_id,
         int(expire.timestamp()),
         token_type.value,
+        token_media.value,
     )
 
     nonce = secrets.token_bytes(settings.nonce_size)
@@ -86,11 +94,12 @@ def verify_access_token(token: str) -> tuple[int, TokenType]:
         )
 
     try:
-        user_id, expires, type_, _, signature = struct.unpack(
-            f">IIH{settings.nonce_size}s{settings.digest_size}s", raw_token
+        user_id, expires, type_, media_, _, signature = struct.unpack(
+            f">IIHH{settings.nonce_size}s{settings.digest_size}s", raw_token
         )
         data = raw_token[: -settings.digest_size]
         token_type = TokenType(type_)
+        token_media = TokenMedia(media_)
         expires_datetime = datetime.fromtimestamp(expires, tz=settings.tz)
     except Exception as ex:
         log_and_raise_token_error(
@@ -110,7 +119,7 @@ def verify_access_token(token: str) -> tuple[int, TokenType]:
             "token is expired", code=DISPLAY_CODES.QR_ERROR_EXPIRED
         )
 
-    return user_id, token_type
+    return user_id, token_type, token_media
 
 
 def _generate_dl_token(

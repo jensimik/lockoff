@@ -5,10 +5,15 @@ from typing import Annotated
 from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
-from ..access_token import TokenType, generate_access_token, verify_dl_member_token
+from ..access_token import (
+    TokenMedia,
+    TokenType,
+    generate_access_token,
+    verify_dl_member_token,
+)
 from ..card import ApplePass, generate_pdf, generate_png
 from ..config import settings
-from ..db import User, DB
+from ..db import DB, User
 
 router = APIRouter(tags=["card"])
 
@@ -27,7 +32,9 @@ async def get_qr_code_png(
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     access_token = generate_access_token(
-        user_id=user["id"], token_type=TokenType(user["token_type"])
+        user_id=user["id"],
+        token_type=TokenType(user["token_type"]),
+        token_media=TokenMedia.UNKNOWN,
     )
     img = generate_png(qr_code_data=access_token.decode())
     with io.BytesIO() as f:
@@ -51,7 +58,9 @@ async def get_card_pdf(
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     access_token = generate_access_token(
-        user_id=user["id"], token_type=TokenType(user["token_type"])
+        user_id=user["id"],
+        token_type=TokenType(user["token_type"]),
+        token_media=TokenMedia.PRINT,
     )
     pdf_file = generate_pdf(
         name=user["name"],
@@ -89,7 +98,9 @@ async def get_pkpass(
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     access_token = generate_access_token(
-        user_id=user["id"], token_type=TokenType(user["token_type"])
+        user_id=user["id"],
+        token_type=TokenType(user["token_type"]),
+        token_media=TokenMedia.DIGITAL,
     )
     expires_display = datetime.utcnow() + relativedelta(
         day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
