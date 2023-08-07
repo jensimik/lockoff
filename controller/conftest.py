@@ -103,6 +103,9 @@ async def sample_data():
         await Dayticket.update({Dayticket.expires: int(valid.timestamp())}).where(
             Dayticket.id == 3
         )
+        await User.update({User.season_digital: str(settings.current_season)}).where(
+            User.id == 1
+        )
 
 
 @pytest.fixture
