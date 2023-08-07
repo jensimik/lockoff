@@ -51,7 +51,7 @@ class ApplePass:
                 "logoText": "Nørrebro klatreklub",
                 "organizationName": "Jens Davidsen",
                 "passTypeIdentifier": "pass.dk.nkk.lockoff",
-                "serialNumber": f"{expires:%Y}{user_id}",
+                "serialNumber": f"{settings.current_season}{user_id}",
                 "suppressStripShine": False,
                 "teamIdentifier": "LLFSXFW7XK",
                 "description": "Nørrebro klatreklub",
