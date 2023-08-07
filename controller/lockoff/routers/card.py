@@ -60,7 +60,7 @@ async def get_card_pdf(
     )
     # mark that the user have downloaded pdf/print for this season
     async with DB.transaction():
-        User.update({User.season_print: settings.current_season}).where(
+        User.update({User.season_print: str(settings.current_season)}).where(
             User.id == user_id
         )
     return Response(
@@ -103,7 +103,7 @@ async def get_pkpass(
     )
     # mark that the user have downloaded pkpass/digital for this season
     async with DB.transaction():
-        User.update({User.season_digital: settings.current_season}).where(
+        User.update({User.season_digital: str(settings.current_season)}).where(
             User.id == user_id
         )
     return Response(
