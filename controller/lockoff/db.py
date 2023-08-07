@@ -19,6 +19,8 @@ class User(Table, tablename="users", db=DB):
     email = columns.Varchar(length=64)
     batch_id = columns.Varchar(length=25)
     totp_secret = columns.Varchar(length=32)
+    season_digital = columns.Varchar(length=4)
+    season_print = columns.Varchar(length=4)
     active = columns.Boolean()
 
 
