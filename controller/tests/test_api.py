@@ -172,8 +172,8 @@ def test_admin(a1client: TestClient, mocker):
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert data["digital_issued"] == 1
-    assert data["print_issued"] == 0
-    assert data["total_issued"] == 1
+    assert data["print_issued"] == 1
+    assert data["total_issued"] == 2
 
     # generate daytickets
     response = a1client.post("/admin/generate-daytickets", json={"pages_to_print": 1})
