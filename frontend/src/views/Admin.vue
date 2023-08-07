@@ -45,6 +45,7 @@ export default {
     </div>
     <div class="flex one">
         <p><span class="bold">{{ data.active_users }}</span> active members and last synced <span class="bold">{{ data.last_sync }}</span></p>
+        <p><span class="bold">{{ data.total_issued }}</span> members have issued access cards (hereof {{ data.digital_issued }} digital and {{ data.print_issued }} print)</p>
     </div>
     <div class="flex two">
         <h3>Daytickets</h3>

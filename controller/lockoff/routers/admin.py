@@ -172,9 +172,7 @@ async def system_status(
     lsd = datetime.now(tz=settings.tz) - datetime.fromisoformat(last_batch_id)
     hours, remainder = divmod(lsd.total_seconds(), 3600)
     minutes, _ = divmod(remainder, 60)
-    active_users = (
-        await User.select(Count().as_alias("total")).where(User.active == True).first()
-    )["total"]
+    active_users = await User.count().where(User.active == True)
     member_access = (
         await AccessLog.select()
         .order_by(AccessLog.timestamp, ascending=False)
@@ -193,16 +191,18 @@ SUM(CASE WHEN expires > 0 THEN 1 ELSE 0 END) as used
 from dayticket
 group by batch_id"""
     )
-    dayticket_reception = (
-        await Dayticket.select(Count().as_alias("total"))
-        .where(Dayticket.expires == 0)
-        .first()
-    )["total"]
-    dayticket_used = (
-        await Dayticket.select(Count().as_alias("total"))
-        .where(Dayticket.expires > 0)
-        .first()
-    )["total"]
+    dayticket_reception = await Dayticket.count().where(Dayticket.expires == 0)
+    dayticket_used = await Dayticket.count().where(Dayticket.expires > 0)
+    digital_issued = await User.count().where(
+        User.season_digital == settings.current_season
+    )
+    print_issued = await User.count().where(
+        User.season_print == settings.current_season
+    )
+    total_issued = await User.count().where(
+        (User.season_print == settings.current_season)
+        | (User.season_digital == settings.current_season)
+    )
     return {
         "last_sync": f"{hours:.0f} hours and {minutes:.0f} minutes ago",
         "active_users": active_users,
@@ -210,4 +210,7 @@ group by batch_id"""
         "dt_stats": dt_stats,
         "dayticket_reception": dayticket_reception,
         "dayticket_used": dayticket_used,
+        "digital_issued": digital_issued,
+        "print_issued": print_issued,
+        "total_issued": total_issued,
     }

@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from ..access_token import TokenType, generate_access_token, verify_dl_member_token
 from ..card import ApplePass, generate_pdf, generate_png
 from ..config import settings
-from ..db import User
+from ..db import User, DB
 
 router = APIRouter(tags=["card"])
 
@@ -58,6 +58,11 @@ async def get_card_pdf(
         level=f"{TokenType(user['token_type']).name.capitalize()} {settings.current_season}",
         qr_code_data=access_token.decode(),
     )
+    # mark that the user have downloaded pdf/print for this season
+    async with DB.transaction():
+        User.update({User.season_print: settings.current_season}).where(
+            User.id == user_id
+        )
     return Response(
         content=pdf_file.getvalue(),
         media_type="application/pdf",
@@ -96,6 +101,11 @@ async def get_pkpass(
         expires=expires_display,
         qr_code_data=access_token.decode(),
     )
+    # mark that the user have downloaded pkpass/digital for this season
+    async with DB.transaction():
+        User.update({User.season_digital: settings.current_season}).where(
+            User.id == user_id
+        )
     return Response(
         content=pkpass_file.getvalue(),
         media_type="application/vnd.apple.pkpass",
