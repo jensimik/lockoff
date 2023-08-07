@@ -9,7 +9,7 @@ from fakeredis import aioredis
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from fastapi_limiter import FastAPILimiter
-from lockoff.access_token import TokenType
+from lockoff.access_token import TokenType, TokenMedia
 from lockoff.config import settings
 from lockoff.db import DB, AccessLog, Dayticket, User
 from lockoff.misc import simple_hash
@@ -72,6 +72,9 @@ async def sample_data():
                         obj_id=x,
                         token_type=random.choice(
                             [TokenType.NORMAL, TokenType.MORNING, TokenType.DAY_TICKET]
+                        ),
+                        token_media=random.choice(
+                            [TokenMedia.DIGITAL, TokenMedia.PRINT]
                         ),
                         timestamp=(
                             (
