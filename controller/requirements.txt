@@ -17,7 +17,7 @@ dnspython==2.4.1
 docstring-parser==0.15
 ecdsa==0.18.0
 email-validator==2.0.0.post2
-fastapi==0.100.1
+fastapi==0.101.0
 fastapi-limiter==0.1.5
 fonttools==4.42.0
 gpiozero==1.6.2
