@@ -194,14 +194,14 @@ group by batch_id"""
     dayticket_reception = await Dayticket.count().where(Dayticket.expires == 0)
     dayticket_used = await Dayticket.count().where(Dayticket.expires > 0)
     digital_issued = await User.count().where(
-        User.season_digital == settings.current_season
+        User.season_digital == str(settings.current_season)
     )
     print_issued = await User.count().where(
-        User.season_print == settings.current_season
+        User.season_print == str(settings.current_season)
     )
     total_issued = await User.count().where(
-        (User.season_print == settings.current_season)
-        | (User.season_digital == settings.current_season)
+        (User.season_print == str(settings.current_season))
+        | (User.season_digital == str(settings.current_season))
     )
     return {
         "last_sync": f"{hours:.0f} hours and {minutes:.0f} minutes ago",

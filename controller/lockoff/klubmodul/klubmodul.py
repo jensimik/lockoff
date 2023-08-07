@@ -314,7 +314,7 @@ async def refresh():
     async with refresh_lock:
         batch_id = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
         async with KMClient() as client, DB.transaction():
-            async for chunk in async_chunks(client.get_members(), 100):
+            async for chunk in async_chunks(client.get_members(), 500):
                 await User.insert(
                     *[
                         User(
