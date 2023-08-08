@@ -32,6 +32,7 @@ U = typing.TypeVar("U", bound="AppleNotifier")
 
 class AppleNotifier:
     def __init__(self):
+        log.info(settings.key)
         log.info(settings.apn_auth_key)
         self._auth_key = serialization.load_pem_private_key(
             settings.apn_auth_key, password=None
