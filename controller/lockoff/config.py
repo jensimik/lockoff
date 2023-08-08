@@ -28,6 +28,16 @@ class Settings(BaseSettings):
     klubmodul_password: str = ""
     klubmodul_base_url: str = "https://changeme.klub-modul.dk"
     klubmodul_admin_user_id: int = 3535  # change to your own user_id for the admin user
+    apple_pass_description: str = "Nørrebro klatreklub"
+    apple_pass_logo_text: str = "Nørrebro klatreklub"
+    apple_pass_organization_name: str = "Jens Davidsen"
+    apple_pass_pass_type_identifier: str = "pass.dk.nkk.lockoff"
+    apple_pass_team_identifier: str = "LLFSXFW7XK"
+    apple_pass_latitude: float = 55.69942723771949
+    apple_pass_longitude: float = 12.543439832016006
+    apple_pass_relevant_text: str = "lets climb! 🐒"
+    apple_pass_proximity_uuid: str = "812366E1-4479-404B-B4A1-110FBBA9F625"
+    apple_pass_web_service_url: str = "https://lockoff.nkk.dk/apple-pass/"
     hash_salt: str = "changeme"
     nonce_size: int = 4
     digest_size: int = 10

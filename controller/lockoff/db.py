@@ -38,6 +38,21 @@ class AccessLog(Table, tablename="accesslog", db=DB):
     timestamp = columns.Varchar(length=25)
 
 
+class APDevice(Table, tablename="ap_device", db=DB):
+    device_library_identifier = columns.Varchar(primary_key=True)
+    push_token = columns.Varchar()
+
+
+class APPass(Table, tablename="ap_pass", db=DB):
+    serial_number = columns.Varchar(primary_key=True)
+
+
+class APReg(Table, tablename="ap_reg", db=DB):
+    device_library_identifier = columns.Integer(primary_key=True)
+    serial_number = columns.Varchar(primary_key=True)
+    update_tag = columns.Varchar(length=25)
+
+
 DayticketModel = create_pydantic_model(Dayticket)
 UserModel = create_pydantic_model(User)
 AccessLogModel = create_pydantic_model(AccessLog)

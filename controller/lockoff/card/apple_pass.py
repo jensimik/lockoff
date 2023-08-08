@@ -44,20 +44,23 @@ class ApplePass:
         level: str,
         expires: datetime,
         qr_code_data: str,
+        update_auth_token: str,
     ):
         zip_file = io.BytesIO()
         pass_json = json.dumps(
             {
-                "logoText": "Nørrebro klatreklub",
-                "organizationName": "Jens Davidsen",
-                "passTypeIdentifier": "pass.dk.nkk.lockoff",
+                "logoText": settings.apple_pass_logo_text,
+                "organizationName": settings.apple_pass_organization_name,
+                "passTypeIdentifier": settings.apple_pass_pass_type_identifier,
                 "serialNumber": f"{settings.current_season}{user_id}",
                 "suppressStripShine": False,
-                "teamIdentifier": "LLFSXFW7XK",
-                "description": "Nørrebro klatreklub",
+                "teamIdentifier": settings.apple_pass_team_identifier,
+                "description": settings.apple_pass_description,
                 "expirationDate": f"{expires:%Y-%m-%d}T{expires:%H:%M:%S}Z",
                 "sharingProhibited": True,
                 "formatVersion": 1,
+                "webServiceURL": settings.apple_pass_web_service_url,
+                "authenticationToken": update_auth_token,
                 "barcodes": [
                     {
                         "format": "PKBarcodeFormatQR",
@@ -68,18 +71,18 @@ class ApplePass:
                 "locations": [
                     {
                         "altitude": 0.0,
-                        "latitude": 55.69942723771949,
-                        "longitude": 12.543439832016006,
-                        "relevantText": "lets climb! 🐒",
+                        "latitude": settings.apple_pass_latitude,
+                        "longitude": settings.apple_pass_longitude,
+                        "relevantText": settings.apple_pass_relevant_text,
                     }
                 ],
                 "maxDistance": 20,
                 "beacons": [
                     {
-                        "proximityUUID": "812366E1-4479-404B-B4A1-110FBBA9F625",
+                        "proximityUUID": settings.apple_pass_proximity_uuid,
                         "major": 0,
                         "minor": 0,
-                        "relevantText": "lets climb! 🐒",
+                        "relevantText": settings.apple_pass_relevant_text,
                     }
                 ],
                 "generic": {

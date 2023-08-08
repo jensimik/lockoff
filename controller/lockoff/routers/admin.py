@@ -29,7 +29,7 @@ from ..config import settings
 from ..db import DB, AccessLog, Dayticket, Max, User, UserModel
 from ..klubmodul import refresh
 
-router = APIRouter(prefix="/admin", tags=["admin"])
+router = APIRouter(tags=["admin"])
 
 log = logging.getLogger(__name__)
 
