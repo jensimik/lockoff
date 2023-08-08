@@ -53,7 +53,7 @@ async def register_device(
             )
 
 
-@router.post(
+@router.delete(
     "/devices/{device_library_identifier}/registrations/{pass_type_identifier}/{serial_number}"
 )
 async def unregister_pass(
@@ -62,10 +62,13 @@ async def unregister_pass(
     serial_number: str,
     current_pass: Annotated[dict, Depends(apple_auth_pass)],
 ):
-    if await APPass.exists().where(APPass.serial_number == serial_number):
-        async with DB.transaction():
+    async with DB.transaction():
+        await APReg.delete().where(
+            APReg.serial_number == serial_number,
+            APReg.device_library_identifier == device_library_identifier,
+        )
+        if not APReg.exists().where(APReg.serial_number == serial_number):
             APPass.delete().where(APPass.serial_number == serial_number)
-            APReg.delete().where(APReg.serial_number == serial_number)
     return {}
 
 
