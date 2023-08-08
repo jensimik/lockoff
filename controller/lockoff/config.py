@@ -49,8 +49,8 @@ class Settings(BaseSettings):
     dl_secret: bytes = "changeme"
     secret: bytes = "changeme"
     jwt_secret: str = ""
-    opticon_url: str = "loop://?logging=debug"
-    display_url: str = "loop://?logging=debug"
+    opticon_url: str = "/dev/OPTICON"
+    display_url: str = "/dev/DISPLAY"
     admin_user_ids: list[int] = [1]
     db_file: str = "/tmp/lockoff.db3"
     redis_url: str = "redis://localhost"
