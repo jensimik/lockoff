@@ -9,6 +9,10 @@ class AppleDeviceRegistration(BaseModel):
     push_token: str
 
 
+class AppleLog(BaseModel):
+    logs: list[str] = []
+
+
 class TokenCheckInput(BaseModel):
     token: str
 

@@ -1,13 +1,15 @@
-from typing import Annotated
+from typing import Annotated, Optional, Dict
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request, Path
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
+from fastapi.security.base import SecurityBase
+from fastapi.security.utils import get_authorization_scheme_param
 from jose import JWTError, jwt
 from pydantic import ValidationError
 
 from . import schemas
 from .config import settings
-from .db import User, UserModel
+from .db import User, UserModel, APPass
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="login",
@@ -16,6 +18,31 @@ oauth2_scheme = OAuth2PasswordBearer(
         "admin": "admin scope to access logs, etc",
     },
 )
+
+
+async def apple_auth_pass(
+    self,
+    request: Request,
+) -> dict:
+    authorization = request.headers.get("Authorization")
+    scheme, auth_token = get_authorization_scheme_param(authorization)
+    if not authorization or scheme.lower() != "applepass":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "ApplePass"},
+        )
+    if (
+        appass := await APPass.select()
+        .where(
+            APPass.id == request.path_params["serial_number"],
+            APPass.auth_token == auth_token,
+        )
+        .first()
+    ):
+        return appass
+
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 async def get_current_users(

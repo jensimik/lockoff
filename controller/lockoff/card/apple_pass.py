@@ -39,7 +39,7 @@ class ApplePass:
     @classmethod
     def create(
         self,
-        user_id: int,
+        serial: str,
         name: str,
         level: str,
         expires: datetime,
@@ -52,7 +52,7 @@ class ApplePass:
                 "logoText": settings.apple_pass_logo_text,
                 "organizationName": settings.apple_pass_organization_name,
                 "passTypeIdentifier": settings.apple_pass_pass_type_identifier,
-                "serialNumber": f"{settings.current_season}{user_id}",
+                "serialNumber": serial,
                 "suppressStripShine": False,
                 "teamIdentifier": settings.apple_pass_team_identifier,
                 "description": settings.apple_pass_description,
@@ -153,13 +153,3 @@ class ApplePass:
             for filename, filedata in self.FILES.items():
                 zf.writestr(filename, filedata)
         return zip_file
-
-
-# if __name__ == "__main__":
-#     pkpass = ApplePass.create(
-#         user_id=100,
-#         name="Test Testersen",
-#         level="Normal",
-#         expires=datetime(2024, 1, 1, 12, 0, 0),
-#         barcode_data="test1234",
-#     )
