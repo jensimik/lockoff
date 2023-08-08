@@ -3,9 +3,12 @@ import io
 import json
 import logging
 import pathlib
+import typing
 import zipfile
 from datetime import datetime
+from types import TracebackType
 
+import httpx
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.serialization import pkcs7
@@ -20,6 +23,40 @@ def _read_file_bytes(path):
     with open(path, "rb") as f:
         data = f.read()
     return data
+
+
+class AppleNotifier:
+    def _auth(self):
+        pass
+
+    def _verify(self):
+        pass
+
+    async def __aenter__(self: U) -> U:
+        limits = httpx.Limits(max_connections=1, max_keepalive_connections=0)
+        self.client = httpx.AsyncClient(
+            base_url="https://api.push.apple.com:443",
+            http2=True,
+            timeout=10.0,
+            limits=limits,
+            verify=self._verify,
+            auth=self._auth,
+        )
+        return self
+
+    async def send_notify():
+        pass
+
+    async def aclose(self) -> None:
+        await self.client.aclose()
+
+    async def __aexit__(
+        self,
+        exc_type: typing.Optional[typing.Type[BaseException]] = None,
+        exc_value: typing.Optional[BaseException] = None,
+        traceback: typing.Optional[TracebackType] = None,
+    ) -> None:
+        await self.client.aclose()
 
 
 class ApplePass:
