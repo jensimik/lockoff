@@ -1,6 +1,6 @@
-from typing import Annotated, Optional, Dict
+from typing import Annotated, Dict, Optional
 
-from fastapi import Depends, HTTPException, status, Request, Path
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from fastapi.security.base import SecurityBase
 from fastapi.security.utils import get_authorization_scheme_param
@@ -9,7 +9,7 @@ from pydantic import ValidationError
 
 from . import schemas
 from .config import settings
-from .db import User, UserModel, APPass
+from .db import DB, APPass, User, UserModel
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="login",
@@ -22,23 +22,31 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 async def apple_auth_pass(
     request: Request,
-) -> dict:
+) -> (str, dict):
     authorization = request.headers.get("Authorization")
     scheme, auth_token = get_authorization_scheme_param(authorization)
-    if not authorization or scheme.lower() != "applepass":
+    scheme = scheme.lower()
+    if not authorization or scheme in [
+        "applepass",
+        "attidopass",
+        "androidpass",
+    ]:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
             headers={"WWW-Authenticate": "ApplePass"},
         )
+    pass_id = request.path_params["serial_number"]
     if (
         appass := await APPass.select()
         .where(
-            APPass.id == request.path_params["serial_number"],
+            APPass.id == pass_id,
             APPass.auth_token == auth_token,
         )
         .first()
     ):
+        # hack - set scheme in the dict to pass to register function
+        appass["scheme"] = scheme
         return appass
 
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

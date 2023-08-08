@@ -17,6 +17,10 @@ router = APIRouter(prefix="/v1", tags=["applepass"])
 log = logging.getLogger(__name__)
 
 
+# apple wallet registration
+@router.post(
+    "/devices/{device_library_identifier}/registrations_attido/{pass_type_identifier}/{serial_number}"
+)
 @router.post(
     "/devices/{device_library_identifier}/registrations/{pass_type_identifier}/{serial_number}"
 )
@@ -33,14 +37,19 @@ async def register_device(
             APDevice(
                 id=device_library_identifier,
                 push_token=reg.pushToken,
+                device_type=current_pass["scheme"],
+                push_service_url=reg.pushServiceUrl,
             )
         ).on_conflict(
             target=APDevice.id,
             action="DO UPDATE",
-            values=[APDevice.push_token],
+            values=[
+                APDevice.push_token,
+                APDevice.device_type,
+                APDevice.push_service_url,
+            ],
         )
         # upsert link pass and device - piccolo-orm currently doesn't support compound-keys so cannot do upsert :-/
-        update_tag = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
         if not await APReg.exists().where(
             APReg.device_library_identifier == device_library_identifier,
             APReg.serial_number == serial_number,
@@ -54,6 +63,7 @@ async def register_device(
             )
 
 
+# apple wallet delete
 @router.delete(
     "/devices/{device_library_identifier}/registrations/{pass_type_identifier}/{serial_number}"
 )
@@ -73,6 +83,7 @@ async def unregister_pass(
     return {}
 
 
+# apple wallet get available passes for this device
 @router.get("/devices/{device_library_identifier}/registrations/{pass_type_identifier}")
 async def get_list_of_updateable_passes_to_device(
     device_library_identifier: str,
@@ -93,6 +104,7 @@ async def get_list_of_updateable_passes_to_device(
     return {"serialNumbers": serial_numbers, "lastUpdated": last_updated}
 
 
+# apple wallet get updated pass
 @router.get("/passes/{pass_type_identifier}/{serial_number}")
 async def get_updated_pass(
     pass_type_identifier: str,
@@ -129,6 +141,7 @@ async def get_updated_pass(
     )
 
 
+# apple wallet show log info
 @router.post("/log")
 async def log_message(aplog: schemas.AppleLog):
     for message in aplog.logs:

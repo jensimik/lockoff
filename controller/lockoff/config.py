@@ -38,6 +38,8 @@ class Settings(BaseSettings):
     apple_pass_relevant_text: str = "lets climb! 🐒"
     apple_pass_proximity_uuid: str = "812366E1-4479-404B-B4A1-110FBBA9F625"
     apple_pass_web_service_url: str = "https://lockoff-api.gnerd.dk/apple-pass/"
+    apn_auth_key: str = ""
+    apn_key_id: str = ""
     hash_salt: str = "changeme"
     nonce_size: int = 4
     digest_size: int = 10

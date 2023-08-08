@@ -22,10 +22,13 @@ fastapi-limiter==0.1.5
 fonttools==4.42.0
 gpiozero==1.6.2
 h11==0.14.0
+h2==4.1.0
+hpack==4.0.0
 html5lib==1.1
 httpcore==0.17.3
 httptools==0.6.0
 httpx==0.24.1
+hyperframe==6.0.1
 idna==3.4
 inflection==0.5.1
 iniconfig==2.0.0

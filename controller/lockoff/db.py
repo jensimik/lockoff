@@ -41,6 +41,8 @@ class AccessLog(Table, tablename="accesslog", db=DB):
 class APDevice(Table, tablename="ap_device", db=DB):
     id = columns.Varchar(primary_key=True)
     push_token = columns.Varchar()
+    push_service_url = columns.Varchar()
+    device_type = columns.Varchar()
 
 
 class APPass(Table, tablename="ap_pass", db=DB):

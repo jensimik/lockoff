@@ -3,6 +3,7 @@ import io
 import json
 import logging
 import pathlib
+import time
 import typing
 import zipfile
 from datetime import datetime
@@ -12,6 +13,7 @@ import httpx
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.serialization import pkcs7
+from jose import jwt
 
 from ..config import settings
 
@@ -25,26 +27,47 @@ def _read_file_bytes(path):
     return data
 
 
-class AppleNotifier:
-    def _auth(self):
-        pass
+U = typing.TypeVar("U", bound="AppleNotifier")
 
-    def _verify(self):
-        pass
+
+class AppleNotifier:
+    def __init__(self):
+        self._auth_key = serialization.load_pem_private_key(
+            settings.apn_auth_key, password=None
+        )
 
     async def __aenter__(self: U) -> U:
+        iat = int(time.time())
+        ALG = "ES256"
+        token = jwt.encode(
+            {"iss": settings.apple_pass_team_identifier, "iat": iat},
+            self._auth_key,
+            algorithm=ALG,
+            headers={"alg": ALG, "kid": settings.apn_key_id},
+        )
         limits = httpx.Limits(max_connections=1, max_keepalive_connections=0)
         self.client = httpx.AsyncClient(
             base_url="https://api.push.apple.com:443",
             http2=True,
             timeout=10.0,
             limits=limits,
-            verify=self._verify,
-            auth=self._auth,
+            headers={
+                "Authorization": f"bearer {token}",
+                "Content-Type": "application/json",
+            },
         )
         return self
 
-    async def send_notify():
+    async def notify_update(self, device_library_identifier: str) -> bool:
+        try:
+            response = self.client.post(
+                f"/3/device/{device_library_identifier}", json={}
+            )
+        except httpx.RequestError as ex:
+            log.exception(f"failed in notify update with {ex}")
+        log.info(f"notify_update status code: {response.status_code}")
+
+    async def notify_badge(serial: str, message: str) -> bool:
         pass
 
     async def aclose(self) -> None:
