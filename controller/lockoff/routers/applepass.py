@@ -41,20 +41,14 @@ async def register_device(
         )
         # upsert link pass and device - piccolo-orm currently doesn't support compound-keys so cannot do upsert :-/
         update_tag = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
-        if await APReg.exists().where(
+        if not await APReg.exists().where(
             APReg.device_library_identifier == device_library_identifier,
             APReg.serial_number == serial_number,
         ):
-            APReg.update({APReg.update_tag: update_tag}).where(
-                APReg.device_library_identifier == device_library_identifier,
-                APReg.serial_number == serial_number,
-            )
-        else:
             await APReg.insert(
                 APReg(
                     device_library_identifier=device_library_identifier,
                     serial_number=serial_number,
-                    update_tag=update_tag,
                 )
             )
 
