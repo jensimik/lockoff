@@ -43,6 +43,7 @@ services:
       - $PWD/lockoff.db3:/db/lockoff.db3
     environment:
       - tz=Europe/Copenhagen
+      - db_file=/db/lockoff.db3
       - klubmodul_base_url=${KLUBMODUL_BASE_URL}
       - klubmodul_username=${KLUBMODUL_USERNAME}
       - klubmodul_password=${KLUBMODUL_PASSWORD}
