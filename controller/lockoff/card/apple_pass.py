@@ -64,7 +64,7 @@ class AppleNotifier:
         try:
             headers = {"apns-topic": settings.apple_pass_pass_type_identifier}
             response = await self.client.post(
-                f"/3/device/{device_library_identifier}", json={"pushToken": push_token}
+                f"/3/device/{device_library_identifier}", json={"aps": ""}
             )
             log.info(response.status_code)
             log.info(response.json())
