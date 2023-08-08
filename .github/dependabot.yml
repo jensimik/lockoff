@@ -9,7 +9,7 @@ updates:
         patterns:
           - "*"
         exclude-patterns:
-          - "starlettte"
+          - "starlette"
     ignore:
       - dependency-name: "cryptography"
   - package-ecosystem: "npm"
