@@ -4,6 +4,22 @@ updates:
     directory: "/controller"
     schedule:
       interval: "daily"
+    groups:
+      pip-dep:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "starlettte"
+    ignore:
+      - "cryptography"
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "daily"
+    groups:
+      npm-dep:
+        patterns:
+          - "*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
