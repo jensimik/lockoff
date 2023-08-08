@@ -41,7 +41,5 @@ async def testing123():
     for d in await APDevice.select():
         print(d)
         async with AppleNotifier() as an:
-            await an.notify_update(
-                device_library_identifier=d["device_library_identifier"]
-            )
+            await an.notify_update(device_library_identifier=d["id"])
     return {"status": "ok"}
