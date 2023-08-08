@@ -53,15 +53,18 @@ class AppleNotifier:
             limits=limits,
             headers={
                 "Authorization": f"bearer {token}",
-                "Content-Type": "application/json",
+                "Content-Type": "application/json; charset=utf-8",
             },
         )
         return self
 
-    async def notify_update(self, device_library_identifier: str) -> bool:
+    async def notify_update(
+        self, device_library_identifier: str, push_token: str
+    ) -> bool:
         try:
+            headers = {"apns-topic": settings.apple_pass_pass_type_identifier}
             response = await self.client.post(
-                f"/3/device/{device_library_identifier}", json={}
+                f"/3/device/{device_library_identifier}", json={"pushToken": push_token}
             )
             log.info(response.status_code)
             log.info(response.json())
