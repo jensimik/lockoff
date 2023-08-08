@@ -60,7 +60,7 @@ class AppleNotifier:
 
     async def notify_update(self, device_library_identifier: str) -> bool:
         try:
-            response = self.client.post(
+            response = await self.client.post(
                 f"/3/device/{device_library_identifier}", json={}
             )
             log.info(response.status_code)
