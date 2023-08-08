@@ -25,7 +25,7 @@ async def register_device(
     pass_type_identifier: str,
     serial_number: str,
     reg: schemas.AppleDeviceRegistration,
-    current_pass=Annotated[dict, Depends(apple_auth_pass)],
+    current_pass: Annotated[dict, Depends(apple_auth_pass)],
 ):
     async with DB.transaction():
         # upsert device
@@ -67,7 +67,7 @@ async def unregister_pass(
     device_library_identifier: str,
     pass_type_identifier: str,
     serial_number: str,
-    current_pass=Annotated[dict, Depends(apple_auth_pass)],
+    current_pass: Annotated[dict, Depends(apple_auth_pass)],
 ):
     if await APPass.exists().where(APPass.serial_number == serial_number):
         async with DB.transaction():
@@ -100,7 +100,7 @@ async def get_list_of_updateable_passes_to_device(
 async def get_updated_pass(
     pass_type_identifier: str,
     serial_number: str,
-    current_pass=Annotated[dict, Depends(apple_auth_pass)],
+    current_pass: Annotated[dict, Depends(apple_auth_pass)],
 ):
     user = await User.select().where(User.id == current_pass["user_id"]).first()
     if not user:
