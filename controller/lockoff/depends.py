@@ -21,7 +21,6 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 
 async def apple_auth_pass(
-    self,
     request: Request,
 ) -> dict:
     authorization = request.headers.get("Authorization")
