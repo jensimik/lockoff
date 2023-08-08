@@ -49,6 +49,7 @@ async def register_device(
                 APReg(
                     device_library_identifier=device_library_identifier,
                     serial_number=serial_number,
+                    update_tag="V0",
                 )
             )
 
@@ -76,14 +77,14 @@ async def unregister_pass(
 async def get_list_of_updateable_passes_to_device(
     device_library_identifier: str,
     pass_type_identifier: str,
-    passesUpdatedSince: int = 0,
+    passesUpdatedSince: str = "V0",
 ):
     serial_numbers = (
         await APReg.select(APReg.serial_number)
         .output(as_list=True)
         .where(
             APReg.device_library_identifier == device_library_identifier,
-            APReg.update_tag > passesUpdatedSince,
+            APReg.update_tag != passesUpdatedSince,
         )
     )
     if not serial_numbers:
