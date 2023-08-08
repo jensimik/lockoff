@@ -64,7 +64,8 @@ class AppleNotifier:
                 f"/3/device/{device_library_identifier}", json={}
             )
             log.info(response.status_code)
-            log.info(await response.json())
+            log.info(response.json())
+            log.info(response.text)
         except httpx.RequestError as ex:
             log.exception(f"failed in notify update with {ex}")
         log.info(f"notify_update status code: {response.status_code}")
