@@ -26,7 +26,7 @@ async def apple_auth_pass(
     authorization = request.headers.get("Authorization")
     scheme, auth_token = get_authorization_scheme_param(authorization)
     scheme = scheme.lower()
-    if not authorization or scheme in [
+    if not authorization or scheme not in [
         "applepass",
         "attidopass",
         "androidpass",
