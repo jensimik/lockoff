@@ -33,7 +33,7 @@ async def me(
     )
 
 
-@router.get("testing123")
+@router.get("/testing123")
 async def testing123():
     from ..card.apple_pass import AppleNotifier
     from ..db import APPass, APDevice
