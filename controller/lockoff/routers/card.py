@@ -115,7 +115,7 @@ async def get_pkpass(
         .where(APPass.id == serial)
         .first()
     ):
-        update_auth_token = current_pass["update_auth_token"]
+        update_auth_token = current_pass["auth_token"]
     # generate the apple pass
     pkpass_file = ApplePass.create(
         serial=serial,
