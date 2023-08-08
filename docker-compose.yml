@@ -42,8 +42,8 @@ services:
     volumes:
       - $PWD/lockoff.db3:/db/lockoff.db3
     environment:
-      - prod=1
       - tz=Europe/Copenhagen
+      - db_file=/db/lockoff.db3
       - klubmodul_base_url=${KLUBMODUL_BASE_URL}
       - klubmodul_username=${KLUBMODUL_USERNAME}
       - klubmodul_password=${KLUBMODUL_PASSWORD}
@@ -52,6 +52,7 @@ services:
       - redis_url=${REDIS_URL}
       - jwt_secret=${JWT_SECRET}
       - secret=${SECRET}
+      - dl_secret=${DL_SECRET}
       - key=${KEY}
       - certificate=${CERTIFICATE}
       - certificate_password=${CERTIFICATE_PASSWORD}
@@ -59,6 +60,9 @@ services:
       - GPIOZERO_PIN_FACTORY=native
       - admin_user_ids=${ADMIN_USER_IDS}
       - hash_salt=${HASH_SALT}
+      - apn_auth_key=${APN_AUTH_KEY}
+      - apn_key_id=${APN_KEY_ID}
+      - walletpass_token=${WALLETPASS_TOKEN}
     group_add:
       - dialout
     devices:

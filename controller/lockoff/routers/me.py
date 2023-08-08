@@ -31,3 +31,17 @@ async def me(
             for user in users
         ],
     )
+
+
+@router.get("/testing123")
+async def testing123():
+    from ..card.apple_pass import AppleNotifier
+    from ..db import APPass, APDevice
+
+    for d in await APDevice.select():
+        print(d)
+        async with AppleNotifier() as an:
+            await an.notify_update(
+                device_library_identifier=d["device_library_identifier"]
+            )
+    return {"status": "ok"}

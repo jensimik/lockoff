@@ -5,6 +5,15 @@ from pydantic import BaseModel, Field, constr
 username_type = Literal["mobile", "email"]
 
 
+class AppleDeviceRegistration(BaseModel):
+    pushToken: str
+    pushServiceUrl: Optional[str] = ""
+
+
+class AppleLog(BaseModel):
+    logs: list[str] = []
+
+
 class TokenCheckInput(BaseModel):
     token: str
 

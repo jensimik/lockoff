@@ -1,4 +1,5 @@
 import io
+import secrets
 from datetime import datetime
 from typing import Annotated
 
@@ -13,7 +14,7 @@ from ..access_token import (
 )
 from ..card import ApplePass, generate_pdf, generate_png
 from ..config import settings
-from ..db import DB, User
+from ..db import DB, APPass, User
 
 router = APIRouter(tags=["card"])
 
@@ -63,6 +64,7 @@ async def get_card_pdf(
         token_media=TokenMedia.PRINT,
     )
     pdf_file = generate_pdf(
+        user_id=user["id"],
         name=user["name"],
         level=f"{TokenType(user['token_type']).name.capitalize()} {settings.current_season}",
         qr_code_data=access_token.decode(),
@@ -105,18 +107,34 @@ async def get_pkpass(
     expires_display = datetime.utcnow() + relativedelta(
         day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
     )
+    serial = f"{settings.current_season}{user_id}"
+    # check if already issued? - then use the same auth_token
+    update_auth_token = secrets.token_hex(64)
+    if (
+        current_pass := await APPass.select(APPass.auth_token)
+        .where(APPass.id == serial)
+        .first()
+    ):
+        update_auth_token = current_pass["auth_token"]
+    # generate the apple pass
     pkpass_file = ApplePass.create(
-        user_id=user_id,
+        serial=serial,
         name=user["name"],
         level=TokenType(user["token_type"]).name.capitalize(),
         expires=expires_display,
         qr_code_data=access_token.decode(),
+        update_auth_token=update_auth_token,
     )
-    # mark that the user have downloaded pkpass/digital for this season
     async with DB.transaction():
+        # mark that the user have downloaded pkpass/digital for this season
         await User.update({User.season_digital: str(settings.current_season)}).where(
             User.id == user_id
         )
+        # create a tracked appass
+        await APPass.insert(
+            APPass(id=serial, auth_token=update_auth_token, user_id=user_id)
+        ).on_conflict(target=APPass.id, action="DO NOTHING")
+
     return Response(
         content=pkpass_file.getvalue(),
         media_type="application/vnd.apple.pkpass",

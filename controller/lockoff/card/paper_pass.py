@@ -19,7 +19,7 @@ def generate_png(qr_code_data: str) -> Image:
     return img
 
 
-def generate_pdf(name: str, level: str, qr_code_data: str):
+def generate_pdf(user_id: int, name: str, level: str, qr_code_data: str):
     pdf_file = io.BytesIO()
     # generate qr code
     img = generate_png(qr_code_data=qr_code_data)

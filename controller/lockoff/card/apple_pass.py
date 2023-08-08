@@ -3,12 +3,17 @@ import io
 import json
 import logging
 import pathlib
+import time
+import typing
 import zipfile
 from datetime import datetime
+from types import TracebackType
 
+import httpx
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.serialization import pkcs7
+from jose import jwt
 
 from ..config import settings
 
@@ -20,6 +25,88 @@ def _read_file_bytes(path):
     with open(path, "rb") as f:
         data = f.read()
     return data
+
+
+U = typing.TypeVar("U", bound="AppleNotifier")
+
+
+class AppleNotifier:
+    def __init__(self):
+        log.info(settings.key)
+        log.info(settings.apn_auth_key)
+        self._auth_key = serialization.load_pem_private_key(
+            settings.apn_auth_key, password=None
+        )
+
+    async def __aenter__(self: U) -> U:
+        iat = int(time.time())
+        ALG = "ES256"
+        token = jwt.encode(
+            {"iss": settings.apple_pass_team_identifier, "iat": iat},
+            self._auth_key,
+            algorithm=ALG,
+            headers={"alg": ALG, "kid": settings.apn_key_id},
+        )
+        limits = httpx.Limits(max_connections=1, max_keepalive_connections=0)
+        self.client = httpx.AsyncClient(
+            base_url="https://api.push.apple.com:443",
+            http2=True,
+            timeout=10.0,
+            limits=limits,
+            headers={
+                "Authorization": f"bearer {token}",
+                "Content-Type": "application/json",
+            },
+        )
+        return self
+
+    async def notify_update(self, device_library_identifier: str) -> bool:
+        try:
+            response = self.client.post(
+                f"/3/device/{device_library_identifier}", json={}
+            )
+            log.info(response.status_code)
+            log.info(await response.json())
+        except httpx.RequestError as ex:
+            log.exception(f"failed in notify update with {ex}")
+        log.info(f"notify_update status code: {response.status_code}")
+
+    async def notify_update_passwallet(self, identifiers: list[str]) -> bool:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.post(
+                "http://push.passwallet.net/v1/pushUpdates",
+                json={
+                    "passTypeID": settings.apple_pass_pass_type_identifier,
+                    "pushTokens": identifiers,
+                },
+            )
+            return response.status_code == 200
+
+    async def notify_update_wallet_pass(self, identifiers: list[str]):
+        headers = {"Authorization": settings.walletpass_token}
+        async with httpx.AsyncClient(timeout=10.0, headers=headers) as client:
+            response = await client.post(
+                "https://walletpasses.appspot.com/api/v1/push",
+                json={
+                    "passTypeIdentifier": settings.apple_pass_pass_type_identifier,
+                    "pushTokens": identifiers,
+                },
+            )
+            return response.status_code == 200
+
+    async def notify_badge(serial: str, message: str) -> bool:
+        pass
+
+    async def aclose(self) -> None:
+        await self.client.aclose()
+
+    async def __aexit__(
+        self,
+        exc_type: typing.Optional[typing.Type[BaseException]] = None,
+        exc_value: typing.Optional[BaseException] = None,
+        traceback: typing.Optional[TracebackType] = None,
+    ) -> None:
+        await self.aclose()
 
 
 class ApplePass:
@@ -39,25 +126,28 @@ class ApplePass:
     @classmethod
     def create(
         self,
-        user_id: int,
+        serial: str,
         name: str,
         level: str,
         expires: datetime,
         qr_code_data: str,
+        update_auth_token: str,
     ):
         zip_file = io.BytesIO()
         pass_json = json.dumps(
             {
-                "logoText": "Nørrebro klatreklub",
-                "organizationName": "Jens Davidsen",
-                "passTypeIdentifier": "pass.dk.nkk.lockoff",
-                "serialNumber": f"{settings.current_season}{user_id}",
+                "logoText": settings.apple_pass_logo_text,
+                "organizationName": settings.apple_pass_organization_name,
+                "passTypeIdentifier": settings.apple_pass_pass_type_identifier,
+                "serialNumber": serial,
                 "suppressStripShine": False,
-                "teamIdentifier": "LLFSXFW7XK",
-                "description": "Nørrebro klatreklub",
+                "teamIdentifier": settings.apple_pass_team_identifier,
+                "description": settings.apple_pass_description,
                 "expirationDate": f"{expires:%Y-%m-%d}T{expires:%H:%M:%S}Z",
                 "sharingProhibited": True,
                 "formatVersion": 1,
+                "webServiceURL": settings.apple_pass_web_service_url,
+                "authenticationToken": update_auth_token,
                 "barcodes": [
                     {
                         "format": "PKBarcodeFormatQR",
@@ -68,18 +158,18 @@ class ApplePass:
                 "locations": [
                     {
                         "altitude": 0.0,
-                        "latitude": 55.69942723771949,
-                        "longitude": 12.543439832016006,
-                        "relevantText": "lets climb! 🐒",
+                        "latitude": settings.apple_pass_latitude,
+                        "longitude": settings.apple_pass_longitude,
+                        "relevantText": settings.apple_pass_relevant_text,
                     }
                 ],
                 "maxDistance": 20,
                 "beacons": [
                     {
-                        "proximityUUID": "812366E1-4479-404B-B4A1-110FBBA9F625",
+                        "proximityUUID": settings.apple_pass_proximity_uuid,
                         "major": 0,
                         "minor": 0,
-                        "relevantText": "lets climb! 🐒",
+                        "relevantText": settings.apple_pass_relevant_text,
                     }
                 ],
                 "generic": {
@@ -150,13 +240,3 @@ class ApplePass:
             for filename, filedata in self.FILES.items():
                 zf.writestr(filename, filedata)
         return zip_file
-
-
-# if __name__ == "__main__":
-#     pkpass = ApplePass.create(
-#         user_id=100,
-#         name="Test Testersen",
-#         level="Normal",
-#         expires=datetime(2024, 1, 1, 12, 0, 0),
-#         barcode_data="test1234",
-#     )

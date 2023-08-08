@@ -9,7 +9,8 @@ from .config import settings
 from .klubmodul import klubmodul_runner
 from .misc import GFXDisplay, watchdog
 from .reader import Reader
-from .db import User, Dayticket, AccessLog
+from .db import User, Dayticket, AccessLog, APDevice, APPass, APReg
+from piccolo.table import create_db_tables
 
 
 @asynccontextmanager
@@ -17,9 +18,9 @@ async def lifespan(app: FastAPI):
     _redis = redis.from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
     await FastAPILimiter.init(_redis)
     # init db and create tables if not exists
-    await User.create_table(if_not_exists=True)
-    await Dayticket.create_table(if_not_exists=True)
-    await AccessLog.create_table(if_not_exists=True)
+    await create_db_tables(
+        User, Dayticket, AccessLog, APReg, APDevice, APPass, if_not_exists=True
+    )
     # start display
     display = GFXDisplay()
     await display.setup()
