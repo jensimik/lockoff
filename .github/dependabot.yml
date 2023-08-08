@@ -10,7 +10,7 @@ updates:
           - "*"
         exclude-patterns:
           - "starlettte"
-    ignores:
+    ignore:
       - dependency-name: "cryptography"
   - package-ecosystem: "npm"
     directory: "/frontend"
