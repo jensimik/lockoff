@@ -33,7 +33,7 @@ async def register_device(
             APDevice(
                 id=device_library_identifier,
                 auth_token=current_pass["auth_token"],
-                push_token=reg.push_token,
+                push_token=reg.pushToken,
             )
         ).on_conflict(
             target=APDevice.id,

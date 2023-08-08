@@ -6,7 +6,7 @@ username_type = Literal["mobile", "email"]
 
 
 class AppleDeviceRegistration(BaseModel):
-    push_token: str
+    pushToken: str
 
 
 class AppleLog(BaseModel):
