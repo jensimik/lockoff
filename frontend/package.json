@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "maska": "^2.1.9",
     "picnic": "^7.1.0",
     "vue": "^3.3.4",
     "vue-qrcode-reader": "^5.1.0",
