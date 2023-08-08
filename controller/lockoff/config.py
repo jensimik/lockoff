@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     apple_pass_longitude: float = 12.543439832016006
     apple_pass_relevant_text: str = "lets climb! 🐒"
     apple_pass_proximity_uuid: str = "812366E1-4479-404B-B4A1-110FBBA9F625"
-    apple_pass_web_service_url: str = "https://lockoff.nkk.dk/apple-pass/"
+    apple_pass_web_service_url: str = "https://lockoff-api.gnerd.dk/apple-pass/"
     hash_salt: str = "changeme"
     nonce_size: int = 4
     digest_size: int = 10
