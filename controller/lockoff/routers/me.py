@@ -38,7 +38,7 @@ async def testing123():
     from ..card.apple_pass import AppleNotifier
     from ..db import APPass, APDevice
 
-    async for d in APDevice.select():
+    for d in await APDevice.select():
         print(d)
         async with AppleNotifier() as an:
             await an.notify_update(
