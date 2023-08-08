@@ -67,6 +67,29 @@ class AppleNotifier:
             log.exception(f"failed in notify update with {ex}")
         log.info(f"notify_update status code: {response.status_code}")
 
+    async def notify_update_passwallet(self, identifiers: list[str]) -> bool:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.post(
+                "http://push.passwallet.net/v1/pushUpdates",
+                json={
+                    "passTypeID": settings.apple_pass_pass_type_identifier,
+                    "pushTokens": identifiers,
+                },
+            )
+            return response.status_code == 200
+
+    async def notify_update_wallet_pass(self, identifiers: list[str]):
+        headers = {"Authorization": settings.walletpass_token}
+        async with httpx.AsyncClient(timeout=10.0, headers=headers) as client:
+            response = await client.post(
+                "https://walletpasses.appspot.com/api/v1/push",
+                json={
+                    "passTypeIdentifier": settings.apple_pass_pass_type_identifier,
+                    "pushTokens": identifiers,
+                },
+            )
+            return response.status_code == 200
+
     async def notify_badge(serial: str, message: str) -> bool:
         pass
 
@@ -79,7 +102,7 @@ class AppleNotifier:
         exc_value: typing.Optional[BaseException] = None,
         traceback: typing.Optional[TracebackType] = None,
     ) -> None:
-        await self.client.aclose()
+        await self.aclose()
 
 
 class ApplePass:
