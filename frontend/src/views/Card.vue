@@ -57,14 +57,13 @@ export default {
           <div class="flex two">
             <div>
               <h4>WalletPass</h4>
-              <a target="_blank" href='https://play.google.com/store/apps/details?id=io.walletpasses.android'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+              <a target="_blank" :href="'https://walletpass.io?u=' + encodeURIComponent(baseURL + '/' + user.token + '/membership-card.pkpass')"><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
             </div>
             <div>
               <h4>PassWallet</h4>
-              <a target="_blank" href='https://play.google.com/store/apps/details?id=com.attidomobile.passwallet'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+              <a target="_blank" :href="'https://passwallet.page.link/?apn=com.attidomobile.passwallet&link=' + encodeURIComponent(baseURL + '/' + user.token + '/membership-card.pkpass')"><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
             </div>
           </div>
-          <p>be sure to <a target="_blank" href="https://support.passcreator.com/space/KB/22347871/Location+based+notifications+-+troubleshooting#Location-based-notifications-on-Android">enable geo and ibeacon in the app</a></p>
         </div>
     </div>
 </template>
