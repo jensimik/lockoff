@@ -97,7 +97,9 @@ async def get_list_of_updateable_passes_to_device(
         query = query.where(APPass.update_tag > passesUpdatedSince)
     data = await query
     log.info(data)
-    last_updated = sorted([d["update_tag"] for d in data], reverse=True)[0]
+    last_updated = sorted([d["serial_number.update_tag"] for d in data], reverse=True)[
+        0
+    ]
     serial_numbers = [d["serial_number"] for d in data]
     if not serial_numbers:
         raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
