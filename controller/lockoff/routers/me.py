@@ -39,7 +39,7 @@ async def testing123():
     from ..db import APPass, APDevice, APReg
 
     async with AppleNotifier() as an:
-        for p in APPass.select(
+        for p in await APPass.select(
             APPass.id,
             APPass.id.join_on(APReg.serial_number)
             .device_library_identifier.join_on(APDevice.id)
