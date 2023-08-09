@@ -49,6 +49,6 @@ async def testing123():
         ):
             log.info(p)
             await an.notify_update(
-                push_token=p["serial_number.device_library_identifier.push_token"]
+                push_token=p["id.device_library_identifier.push_token"]
             )
     return {"status": "ok"}
