@@ -48,5 +48,9 @@ async def testing123():
             .push_token.as_alias("push_token"),
         ):
             log.info(p)
+            # increment version
+            await APPass.update({APPass.update_tag: APPass.update_tag + 1}).where(
+                APPass.id == p["id"]
+            )
             await an.notify_update(push_token=p["push_token"])
     return {"status": "ok"}
