@@ -129,7 +129,7 @@ async def get_updated_pass(
         level=TokenType(user["token_type"]).name.capitalize(),
         expires=expires_display,
         qr_code_data=access_token.decode(),
-        update_auth_token=current_pass["update_auth_token"],
+        update_auth_token=current_pass["auth_token"],
     )
     return Response(
         content=pkpass_file.getvalue(),
