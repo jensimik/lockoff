@@ -75,7 +75,7 @@ class AppleNotifier:
             log.info(response.status_code)
             log.info(response.json())
             log.info(response.text)
-            log.info(response.request.headers)
+            # log.info(response.request.headers)
         except httpx.RequestError as ex:
             log.exception(f"failed in notify update with {ex}")
         log.info(f"notify_update status code: {response.status_code}")
