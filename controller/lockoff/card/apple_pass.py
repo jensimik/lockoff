@@ -6,6 +6,7 @@ import pathlib
 import time
 import typing
 import zipfile
+import uuid
 from datetime import datetime
 from types import TracebackType
 
@@ -32,8 +33,6 @@ U = typing.TypeVar("U", bound="AppleNotifier")
 
 class AppleNotifier:
     def __init__(self):
-        log.info(settings.key)
-        log.info(settings.apn_auth_key)
         self._auth_key = serialization.load_pem_private_key(
             settings.apn_auth_key, password=None
         )
@@ -55,18 +54,47 @@ class AppleNotifier:
             limits=limits,
             headers={
                 "Authorization": f"bearer {token}",
-                "Content-Type": "application/json",
+                "Content-Type": "application/json; charset=utf-8",
             },
         )
         return self
 
-    async def notify_update(self, device_library_identifier: str) -> bool:
+    async def notify_update(self, push_token: str) -> bool:
         try:
-            response = self.client.post(
-                f"/3/device/{device_library_identifier}", json={}
+            headers = {
+                "apns-topic": settings.apple_pass_pass_type_identifier,
+                # "apns-id": uuid.uuid4().hex,
+                # "apns-expiration": "{}".format(int(time.time()) + 3600),
+                # "apns-push-type": "background",
+            }
+            response = await self.client.post(
+                f"/3/device/{push_token}", headers=headers, json={}
             )
             log.info(response.status_code)
-            log.info(await response.json())
+            if response.status_code != 200:
+                log.info(response.json())
+                log.info(response.text)
+        except httpx.RequestError as ex:
+            log.exception(f"failed in notify update with {ex}")
+        log.info(f"notify_update status code: {response.status_code}")
+
+    async def notify_alert(
+        self, device_library_identifier: str, push_token: str
+    ) -> bool:
+        try:
+            headers = {
+                "apns-topic": settings.apple_pass_pass_type_identifier,
+                "apns-id": uuid.uuid4().hex,
+                "apns-expiration": "{}".format(int(time.time()) + 3600),
+                "apns-push-type": "alert",
+            }
+            response = await self.client.post(
+                f"/3/device/{push_token}", headers=headers, json={"aps": "hej med dig"}
+            )
+            log.info(response.status_code)
+            if response.status_code != 200:
+                log.info(response.json())
+                log.info(response.text)
         except httpx.RequestError as ex:
             log.exception(f"failed in notify update with {ex}")
         log.info(f"notify_update status code: {response.status_code}")

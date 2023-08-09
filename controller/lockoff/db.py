@@ -2,6 +2,7 @@ from piccolo import columns
 from piccolo.engine import SQLiteEngine
 from piccolo.query import Min, Max  # noqa: F401
 from piccolo.query.methods.select import Count  # noqa: F401
+from piccolo.query import WhereRaw  # noqa: F401
 from piccolo.table import Table
 from piccolo.utils.pydantic import create_pydantic_model
 
@@ -49,12 +50,12 @@ class APPass(Table, tablename="ap_pass", db=DB):
     id = columns.Varchar(primary_key=True)
     user_id = columns.Integer()
     auth_token = columns.Varchar()
+    update_tag = columns.Integer(default=0)
 
 
 class APReg(Table, tablename="ap_reg", db=DB):
     device_library_identifier = columns.Varchar()
     serial_number = columns.Varchar()
-    update_tag = columns.Varchar(length=25)
 
 
 DayticketModel = create_pydantic_model(Dayticket)
