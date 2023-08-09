@@ -6,6 +6,7 @@ import pathlib
 import time
 import typing
 import zipfile
+import uuid
 from datetime import datetime
 from types import TracebackType
 
@@ -62,7 +63,12 @@ class AppleNotifier:
         self, device_library_identifier: str, push_token: str
     ) -> bool:
         try:
-            headers = {"apns-topic": settings.apple_pass_pass_type_identifier}
+            headers = {
+                "apns-topic": settings.apple_pass_pass_type_identifier,
+                "apns-id": uuid.uuid4().hex,
+                "apns-expiration": int(time.time()) + 3600,
+                "apns-push-type": "background",
+            }
             response = await self.client.post(
                 f"/3/device/{device_library_identifier}", json={"aps": ""}
             )
