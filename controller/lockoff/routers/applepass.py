@@ -10,7 +10,7 @@ from .. import schemas
 from ..access_token import TokenMedia, TokenType, generate_access_token
 from ..card import ApplePass
 from ..config import settings
-from ..db import DB, APDevice, APPass, APReg, User
+from ..db import DB, APDevice, APPass, APReg, User, WhereRaw
 from ..depends import apple_auth_pass
 
 router = APIRouter(prefix="/v1", tags=["applepass"])
@@ -95,7 +95,7 @@ async def get_list_of_updateable_passes_to_device(
         APReg.serial_number.join_on(APPass.id).update_tag.as_alias("update_tag"),
     ).where(APReg.device_library_identifier == device_library_identifier)
     if passesUpdatedSince:
-        query = query.where(APPass.update_tag > passesUpdatedSince)
+        query = query.where(WhereRaw("update_tag > {}", passesUpdatedSince))
     data = await query
     log.info(data)
     last_updated = sorted([d["update_tag"] for d in data], reverse=True)[0]

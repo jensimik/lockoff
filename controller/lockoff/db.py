@@ -2,6 +2,7 @@ from piccolo import columns
 from piccolo.engine import SQLiteEngine
 from piccolo.query import Min, Max  # noqa: F401
 from piccolo.query.methods.select import Count  # noqa: F401
+from piccolo.query import WhereRaw  # noqa: F401
 from piccolo.table import Table
 from piccolo.utils.pydantic import create_pydantic_model
 
