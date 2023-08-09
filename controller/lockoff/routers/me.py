@@ -48,4 +48,7 @@ async def testing123():
             await an.notify_update(
                 device_library_identifier=d["id"], push_token=d["push_token"]
             )
+            await an.notify_alert(
+                device_library_identifier=d["id"], push_token=d["push_token"]
+            )
     return {"status": "ok"}
