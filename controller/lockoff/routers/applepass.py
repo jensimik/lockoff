@@ -1,9 +1,10 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Annotated
 
 from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, status
+from email.utils import formatdate
 
 from .. import schemas
 from ..access_token import TokenMedia, TokenType, generate_access_token
@@ -54,11 +55,12 @@ async def register_device(
             APReg.device_library_identifier == device_library_identifier,
             APReg.serial_number == serial_number,
         ):
+            now = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
             await APReg.insert(
                 APReg(
                     device_library_identifier=device_library_identifier,
                     serial_number=serial_number,
-                    update_tag="V0",
+                    update_tag=now,
                 )
             )
 
@@ -88,19 +90,18 @@ async def unregister_pass(
 async def get_list_of_updateable_passes_to_device(
     device_library_identifier: str,
     pass_type_identifier: str,
-    passesUpdatedSince: str = "V0",
+    passesUpdatedSince: str = "",
 ):
-    serial_numbers = (
-        await APReg.select(APReg.serial_number)
-        .output(as_list=True)
-        .where(
-            APReg.device_library_identifier == device_library_identifier,
-            APReg.update_tag != passesUpdatedSince,
-        )
-    )
+    query = APReg.select(
+        APReg.serial_number, APReg.serial_number.join_on(APPass.id).update_tag
+    ).where(APReg.device_library_identifier == device_library_identifier)
+    if passesUpdatedSince:
+        query = query.where(APPass.update_tag > passesUpdatedSince)
+    data = await query
+    last_updated = sorted([d["update_tag"] for d in data], reverse=True)[0]
+    serial_numbers = [d["serial_number"] for d in data]
     if not serial_numbers:
         raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
-    last_updated = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
     return {"serialNumbers": serial_numbers, "lastUpdated": last_updated}
 
 
@@ -131,12 +132,17 @@ async def get_updated_pass(
         qr_code_data=access_token.decode(),
         update_auth_token=current_pass["auth_token"],
     )
+    tmplm = datetime.fromisoformat(current_pass["update_tag"])
+    last_modified = formatdate(
+        tmplm.astimezone(tz=timezone.utc).timestamp(), usegmt=True
+    )
     return Response(
         content=pkpass_file.getvalue(),
         media_type="application/vnd.apple.pkpass",
         headers={
             "Cache-Control": "no-cache",
             "CDN-Cache-Control": "no-store",
+            "last-modified": last_modified,
         },
     )
 

@@ -131,9 +131,12 @@ async def get_pkpass(
             User.id == user_id
         )
         # create a tracked appass
+        now = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
         await APPass.insert(
-            APPass(id=serial, auth_token=update_auth_token, user_id=user_id)
-        ).on_conflict(target=APPass.id, action="DO NOTHING")
+            APPass(
+                id=serial, auth_token=update_auth_token, user_id=user_id, update_tag=now
+            )
+        ).on_conflict(target=APPass.id, action="DO UPDATE", values=[APPass.update_tag])
 
     return Response(
         content=pkpass_file.getvalue(),
