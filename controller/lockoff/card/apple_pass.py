@@ -73,9 +73,9 @@ class AppleNotifier:
                 f"/3/device/{push_token}", headers=headers, json={}
             )
             log.info(response.status_code)
-            log.info(response.json())
-            log.info(response.text)
-            # log.info(response.request.headers)
+            if response.status_code != 200:
+                log.info(response.json())
+                log.info(response.text)
         except httpx.RequestError as ex:
             log.exception(f"failed in notify update with {ex}")
         log.info(f"notify_update status code: {response.status_code}")
