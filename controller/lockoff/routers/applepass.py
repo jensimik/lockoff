@@ -95,10 +95,8 @@ async def get_list_of_updateable_passes_to_device(
         APReg.serial_number.join_on(APPass.id).update_tag.as_alias("update_tag"),
     ).where(APReg.device_library_identifier == device_library_identifier)
     if passesUpdatedSince:
-        log.info("doing passesupdatesince query")
         query = query.where(WhereRaw("update_tag > {}", passesUpdatedSince))
     data = await query
-    log.info(data)
     last_updated = sorted([d["update_tag"] for d in data], reverse=True)[0]
     serial_numbers = [d["serial_number"] for d in data]
     if not serial_numbers:

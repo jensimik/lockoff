@@ -50,7 +50,7 @@ class APPass(Table, tablename="ap_pass", db=DB):
     id = columns.Varchar(primary_key=True)
     user_id = columns.Integer()
     auth_token = columns.Varchar()
-    update_tag = columns.Varchar(length=25)
+    update_tag = columns.Integer(default=0)
 
 
 class APReg(Table, tablename="ap_reg", db=DB):
