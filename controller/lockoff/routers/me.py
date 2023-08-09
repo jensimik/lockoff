@@ -45,10 +45,8 @@ async def testing123():
             APPass.id,
             APPass.id.join_on(APReg.serial_number)
             .device_library_identifier.join_on(APDevice.id)
-            .push_token,
+            .push_token.as_alias("push_token"),
         ):
             log.info(p)
-            await an.notify_update(
-                push_token=p["id.device_library_identifier.push_token"]
-            )
+            await an.notify_update(push_token=p["push_token"])
     return {"status": "ok"}
