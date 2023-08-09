@@ -69,7 +69,9 @@ class AppleNotifier:
                 "apns-expiration": int(time.time()) + 3600,
                 "apns-push-type": "background",
             }
-            response = await self.client.post(f"/3/device/{push_token}", json={})
+            response = await self.client.post(
+                f"/3/device/{push_token}", headers=headers, json={}
+            )
             log.info(response.status_code)
             log.info(response.json())
             log.info(response.text)
