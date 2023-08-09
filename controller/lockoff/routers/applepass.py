@@ -131,10 +131,7 @@ async def get_updated_pass(
         qr_code_data=access_token.decode(),
         update_auth_token=current_pass["auth_token"],
     )
-    tmplm = datetime.fromisoformat(current_pass["update_tag"])
-    last_modified = formatdate(
-        tmplm.astimezone(tz=timezone.utc).timestamp(), usegmt=True
-    )
+    last_modified = formatdate(datetime.utcnow().timestamp(), usegmt=True)
     return Response(
         content=pkpass_file.getvalue(),
         media_type="application/vnd.apple.pkpass",
