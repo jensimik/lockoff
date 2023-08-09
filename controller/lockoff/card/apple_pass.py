@@ -66,7 +66,7 @@ class AppleNotifier:
             headers = {
                 "apns-topic": settings.apple_pass_pass_type_identifier,
                 "apns-id": uuid.uuid4().hex,
-                "apns-expiration": int(time.time()) + 3600,
+                "apns-expiration": "{}".format(int(time.time()) + 3600),
                 "apns-push-type": "background",
             }
             response = await self.client.post(
