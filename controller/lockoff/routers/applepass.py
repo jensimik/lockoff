@@ -78,8 +78,8 @@ async def unregister_pass(
             APReg.serial_number == serial_number,
             APReg.device_library_identifier == device_library_identifier,
         )
-        if not APReg.exists().where(APReg.serial_number == serial_number):
-            APPass.delete().where(APPass.serial_number == serial_number)
+        if not await APReg.exists().where(APReg.serial_number == serial_number):
+            await APPass.delete().where(APPass.id == serial_number)
     return {}
 
 
