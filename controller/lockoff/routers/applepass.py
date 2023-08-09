@@ -88,20 +88,20 @@ async def unregister_pass(
 async def get_list_of_updateable_passes_to_device(
     device_library_identifier: str,
     pass_type_identifier: str,
-    passesUpdatedSince: str = "",
+    passesUpdatedSince: int = None,
 ):
     query = APReg.select(
         APReg.serial_number,
         APReg.serial_number.join_on(APPass.id).update_tag.as_alias("update_tag"),
     ).where(APReg.device_library_identifier == device_library_identifier)
-    if passesUpdatedSince:
+    if passesUpdatedSince is not None:
         query = query.where(WhereRaw("update_tag > {}", passesUpdatedSince))
     data = await query
     last_updated = sorted([d["update_tag"] for d in data], reverse=True)[0]
     serial_numbers = [d["serial_number"] for d in data]
     if not serial_numbers:
         raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
-    return {"serialNumbers": serial_numbers, "lastUpdated": last_updated}
+    return {"serialNumbers": serial_numbers, "lastUpdated": str(last_updated)}
 
 
 # apple wallet get updated pass
