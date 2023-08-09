@@ -38,17 +38,14 @@ async def testing123():
     from ..card.apple_pass import AppleNotifier
     from ..db import APPass, APDevice, APReg
 
-    for d in await APDevice.select():
-        print(d)
-        # update version to trigger redownload
-        await APReg.update({APReg.update_tag: "V1"}).where(
-            APReg.device_library_identifier == d["id"]
-        )
-        async with AppleNotifier() as an:
+    async with AppleNotifier() as an:
+        for p in APPass.select(
+            APPass.id,
+            APPass.id.join_on(APReg.serial_number)
+            .device_library_identifier.join_on(APDevice.id)
+            .push_token,
+        ):
             await an.notify_update(
-                device_library_identifier=d["id"], push_token=d["push_token"]
+                push_token=p["serial_number.device_library_identifier.push_token"]
             )
-            # await an.notify_alert(
-            #     device_library_identifier=d["id"], push_token=d["push_token"]
-            # )
     return {"status": "ok"}

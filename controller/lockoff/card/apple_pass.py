@@ -59,9 +59,7 @@ class AppleNotifier:
         )
         return self
 
-    async def notify_update(
-        self, device_library_identifier: str, push_token: str
-    ) -> bool:
+    async def notify_update(self, str, push_token: str) -> bool:
         try:
             headers = {
                 "apns-topic": settings.apple_pass_pass_type_identifier,
