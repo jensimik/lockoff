@@ -55,12 +55,10 @@ async def register_device(
             APReg.device_library_identifier == device_library_identifier,
             APReg.serial_number == serial_number,
         ):
-            now = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
             await APReg.insert(
                 APReg(
                     device_library_identifier=device_library_identifier,
                     serial_number=serial_number,
-                    update_tag=now,
                 )
             )
 
