@@ -61,11 +61,12 @@ class GooglePass:
         response = await self.client.patch(url, json=patch)
         return response.status_code == 200
 
-    def _generate_class(self):
+    def _generate_generic_class(self):
         new_class = {
             "id": f"{self.issuer_id}.membercard",
             # "callback": {"url": "https://lockoff-api.gnerd.dk/"},
         }
+        return new_class
 
     def _generate_generic_object(
         self, pass_id: str, name: str, level: str, expires: str, qr_code_data: str
