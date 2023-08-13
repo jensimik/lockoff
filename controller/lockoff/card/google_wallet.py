@@ -91,7 +91,7 @@ class GooglePass:
                 },
                 {
                     "header": "Expires",
-                    "body": expires,
+                    "body": f"{expires:%Y-%m-%d}",
                     "id": "TEXT_EXPIRES",
                 },
             ],
