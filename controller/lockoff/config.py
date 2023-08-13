@@ -61,7 +61,7 @@ class Settings(BaseSettings):
     db_file: str = "/tmp/lockoff.db3"
     redis_url: str = "redis://localhost"
     google_service_account: pathlib.Path = pathlib.Path(
-        "/secret/google_service_account_json"
+        "/secret/google-service-account.json"
     )
     google_issuer_id: str = ""
     current_season: int = 2023
