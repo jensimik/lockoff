@@ -143,7 +143,7 @@ class ApplePass:
         "icon.png": _read_file_bytes(module_directory / "logo.png"),
         "icon@2x.png": _read_file_bytes(module_directory / "logo.png"),
     }
-    if settings.apple_key:
+    if settings.apple_pass_key:
         with open(settings.apple_pass_certificate, "rb") as f:
             CERT = x509.load_pem_x509_certificate(f.read())
         with open(settings.apple_pass_key, "rb") as f:
