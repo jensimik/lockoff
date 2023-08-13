@@ -22,7 +22,7 @@ class GoogleAuth(httpx.Auth):
             scopes=["https://www.googleapis.com/auth/wallet_object.issuer"],
         )
         self.credentials._always_use_jwt_access = True
-        self.credentials._create_self_signed_jwt()
+        self.credentials._create_self_signed_jwt(audience=None)
 
     def auth_flow(self, request: httpx.Request):
         if self.credentials.expired:
