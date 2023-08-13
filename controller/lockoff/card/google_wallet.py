@@ -75,68 +75,41 @@ class GooglePass:
             "id": f"{self.issuer_id}.{pass_id}",
             "classId": f"{self.issuer_id}.membercard",
             "state": "ACTIVE",
-            "heroImage": {
-                "sourceUri": {
-                    "uri": "https://farm4.staticflickr.com/3723/11177041115_6e6a3b6f49_o.jpg"
-                },
-                "contentDescription": {
-                    "defaultValue": {
-                        "language": "en-US",
-                        "value": "Hero image description",
-                    }
-                },
+            "genericType": "GENERIC_GYM_MEMBERSHIP",
+            "cardTitle": {
+                "defaultValue": {
+                    "language": "en-US",
+                    "value": settings.apple_pass_logo_text,
+                }
             },
+            "header": {"defaultValue": {"language": "en-US", "value": name}},
             "textModulesData": [
                 {
-                    "header": "Text module header",
-                    "body": "Text module body",
-                    "id": "TEXT_MODULE_ID",
-                }
+                    "header": "Level",
+                    "body": level,
+                    "id": "TEXT_NAME",
+                },
+                {
+                    "header": "Expires",
+                    "body": expires,
+                    "id": "TEXT_EXPIRES",
+                },
             ],
             "linksModuleData": {
                 "uris": [
                     {
-                        "uri": "http://maps.google.com/",
+                        "uri": "https://nkk.klub-modul.dk/default.aspx",
                         "description": "Link module URI description",
-                        "id": "LINK_MODULE_URI_ID",
-                    },
-                    {
-                        "uri": "tel:6505555555",
-                        "description": "Link module tel description",
-                        "id": "LINK_MODULE_TEL_ID",
+                        "id": "LINK_TO_NKK",
                     },
                 ]
             },
-            "imageModulesData": [
-                {
-                    "mainImage": {
-                        "sourceUri": {
-                            "uri": "http://farm4.staticflickr.com/3738/12440799783_3dc3c20606_b.jpg"
-                        },
-                        "contentDescription": {
-                            "defaultValue": {
-                                "language": "en-US",
-                                "value": "Image module description",
-                            }
-                        },
-                    },
-                    "id": "IMAGE_MODULE_ID",
-                }
-            ],
             "barcode": {"type": "QR_CODE", "value": qr_code_data},
-            "cardTitle": {
-                "defaultValue": {"language": "en-US", "value": "Generic card title"}
-            },
-            "header": {
-                "defaultValue": {"language": "en-US", "value": "Generic header"}
-            },
-            "hexBackgroundColor": "#4285f4",
+            "hexBackgroundColor": "#fff",
             "logo": {
-                "sourceUri": {
-                    "uri": "https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg"
-                },
+                "sourceUri": {"uri": "https://lockoff.nkk.dk/apple-touch-icon.png"},
                 "contentDescription": {
-                    "defaultValue": {"language": "en-US", "value": "Generic card logo"}
+                    "defaultValue": {"language": "en-US", "value": "NKK logo"}
                 },
             },
         }
