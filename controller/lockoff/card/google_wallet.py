@@ -40,7 +40,7 @@ class GooglePass:
         self.base_url = "https://walletobjects.googleapis.com/walletobjects/v1"
         self.object_url = "/genericObject"
 
-        auth = GoogleAuth(credentials=self.service_account)
+        auth = GoogleAuth()
 
         self.client = httpx.AsyncClient(
             auth=auth,
