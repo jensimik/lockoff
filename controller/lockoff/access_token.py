@@ -4,7 +4,7 @@ import logging
 import secrets
 import struct
 from datetime import datetime
-from enum import Enum
+from enum import Enum, IntFlag, auto
 
 import base45
 from dateutil.relativedelta import relativedelta
@@ -23,10 +23,12 @@ class TokenType(Enum):
     DAY_TICKET = 3
 
 
-class TokenMedia(Enum):
-    PRINT = 1
-    DIGITAL = 2
-    UNKNOWN = 3
+class TokenMedia(IntFlag):
+    PRINT = auto()
+    DIGITAL = auto()
+    ANDROID = auto()
+    APPLE = auto()
+    UNKNOWN = auto()
 
 
 class TokenError(Exception):

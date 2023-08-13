@@ -59,9 +59,93 @@ class GooglePass:
         return response.status_code == 200
 
     def _generate_class(self):
-        return {}
+        new_class = {
+            "id": f"{self.issuer_id}.membercard",
+            # "callback": {"url": "https://lockoff-api.gnerd.dk/"},
+        }
 
-    def create_pass(self, pass_id: str):
+    def _generate_generic_object(
+        self, pass_id: str, name: str, level: str, expires: str, qr_code_data: str
+    ):
+        new_object = {
+            "id": f"{self.issuer_id}.{pass_id}",
+            "classId": f"{self.issuer_id}.membercard",
+            "state": "ACTIVE",
+            "heroImage": {
+                "sourceUri": {
+                    "uri": "https://farm4.staticflickr.com/3723/11177041115_6e6a3b6f49_o.jpg"
+                },
+                "contentDescription": {
+                    "defaultValue": {
+                        "language": "en-US",
+                        "value": "Hero image description",
+                    }
+                },
+            },
+            "textModulesData": [
+                {
+                    "header": "Text module header",
+                    "body": "Text module body",
+                    "id": "TEXT_MODULE_ID",
+                }
+            ],
+            "linksModuleData": {
+                "uris": [
+                    {
+                        "uri": "http://maps.google.com/",
+                        "description": "Link module URI description",
+                        "id": "LINK_MODULE_URI_ID",
+                    },
+                    {
+                        "uri": "tel:6505555555",
+                        "description": "Link module tel description",
+                        "id": "LINK_MODULE_TEL_ID",
+                    },
+                ]
+            },
+            "imageModulesData": [
+                {
+                    "mainImage": {
+                        "sourceUri": {
+                            "uri": "http://farm4.staticflickr.com/3738/12440799783_3dc3c20606_b.jpg"
+                        },
+                        "contentDescription": {
+                            "defaultValue": {
+                                "language": "en-US",
+                                "value": "Image module description",
+                            }
+                        },
+                    },
+                    "id": "IMAGE_MODULE_ID",
+                }
+            ],
+            "barcode": {"type": "QR_CODE", "value": qr_code_data},
+            "cardTitle": {
+                "defaultValue": {"language": "en-US", "value": "Generic card title"}
+            },
+            "header": {
+                "defaultValue": {"language": "en-US", "value": "Generic header"}
+            },
+            "hexBackgroundColor": "#4285f4",
+            "logo": {
+                "sourceUri": {
+                    "uri": "https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg"
+                },
+                "contentDescription": {
+                    "defaultValue": {"language": "en-US", "value": "Generic card logo"}
+                },
+            },
+        }
+        return new_object
+
+    def create_pass(
+        self,
+        pass_id: str,
+        name: str,
+        level: str,
+        expires: str,
+        qr_code_data: str,
+    ):
         claims = {
             "iss": self.credentials.service_account_email,
             "aud": "google",
@@ -69,7 +153,15 @@ class GooglePass:
             "typ": "savetowallet",
             "payload": {
                 "genericClasses": [self._generate_generic_class()],
-                "genericObjects": [self._generate_generic_object(pass_id=pass_id)],
+                "genericObjects": [
+                    self._generate_generic_object(
+                        pass_id=pass_id,
+                        name=name,
+                        level=level,
+                        expires=expires,
+                        qr_code_data=qr_code_data,
+                    )
+                ],
             },
         }
         token = jwt.encode(self.signer, claims).decode("utf-8")

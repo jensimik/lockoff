@@ -5,6 +5,7 @@ from typing import Annotated
 
 from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi.responses import RedirectResponse
 
 from ..access_token import (
     TokenMedia,
@@ -12,7 +13,7 @@ from ..access_token import (
     generate_access_token,
     verify_dl_member_token,
 )
-from ..card import ApplePass, generate_pdf, generate_png
+from ..card import ApplePass, GooglePass, generate_pdf, generate_png
 from ..config import settings
 from ..db import DB, APPass, User
 
@@ -102,7 +103,7 @@ async def get_pkpass(
     access_token = generate_access_token(
         user_id=user["id"],
         token_type=TokenType(user["token_type"]),
-        token_media=TokenMedia.DIGITAL,
+        token_media=TokenMedia.DIGITAL | TokenMedia.APPLE,
     )
     expires_display = datetime.utcnow() + relativedelta(
         day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
@@ -145,4 +146,47 @@ async def get_pkpass(
             "Cache-Control": "no-cache",
             "CDN-Cache-Control": "no-store",
         },
+    )
+
+
+# digital google wallet pass (jwt)
+@router.get(
+    "/{token}/membership-card",
+    response_class=Response,
+)
+async def get_google_wallet(
+    user_id: Annotated[int, Depends(verify_dl_member_token)],
+):
+    user = await User.select().where(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    access_token = generate_access_token(
+        user_id=user["id"],
+        token_type=TokenType(user["token_type"]),
+        token_media=TokenMedia.DIGITAL | TokenMedia.ANDROID,
+    )
+    expires_display = datetime.utcnow() + relativedelta(
+        day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
+    )
+    serial = f"{settings.current_season}{user_id}"
+    async with GooglePass() as gp:
+        jwt_url = gp.create_pass(
+            pass_id=serial,
+            name=user["name"],
+            level=TokenType(user["token_type"]).name.capitalize(),
+            expires=expires_display,
+            qr_code_data=access_token.decode(),
+        )
+    async with DB.transaction():
+        # mark that the user have downloaded digital for this season
+        await User.update({User.season_digital: str(settings.current_season)}).where(
+            User.id == user_id
+        )
+        # create a tracked appass
+        await APPass.insert(
+            APPass(id=serial, auth_token="", user_id=user_id, update_tag=0)
+        ).on_conflict(target=APPass.id, action="DO UPDATE", values=[APPass.update_tag])
+    return RedirectResponse(
+        url=jwt_url,
+        headers={"Cache-Control": "no-cache", "CDN-Cache-Control": "no-store"},
     )
