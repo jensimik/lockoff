@@ -59,7 +59,7 @@ class GooglePass:
         return response.status_code == 200
 
     def _generate_class(self):
-        pass
+        return {}
 
     def create_pass(self, pass_id: str):
         claims = {
