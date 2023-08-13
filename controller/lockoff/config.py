@@ -1,3 +1,4 @@
+import pathlib
 from typing import Any, Tuple, Type
 
 from dateutil.tz import gettz, tzfile
@@ -58,7 +59,11 @@ class Settings(BaseSettings):
     certificate: bytes = ""
     key: bytes = ""
     certificate_password: bytes = ""
-    wwdr_certificate: bytes = ""
+    wwdr_certificate: pathlib.Path = pathlib.Path("/certs/wwdr.pem")
+    google_service_account: pathlib.Path = pathlib.Path(
+        "/certs/google-service-account.json"
+    )
+    google_issuer_id: str = ""
     current_season: int = 2023
     tz: tzfile = gettz("Europe/Copenhagen")
 
