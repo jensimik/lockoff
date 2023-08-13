@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.8"  
 services:
   watchtower:
     image: containrrr/watchtower
@@ -41,6 +41,12 @@ services:
     restart: always
     volumes:
       - $PWD/lockoff.db3:/db/lockoff.db3
+    secrets:
+      - apple_wwdr_cert
+      - apple_cert
+      - apple_key
+      - apple_apn_auth_key
+      - google_service_account_json
     environment:
       - tz=Europe/Copenhagen
       - db_file=/db/lockoff.db3
@@ -53,14 +59,10 @@ services:
       - jwt_secret=${JWT_SECRET}
       - secret=${SECRET}
       - dl_secret=${DL_SECRET}
-      - key=${KEY}
-      - certificate=${CERTIFICATE}
       - certificate_password=${CERTIFICATE_PASSWORD}
-      - wwdr_certificate=${WWDR_CERTIFICATE}
       - GPIOZERO_PIN_FACTORY=native
       - admin_user_ids=${ADMIN_USER_IDS}
       - hash_salt=${HASH_SALT}
-      - apn_auth_key=${APN_AUTH_KEY}
       - apn_key_id=${APN_KEY_ID}
       - walletpass_token=${WALLETPASS_TOKEN}
       - sentry_dsn=${SENTRY_DSN}
@@ -78,3 +80,14 @@ services:
       timeout: 3s
       start_period: 20s
       retries: 5
+secrets:
+  apple_wwdr_cert:
+    file: $PWD/certs/apple-wwdr.pem
+  apple_cert:
+    file: $PWD/certs/apple-certificate.pem
+  apple_key:
+    file: $PWD/certs/apple-key.encrypted
+  apple_apn_auth_key:
+    file: $PWD/certs/apple-apn-auth-key.pem
+  google_service_account_json:
+    file: $PWD/certs/google-service-account.json

@@ -34,7 +34,7 @@ U = typing.TypeVar("U", bound="AppleNotifier")
 class AppleNotifier:
     def __init__(self):
         self._auth_key = serialization.load_pem_private_key(
-            settings.apn_auth_key, password=None
+            settings.apple_apn_auth_key, password=None
         )
 
     async def __aenter__(self: U) -> U:
@@ -44,7 +44,7 @@ class AppleNotifier:
             {"iss": settings.apple_pass_team_identifier, "iat": iat},
             self._auth_key,
             algorithm=ALG,
-            headers={"alg": ALG, "kid": settings.apn_key_id},
+            headers={"alg": ALG, "kid": settings.apple_apn_key_id},
         )
         limits = httpx.Limits(max_connections=1, max_keepalive_connections=0)
         self.client = httpx.AsyncClient(
@@ -143,12 +143,15 @@ class ApplePass:
         "icon.png": _read_file_bytes(module_directory / "logo.png"),
         "icon@2x.png": _read_file_bytes(module_directory / "logo.png"),
     }
-    if settings.key:
-        CERT = x509.load_pem_x509_certificate(settings.certificate)
-        PRIV_KEY = serialization.load_pem_private_key(
-            settings.key, password=settings.certificate_password
-        )
-        WWDR_CERT = x509.load_pem_x509_certificate(settings.wwdr_certificate)
+    if settings.apple_key:
+        with open(settings.apple_pass_certificate, "rb") as f:
+            CERT = x509.load_pem_x509_certificate(f.read())
+        with open(settings.apple_pass_key, "rb") as f:
+            PRIV_KEY = serialization.load_pem_private_key(
+                f.read(), password=settings.apple_pass_key_password
+            )
+        with open(settings.apple_pass_wwdr_cert, "rb") as f:
+            WWDR_CERT = x509.load_pem_x509_certificate(f.read())
     OPTIONS = [pkcs7.PKCS7Options.DetachedSignature]
 
     @classmethod
