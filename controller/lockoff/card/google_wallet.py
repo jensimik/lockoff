@@ -33,6 +33,9 @@ class GoogleAuth(httpx.Auth):
 
 class GooglePass:
     def __init__(self):
+        self.credentials = Credentials.from_service_account_file(
+            filename=settings.google_service_account
+        )
         self.signer = crypt.RSASigner.from_service_account_file(
             filename=settings.google_service_account
         )
