@@ -24,6 +24,7 @@ class MyCustomSource(EnvSettingsSource):
 
 class Settings(BaseSettings):
     app_name: str = "lockoff"
+    sentry_dsn: str = ""
     klubmodul_username: str = ""
     klubmodul_password: str = ""
     klubmodul_base_url: str = "https://changeme.klub-modul.dk"

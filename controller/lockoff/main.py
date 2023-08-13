@@ -1,12 +1,13 @@
 import logging
 
+import sentry_sdk
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_limiter.depends import RateLimiter
 
 from .config import settings
 from .lifespan import lifespan, watchdog
-from .routers import admin, auth, card, me, applepass
+from .routers import admin, applepass, auth, card, me
 
 log = logging.getLogger(__name__)
 
@@ -17,6 +18,11 @@ origins = [
     "http://192.168.1.168:5173",
 ]
 
+if settings.sentry_dsn:
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        traces_sample_rate=0.5,
+    )
 
 app = FastAPI(
     title=settings.app_name,

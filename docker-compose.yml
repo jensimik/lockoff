@@ -63,6 +63,7 @@ services:
       - apn_auth_key=${APN_AUTH_KEY}
       - apn_key_id=${APN_KEY_ID}
       - walletpass_token=${WALLETPASS_TOKEN}
+      - sentry_dsn=${SENTRY_DSN}
     group_add:
       - dialout
     devices:
