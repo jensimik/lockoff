@@ -33,9 +33,8 @@ U = typing.TypeVar("U", bound="AppleNotifier")
 
 class AppleNotifier:
     def __init__(self):
-        self._auth_key = serialization.load_pem_private_key(
-            settings.apple_apn_auth_key, password=None
-        )
+        with open(settings.apple_apn_auth_key, "rb") as f:
+            self._auth_key = serialization.load_pem_private_key(f.read(), password=None)
 
     async def __aenter__(self: U) -> U:
         iat = int(time.time())
@@ -78,27 +77,6 @@ class AppleNotifier:
             log.exception(f"failed in notify update with {ex}")
         log.info(f"notify_update status code: {response.status_code}")
 
-    async def notify_alert(
-        self, device_library_identifier: str, push_token: str
-    ) -> bool:
-        try:
-            headers = {
-                "apns-topic": settings.apple_pass_pass_type_identifier,
-                "apns-id": uuid.uuid4().hex,
-                "apns-expiration": "{}".format(int(time.time()) + 3600),
-                "apns-push-type": "alert",
-            }
-            response = await self.client.post(
-                f"/3/device/{push_token}", headers=headers, json={"aps": "hej med dig"}
-            )
-            log.info(response.status_code)
-            if response.status_code != 200:
-                log.info(response.json())
-                log.info(response.text)
-        except httpx.RequestError as ex:
-            log.exception(f"failed in notify update with {ex}")
-        log.info(f"notify_update status code: {response.status_code}")
-
     async def notify_update_passwallet(self, identifiers: list[str]) -> bool:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.post(
@@ -121,9 +99,6 @@ class AppleNotifier:
                 },
             )
             return response.status_code == 200
-
-    async def notify_badge(serial: str, message: str) -> bool:
-        pass
 
     async def aclose(self) -> None:
         await self.client.aclose()
