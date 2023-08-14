@@ -13,7 +13,7 @@ from ..config import settings
 from ..db import DB, APDevice, APPass, APReg, User, WhereRaw
 from ..depends import apple_auth_pass
 
-router = APIRouter(prefix="/v1", tags=["applepass"])
+router = APIRouter(prefix="/v1", tags=["apple_wallet"])
 
 log = logging.getLogger(__name__)
 

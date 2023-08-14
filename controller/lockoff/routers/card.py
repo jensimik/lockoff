@@ -1,3 +1,4 @@
+import base64
 import io
 import secrets
 from datetime import datetime
@@ -5,6 +6,7 @@ from typing import Annotated
 
 from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi.responses import RedirectResponse
 
 from ..access_token import (
     TokenMedia,
@@ -12,9 +14,9 @@ from ..access_token import (
     generate_access_token,
     verify_dl_member_token,
 )
-from ..card import ApplePass, generate_pdf, generate_png
+from ..card import ApplePass, GooglePass, GPassStatus, generate_pdf, generate_png
 from ..config import settings
-from ..db import DB, APPass, User
+from ..db import DB, APPass, GPass, User
 
 router = APIRouter(tags=["card"])
 
@@ -102,7 +104,7 @@ async def get_pkpass(
     access_token = generate_access_token(
         user_id=user["id"],
         token_type=TokenType(user["token_type"]),
-        token_media=TokenMedia.DIGITAL,
+        token_media=TokenMedia.DIGITAL | TokenMedia.APPLE,
     )
     expires_display = datetime.utcnow() + relativedelta(
         day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
@@ -145,4 +147,54 @@ async def get_pkpass(
             "Cache-Control": "no-cache",
             "CDN-Cache-Control": "no-store",
         },
+    )
+
+
+# digital google wallet pass (jwt)
+@router.get(
+    "/{token}/membership-card",
+    response_class=Response,
+)
+async def get_google_wallet(
+    user_id: Annotated[int, Depends(verify_dl_member_token)],
+):
+    user = await User.select().where(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    access_token = generate_access_token(
+        user_id=user["id"],
+        token_type=TokenType(user["token_type"]),
+        token_media=TokenMedia.DIGITAL | TokenMedia.ANDROID,
+    )
+    expires_display = datetime.now(tz=settings.tz) + relativedelta(
+        day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
+    )
+    serial = f"{settings.current_season}{user_id}"
+    totp_key_bytes = secrets.token_bytes(16)
+    async with GooglePass() as gp:
+        jwt_url = await gp.create_pass(
+            pass_id=serial,
+            name=user["name"],
+            level=TokenType(user["token_type"]).name.capitalize(),
+            expires=expires_display,
+            qr_code_data=access_token.decode(),
+            totp_key=base64.b16encode(totp_key_bytes).decode(),
+        )
+    async with DB.transaction():
+        # mark that the user have downloaded digital for this season
+        await User.update({User.season_digital: str(settings.current_season)}).where(
+            User.id == user_id
+        )
+        # create a tracked gpass
+        await GPass.insert(
+            GPass(
+                id=serial,
+                totp=base64.b32encode(totp_key_bytes).decode(),
+                user_id=user_id,
+                status=GPassStatus.UNKNOWN,
+            )
+        ).on_conflict(target=GPass.id, action="DO UPDATE", values=[GPass.totp])
+    return RedirectResponse(
+        url=jwt_url,
+        headers={"Cache-Control": "no-cache", "CDN-Cache-Control": "no-store"},
     )

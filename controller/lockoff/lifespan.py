@@ -9,7 +9,7 @@ from .config import settings
 from .klubmodul import klubmodul_runner
 from .misc import GFXDisplay, watchdog
 from .reader import Reader
-from .db import User, Dayticket, AccessLog, APDevice, APPass, APReg
+from .db import User, Dayticket, AccessLog, APDevice, APPass, APReg, GPass
 from piccolo.table import create_db_tables
 
 
@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
     await FastAPILimiter.init(_redis)
     # init db and create tables if not exists
     await create_db_tables(
-        User, Dayticket, AccessLog, APReg, APDevice, APPass, if_not_exists=True
+        User, Dayticket, AccessLog, APReg, APDevice, APPass, GPass, if_not_exists=True
     )
     # start display
     display = GFXDisplay()

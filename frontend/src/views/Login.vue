@@ -9,6 +9,7 @@ import router from '../router';
 var step = ref("username");
 var username = ref("");
 var username_type = ref("mobile");
+var error_message = ref("");
 var totp = ref("");
 var os = ref(getMobileOS());
 const route = useRoute();
@@ -27,6 +28,7 @@ const selector_change = async(e) => {
 
 const mobile_update = async(e) => {
   e.target.style.setProperty('--_otp-digit', e.target.selectionStart);
+  error_message.value = "";
   if (username.value.length == 8) {
     e.target.blur();
     step.value = "totp";
@@ -46,6 +48,10 @@ const mobile_update = async(e) => {
             console.log(err);
           });
       }
+    }).catch((e) => {
+      step.value = "username";
+      username.value = "";
+      error_message.value = "error in data or no connection to backend - try again later";
     })
   }
 }
@@ -74,13 +80,21 @@ const totp_update = async(e) => {
         else
             router.push({name: "card"})
     }).catch((e) => {
-        console.log("failed to login : " + e);
+        error_message.value = "failed to login - check if your code mobile/email and code is correct and try again";
         username.value = "";
         totp.value = "";
         step.value = "username";
     })
   }
 }
+
+const tryagain = async(e) => {
+  username.value = "";
+  totp.value = "";
+  step.value = "username";
+  return false
+}
+
 </script>
 
 <template>
@@ -115,6 +129,9 @@ const totp_update = async(e) => {
       <div class="flex one jcenter email">
         <button @click="email_update">verify</button>
       </div>
+      <div v-if="error_message" class="flex one jcenter">
+        <p>{{ error_message }}</p>
+      </div>
     </div>
   </div>
   <div v-show="step == 'totp'">
@@ -122,7 +139,10 @@ const totp_update = async(e) => {
       <label for="pin">code</label>
     </div>
     <div class="flex one jcenter">
-    <input id="otp" type="text" inputmode="numeric" pattern="\d{6}" placeholder="000000" autocomplete="one-time-code" @input="totp_update" v-model="totp" size="6" maxlength="6" required>
+      <input id="otp" type="text" inputmode="numeric" pattern="\d{6}" placeholder="000000" autocomplete="one-time-code" @input="totp_update" v-model="totp" size="6" maxlength="6" required>
+    </div>
+    <div class="flex one jcenter">
+      <p>if you did not receive a code then double check if your {{ username_type }} is set correct in nkk.klub-modul.dk and <a @click="tryagain">try again later</a></p>
     </div>
   </div>
 </template>
