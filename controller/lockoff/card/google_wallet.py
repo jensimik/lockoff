@@ -1,6 +1,7 @@
 import typing
 from datetime import datetime
 from types import TracebackType
+from enum import IntEnum
 
 import httpx
 from dateutil.relativedelta import relativedelta
@@ -10,6 +11,12 @@ from google.oauth2.service_account import Credentials
 from ..config import settings
 
 U = typing.TypeVar("U", bound="GooglePass")
+
+
+class GPassStatus(IntEnum):
+    UNKNOWN = 0
+    SAVED = 1
+    DELETED = 2
 
 
 class GoogleAuth(httpx.Auth):

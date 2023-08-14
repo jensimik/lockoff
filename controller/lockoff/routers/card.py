@@ -14,7 +14,7 @@ from ..access_token import (
     generate_access_token,
     verify_dl_member_token,
 )
-from ..card import ApplePass, GooglePass, generate_pdf, generate_png
+from ..card import ApplePass, GooglePass, GPassStatus, generate_pdf, generate_png
 from ..config import settings
 from ..db import DB, APPass, GPass, User
 
@@ -191,6 +191,7 @@ async def get_google_wallet(
                 id=serial,
                 totp=base64.b32encode(totp_key_bytes).decode(),
                 user_id=user_id,
+                status=GPassStatus.UNKNOWN,
             )
         ).on_conflict(target=GPass.id, action="DO UPDATE", values=[GPass.totp])
     return RedirectResponse(

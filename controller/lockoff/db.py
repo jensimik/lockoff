@@ -62,9 +62,9 @@ class GPass(Table, tablename="g_pass", db=DB):
     id = columns.Varchar(primary_key=True)
     user_id = columns.Integer()
     totp = columns.Varchar()
-    installed = columns.Boolean()
+    status = columns.Integer()
 
 
-DayticketModel = create_pydantic_model(Dayticket)
-UserModel = create_pydantic_model(User)
-AccessLogModel = create_pydantic_model(AccessLog)
+# DayticketModel = create_pydantic_model(Dayticket)
+# UserModel = create_pydantic_model(User)
+# AccessLogModel = create_pydantic_model(AccessLog)
