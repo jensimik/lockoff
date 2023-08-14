@@ -97,17 +97,17 @@ class GooglePass:
             "state": "ACTIVE",
             "genericType": "GENERIC_GYM_MEMBERSHIP",
             "passConstraints": {"screenshotEligibility": "INELIGIBLE"},
-            "TimeInterval": {
-                "start": now.isoformat(timespec="seconds"),
-                "end": (expires + expires_delta).isoformat(timespec="seconds"),
-            },
+            # "TimeInterval": {
+            #     "start": now.isoformat(timespec="seconds"),
+            #     "end": (expires + expires_delta).isoformat(timespec="seconds"),
+            # },
             "cardTitle": {
                 "defaultValue": {
                     "language": "en-US",
                     "value": settings.apple_pass_logo_text,
                 }
             },
-            "subheader": {"defaultValue": {"langugae": "en-US", "value": "Name"}},
+            # "subheader": {"defaultValue": {"langugae": "en-US", "value": "Name"}},
             "header": {"defaultValue": {"language": "en-US", "value": name}},
             "textModulesData": [
                 {
