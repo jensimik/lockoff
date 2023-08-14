@@ -172,7 +172,7 @@ async def get_google_wallet(
     serial = f"{settings.current_season}{user_id}"
     totp_key = secrets.token_hex(16)
     async with GooglePass() as gp:
-        jwt_url = gp.create_pass(
+        jwt_url = await gp.create_pass(
             pass_id=serial,
             name=user["name"],
             level=TokenType(user["token_type"]).name.capitalize(),
