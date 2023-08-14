@@ -144,6 +144,7 @@ class GooglePass:
                 },
             },
         }
+        print(new_object)
         return new_object
 
     async def create_object(
