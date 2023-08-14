@@ -36,5 +36,13 @@ async def test_basic_notifier(httpx_mock):
     httpx_mock.add_response(
         method="POST", url=f"https://api.push.apple.com:443/3/device/{push_token}"
     )
+    httpx_mock.add_response(
+        method="POST", url="http://push.passwallet.net/v1/pushUpdates"
+    )
+    httpx_mock.add_response(
+        method="POST", url=f"https://walletpasses.appspot.com/api/v1/push"
+    )
     async with AppleNotifier() as notifier:
         await notifier.notify_update(push_token=push_token)
+        await notifier.notify_update_passwallet(identifiers=[push_token])
+        await notifier.notify_update_wallet_pass(identifiers=[push_token])
