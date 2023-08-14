@@ -96,7 +96,7 @@ async def check_token(
     ],
 ) -> schemas.TokenCheck:
     try:
-        user_id, token_type, _ = verify_access_token(token=token_input.token)
+        user_id, token_type, _, totp = verify_access_token(token=token_input.token)
         name = "n/a"
     except TokenError:
         raise HTTPException(

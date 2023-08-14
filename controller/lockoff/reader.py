@@ -54,7 +54,7 @@ async def check_dayticket(user_id: int):
 
 
 async def check_qrcode(qr_code: str):
-    user_id, token_type, token_media = verify_access_token(
+    user_id, token_type, token_media, totp = verify_access_token(
         token=qr_code
     )  # it will raise TokenError if not valid
     log.info(f"checking user {user_id} {token_type}")

@@ -4,7 +4,7 @@ import logging
 import secrets
 import struct
 from datetime import datetime
-from enum import Enum, IntFlag, auto
+from enum import Enum, IntFlag
 
 import base45
 from dateutil.relativedelta import relativedelta
@@ -24,11 +24,11 @@ class TokenType(Enum):
 
 
 class TokenMedia(IntFlag):
-    PRINT = auto()
-    DIGITAL = auto()
-    ANDROID = auto()
-    APPLE = auto()
-    UNKNOWN = auto()
+    UNKNOWN = 0
+    PRINT = 1
+    DIGITAL = 2
+    ANDROID = 4
+    APPLE = 8
 
 
 class TokenError(Exception):
@@ -79,7 +79,7 @@ def generate_access_token(
     return base45.b45encode(data + nonce + signature)
 
 
-def verify_access_token(token: str) -> tuple[int, TokenType]:
+def verify_access_token(token: str) -> tuple[int, TokenType, TokenMedia, str]:
     """verify the access token if possible to parse, 'signed' correct and is not expired
 
     Raises
@@ -97,11 +97,17 @@ def verify_access_token(token: str) -> tuple[int, TokenType]:
 
     try:
         user_id, expires, type_, media_, _, signature = struct.unpack(
-            f">IIHH{settings.nonce_size}s{settings.digest_size}s", raw_token
+            f">IIHH{settings.nonce_size}s{settings.digest_size}s",
+            raw_token[: 12 + settings.nonce_size + settings.digest_size],
         )
-        data = raw_token[: -settings.digest_size]
         token_type = TokenType(type_)
         token_media = TokenMedia(media_)
+        data = raw_token[: -settings.digest_size]
+        totp = ""
+        # android have 8 digit totp in the token suffix
+        if TokenMedia.ANDROID in token_media:
+            data = raw_token[: -(settings.digest_size + 8)]
+            totp = raw_token[:-8]
         expires_datetime = datetime.fromtimestamp(expires, tz=settings.tz)
     except Exception as ex:
         log_and_raise_token_error(
@@ -121,7 +127,7 @@ def verify_access_token(token: str) -> tuple[int, TokenType]:
             "token is expired", code=DISPLAY_CODES.QR_ERROR_EXPIRED
         )
 
-    return user_id, token_type, token_media
+    return user_id, token_type, token_media, totp
 
 
 def _generate_dl_token(

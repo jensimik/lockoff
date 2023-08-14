@@ -64,7 +64,18 @@ class GooglePass:
     def _generate_generic_class(self):
         new_class = {
             "id": f"{self.issuer_id}.membercard",
-            # "callback": {"url": "https://lockoff-api.gnerd.dk/"},
+            "linksModuleData": {
+                "uris": [
+                    {
+                        "uri": "https://nkk.klub-modul.dk/default.aspx",
+                        "description": "Link module URI description",
+                        "id": "LINK_TO_NKK",
+                    },
+                ]
+            },
+            "callbackOptions": {
+                "url": "https://lockoff-api.gnerd.dk/googlepass/callback"
+            },
         }
         return new_class
 
@@ -76,6 +87,7 @@ class GooglePass:
             "classId": f"{self.issuer_id}.membercard",
             "state": "ACTIVE",
             "genericType": "GENERIC_GYM_MEMBERSHIP",
+            "passConstraints": {"screenshotEligibility": "INELIGIBLE"},
             "cardTitle": {
                 "defaultValue": {
                     "language": "en-US",
@@ -95,16 +107,21 @@ class GooglePass:
                     "id": "TEXT_EXPIRES",
                 },
             ],
-            "linksModuleData": {
-                "uris": [
-                    {
-                        "uri": "https://nkk.klub-modul.dk/default.aspx",
-                        "description": "Link module URI description",
-                        "id": "LINK_TO_NKK",
-                    },
-                ]
+            "rotatingBarcode": {
+                "type": "QR_CODE",
+                "valuePattern": f"{qr_code_data}{{totp_value_0}}",
+                "totpDetails": {
+                    "algorithm": "TOTP_SHA1",
+                    "periodMillis": "30000",
+                    "parameters": [
+                        {
+                            "key": "3132333435363738393031323334353637383930",
+                            "valueLength": "8",
+                        }
+                    ],
+                },
             },
-            "barcode": {"type": "QR_CODE", "value": qr_code_data},
+            # "barcode": {"type": "QR_CODE", "value": qr_code_data},
             "hexBackgroundColor": "#fff",
             "logo": {
                 "sourceUri": {"uri": "https://lockoff.nkk.dk/apple-touch-icon.png"},

@@ -62,12 +62,16 @@ def test_token(user_id, token_type, token_media):
     )
     token_str = token_bytes.decode()
 
-    verify_user_id, verify_token_type, verify_token_media = verify_access_token(
-        token_str
-    )
+    (
+        verify_user_id,
+        verify_token_type,
+        verify_token_media,
+        verify_totp,
+    ) = verify_access_token(token_str)
     assert user_id == verify_user_id
     assert token_type == verify_token_type
     assert token_media == verify_token_media
+    assert "" == verify_totp
 
     # try to change a bit in signature part
     ba = bytearray(token_bytes)
