@@ -178,9 +178,13 @@ class GooglePass:
             # update it
             data["reviewStatus"] = "UNDER_REVIEW"
             response = await self.client.put(url, json=data)
+            d = response.json()
+            print(f"updated {d}")
         elif exists.status_code == 404:
             # create it
             response = await self.client.post("/genericClass", json=data)
+            d = response.json()
+            print(f"created {d}")
         return response.status_code == 200
 
     async def create_object(
