@@ -43,11 +43,11 @@ export default {
           <p>{{ user.member_type }} member exp {{ user.expires }}</p>
           <footer>
             <div class="fleft">
-              <a class="button print" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pdf'">🖨️ pdf print</a>
+              <a class="button print" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pdf'"><span class="printicon">🖨️</span> pdf print</a>
             </div>
             <div class="fright">
               <a target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pkpass'"><img class="addtoapplewallet" src="/US-UK_Add_to_Apple_Wallet_RGB_101421.svg" /></a>
-              <a target="_blank" :href="baseURL + '/' + user.token + '/membership-card'"><img class="addtogooglewallet" src="/svg/enGB_add_to_google_wallet_wallet-button.svg" /></a>
+              <a target="_blank" :href="baseURL + '/' + user.token + '/membership-card'"><img class="addtogooglewallet" src="/svg/enGB_add_to_google_wallet_add-wallet-badge.svg" /></a>
             </div>
           </footer>
         </article>
@@ -60,15 +60,20 @@ img[alt="Get it on Google Play"] {
   width: 100%;
 }
 .print {
-  padding-top: 2em;
-  padding-bottom: 2em;
+  padding-top: 1.25em;
+  padding-bottom: 1.25em;
   background-color: #000;
   color: #fff;
   font-size: 1.5em;
 }
+span.printicon {
+  font-size: 2.5em;
+}
 img.addtoapplewallet {
   width: 100%;
-  /* margin-left: 50%; */
+}
+img.addtogooglewallet {
+  width: 100%;
 }
 h3 {
   font-size: 1.5em;
