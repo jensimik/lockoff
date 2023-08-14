@@ -178,7 +178,7 @@ async def get_google_wallet(
             level=TokenType(user["token_type"]).name.capitalize(),
             expires=expires_display,
             qr_code_data=access_token.decode(),
-            totp_key=base64.b16encode(totp_key),
+            totp_key=base64.b16encode(totp_key).decode(),
         )
     async with DB.transaction():
         # mark that the user have downloaded digital for this season
@@ -187,7 +187,7 @@ async def get_google_wallet(
         )
         # create a tracked gpass
         await GPass.insert(
-            GPass(id=serial, totp=base64.b32encode(totp_key), user_id=user_id)
+            GPass(id=serial, totp=base64.b32encode(totp_key).decode(), user_id=user_id)
         ).on_conflict(target=GPass.id, action="DO UPDATE", values=[GPass.totp])
     return RedirectResponse(
         url=jwt_url,
