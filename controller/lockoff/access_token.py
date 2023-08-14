@@ -124,6 +124,8 @@ def verify_access_token(token: str) -> tuple[int, TokenType, TokenMedia, str]:
             "token is expired", code=DISPLAY_CODES.QR_ERROR_EXPIRED
         )
 
+    print(f"totp_suffix {totp_suffix}")
+
     return user_id, token_type, token_media, totp_suffix
 
 
