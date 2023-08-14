@@ -23,6 +23,8 @@ env:
   APPLE_PASS_KEY: ./tests/certs/private.key
   APPLE_PASS_WWDR_CERT: ./tests/certs/wwdr_certificate.pem
   APPLE_APN_AUTH_KEY: ./tests/certs/apn.key
+  GOOGLE_SERVICE_ACCOUNT: ./tests/certs/service-account.json
+  GOOGLE_ISSUER_ID: 12345
 
 jobs:
   test:
