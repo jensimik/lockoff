@@ -172,15 +172,15 @@ class GooglePass:
 
     async def create_class(self):
         url = f"/genericClass/{settings.google_issuer_id}.membercard"
+        data = self._generate_generic_class()
         exists = await self.client.get(url)
         if exists.status_code == 200:
             # update it
-            response = await self.client.put(url, json=self._generate_generic_class())
+            data["reviewStatus"] = "UNDER_REVIEW"
+            response = await self.client.put(url, json=data)
         elif exists.status_code == 404:
             # create it
-            response = await self.client.post(
-                "/genericClass", json=self._generate_generic_class()
-            )
+            response = await self.client.post("/genericClass", json=data)
         return response.status_code == 200
 
     async def create_object(
