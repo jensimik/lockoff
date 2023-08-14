@@ -43,24 +43,11 @@ export default {
           <p>{{ user.member_type }} member exp {{ user.expires }}</p>
           <footer>
             <div class="fleft">
-              <a class="button" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pdf'">🖨️ pdf for print</a>
+              <a class="button print" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pdf'">🖨️ pdf print</a>
             </div>
             <div class="fright">
-              <a class="button" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pkpass'">📱 mobile pass<span v-if="os== 'Android'">*</span></a>
-            </div>
-            <a v-if="os == 'iOS'" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pkpass'"><img class="addtoapplewallet" src="/US-UK_Add_to_Apple_Wallet_RGB_101421.svg" /></a>
-            <div v-if="os == 'Android'">
-              <p>* to use the digital wallet on android phones you need an app - i recommend one of these apps:</p>
-              <div class="flex two">
-                <div>
-                  <h4>WalletPass</h4>
-                  <a target="_blank" :href="'https://walletpass.io?u=' + encodeURIComponent(baseURL + '/' + user.token + '/membership-card.pkpass')"><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
-                </div>
-                <div>
-                  <h4>PassWallet</h4>
-                  <a target="_blank" :href="'https://passwallet.page.link/?apn=com.attidomobile.passwallet&link=' + encodeURIComponent(baseURL + '/' + user.token + '/membership-card.pkpass')"><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
-                </div>
-              </div>
+              <a target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pkpass'"><img class="addtoapplewallet" src="/US-UK_Add_to_Apple_Wallet_RGB_101421.svg" /></a>
+              <a target="_blank" :href="baseURL + '/' + user.token + '/membership-card'"><img class="addtogooglewallet" src="/svg/enGB_add_to_google_wallet_wallet-button.svg" /></a>
             </div>
           </footer>
         </article>
@@ -72,9 +59,16 @@ export default {
 img[alt="Get it on Google Play"] {
   width: 100%;
 }
+.print {
+  padding-top: 2em;
+  padding-bottom: 2em;
+  background-color: #000;
+  color: #fff;
+  font-size: 1.5em;
+}
 img.addtoapplewallet {
-  width: 50%;
-  margin-left: 50%;
+  width: 100%;
+  /* margin-left: 50%; */
 }
 h3 {
   font-size: 1.5em;
