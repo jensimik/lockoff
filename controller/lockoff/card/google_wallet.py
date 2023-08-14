@@ -24,11 +24,9 @@ class GoogleAuth(httpx.Auth):
         self.credentials._create_self_signed_jwt(audience=None)
 
     def auth_flow(self, request: httpx.Request):
-        if self.credentials._jwt_credentials.expired:
-            self.credentials._jwt_credentials.refresh()
-        self.credentials._jwt_credentials.apply(
-            request.headers, self.credentials._jwt_credentials.token.decode()
-        )
+        if self.credentials.expired:
+            self.credentials.refresh()
+        self.credentials.apply(request.headers, self.credentials.token)
         yield request
 
 
