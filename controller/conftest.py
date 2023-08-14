@@ -9,10 +9,11 @@ from fakeredis import aioredis
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from fastapi_limiter import FastAPILimiter
-from lockoff.access_token import TokenType, TokenMedia
+from lockoff.access_token import TokenMedia, TokenType
 from lockoff.config import settings
-from lockoff.db import DB, AccessLog, Dayticket, User
+from lockoff.db import DB, AccessLog, Dayticket, GPass, User, APDevice, APPass, APReg
 from lockoff.misc import simple_hash
+from piccolo.table import create_db_tables
 
 TOTP_SECRET = "H6IC425Q5IFZYAP4VINKRVHX7ZIEKO7E"
 
@@ -28,9 +29,16 @@ async def testing_lifespan(app: FastAPI):
 async def sample_data():
     # create tables
     async with DB.transaction():
-        await User.create_table(if_not_exists=True)
-        await Dayticket.create_table(if_not_exists=True)
-        await AccessLog.create_table(if_not_exists=True)
+        await create_db_tables(
+            User,
+            Dayticket,
+            AccessLog,
+            APReg,
+            APDevice,
+            APPass,
+            GPass,
+            if_not_exists=True,
+        )
     # make some sample data in the database to run tests agains
     batch_id = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
     async with DB.transaction():
