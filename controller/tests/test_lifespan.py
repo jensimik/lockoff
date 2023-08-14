@@ -10,6 +10,7 @@ async def test_lifespan(mocker):
     display_runner = mocker.patch("lockoff.lifespan.GFXDisplay.runner")
     reader_setup = mocker.patch("lockoff.lifespan.Reader.setup")
     reader_runner = mocker.patch("lockoff.lifespan.Reader.runner")
+    google_wallet = mocker.patch("lockoff.lifespan.GooglePass")
 
     from lockoff.lifespan import lifespan
     from lockoff.main import app
