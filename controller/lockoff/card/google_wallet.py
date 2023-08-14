@@ -23,6 +23,7 @@ class GoogleAuth(httpx.Auth):
         )
         print(f"scopes: {self.credentials._scopes}")
         self.credentials._create_self_signed_jwt(audience=None)
+        self.credentials.refresh()
         print(
             f"additinal_claims: {self.credentials._jwt_credentials.additional_claims}"
         )
