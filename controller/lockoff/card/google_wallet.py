@@ -1,17 +1,13 @@
-import json
-import os
 import typing
-import uuid
 from datetime import datetime
 from types import TracebackType
-from dateutil.relativedelta import relativedelta
 
 import httpx
+from dateutil.relativedelta import relativedelta
 from google.auth import crypt, jwt
 from google.oauth2.service_account import Credentials
 
 from ..config import settings
-from ..db import GPass
 
 U = typing.TypeVar("U", bound="GooglePass")
 
@@ -42,15 +38,12 @@ class GooglePass:
         self.signer = crypt.RSASigner.from_service_account_file(
             filename=settings.google_service_account
         )
-        self.issuer_id = settings.google_issuer_id
-        self.base_url = "https://walletobjects.googleapis.com/walletobjects/v1"
-        self.object_url = "/genericObject"
 
         auth = GoogleAuth()
 
         self.client = httpx.AsyncClient(
             auth=auth,
-            base_url=self.base_url,
+            base_url="https://walletobjects.googleapis.com/walletobjects/v1",
         )
 
     async def expire_pass(self, pass_id: str):
@@ -60,13 +53,13 @@ class GooglePass:
         return response.status_code == 200
 
     async def patch_pass(self, pass_id: str, patch: dict):
-        url = f"/genericObject/{self.issuer_id}.{pass_id}"
+        url = f"/genericObject/{settings.google_issuer_id}.{pass_id}"
         response = await self.client.patch(url, json=patch)
         return response.status_code == 200
 
     def _generate_generic_class(self):
         new_class = {
-            "id": f"{self.issuer_id}.membercard",
+            "id": f"{settings.google_issuer_id}.membercard",
             "linksModuleData": {
                 "uris": [
                     {
@@ -96,8 +89,8 @@ class GooglePass:
     ):
         now = datetime.now(tz=settings.tz)
         new_object = {
-            "id": f"{self.issuer_id}.{pass_id}",
-            "classId": f"{self.issuer_id}.membercard",
+            "id": f"{settings.google_issuer_id}.{pass_id}",
+            "classId": f"{settings.google_issuer_id}.membercard",
             "state": "ACTIVE",
             "genericType": "GENERIC_GYM_MEMBERSHIP",
             "passConstraints": {"screenshotEligibility": "INELIGIBLE"},
@@ -158,7 +151,7 @@ class GooglePass:
         qr_code_data: str,
         totp: str,
     ) -> bool:
-        url = f"/genericObject/{self.issuer_id}.{pass_id}"
+        url = f"/genericObject/{settings.google_issuer_id}.{pass_id}"
         # check if exists?
         response = await self.client.get(url)
         if response.status_code == httpx._status_codes.codes.OK:
@@ -199,7 +192,10 @@ class GooglePass:
             "typ": "savetowallet",
             "payload": {
                 "genericObjects": [
-                    {"id": pass_id, "classId": f"{self.issuer_id}.membercard"}
+                    {
+                        "id": pass_id,
+                        "classId": f"{settings.google_issuer_id}.membercard",
+                    }
                 ]
             },
         }
