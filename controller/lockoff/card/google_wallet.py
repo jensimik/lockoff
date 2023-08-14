@@ -18,10 +18,11 @@ class GoogleAuth(httpx.Auth):
     def __init__(self):
         self.credentials = Credentials.from_service_account_file(
             filename=settings.google_service_account,
+            always_use_jwt_access=True,
             scopes=["https://www.googleapis.com/auth/wallet_object.issuer"],
         )
-        self.credentials._always_use_jwt_access = True
         self.credentials._create_self_signed_jwt(audience=None)
+        print(f"token: {self.credentials.token}")
 
     def auth_flow(self, request: httpx.Request):
         if self.credentials.expired:
