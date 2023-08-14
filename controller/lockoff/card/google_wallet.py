@@ -88,7 +88,7 @@ class GooglePass:
         expires: datetime,
         qr_code_data: str,
         totp_key: str,
-        expires_delta: relativedelta(days=15),
+        expires_delta: relativedelta = relativedelta(days=15),
     ):
         now = datetime.now(tz=settings.tz)
         new_object = {
@@ -97,17 +97,17 @@ class GooglePass:
             "state": "ACTIVE",
             "genericType": "GENERIC_GYM_MEMBERSHIP",
             "passConstraints": {"screenshotEligibility": "INELIGIBLE"},
-            # "TimeInterval": {
-            #     "start": now.isoformat(timespec="seconds"),
-            #     "end": (expires + expires_delta).isoformat(timespec="seconds"),
-            # },
+            "TimeInterval": {
+                "start": now.isoformat(timespec="seconds"),
+                "end": (expires + expires_delta).isoformat(timespec="seconds"),
+            },
             "cardTitle": {
                 "defaultValue": {
                     "language": "en-US",
                     "value": settings.apple_pass_logo_text,
                 }
             },
-            # "subheader": {"defaultValue": {"langugae": "en-US", "value": "Name"}},
+            "subheader": {"defaultValue": {"langugae": "en-US", "value": "Name"}},
             "header": {"defaultValue": {"language": "en-US", "value": name}},
             "textModulesData": [
                 {
@@ -121,21 +121,21 @@ class GooglePass:
                     "id": "TEXT_EXPIRES",
                 },
             ],
-            # "rotatingBarcode": {
-            #     "type": "QR_CODE",
-            #     "valuePattern": f"{qr_code_data}{{totp_value_0}}",
-            #     "totpDetails": {
-            #         "algorithm": "TOTP_SHA1",
-            #         "periodMillis": "30000",
-            #         "parameters": [
-            #             {
-            #                 "key": totp_key,
-            #                 "valueLength": "8",
-            #             }
-            #         ],
-            #     },
-            # },
-            "barcode": {"type": "QR_CODE", "value": qr_code_data},
+            "rotatingBarcode": {
+                "type": "QR_CODE",
+                "valuePattern": f"{qr_code_data}{{totp_value_0}}",
+                "totpDetails": {
+                    "algorithm": "TOTP_SHA1",
+                    "periodMillis": "30000",
+                    "parameters": [
+                        {
+                            "key": totp_key,
+                            "valueLength": "8",
+                        }
+                    ],
+                },
+            },
+            # "barcode": {"type": "QR_CODE", "value": qr_code_data},
             "hexBackgroundColor": "#fff",
             "logo": {
                 "sourceUri": {"uri": "https://lockoff.nkk.dk/apple-touch-icon.png"},
