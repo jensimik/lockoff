@@ -117,7 +117,7 @@ async def get_updated_pass(
     access_token = generate_access_token(
         user_id=user["id"],
         token_type=TokenType(user["token_type"]),
-        token_media=TokenMedia.DIGITAL,
+        token_media=TokenMedia.DIGITAL | TokenMedia.APPLE,
     )
     expires_display = datetime.utcnow() + relativedelta(
         day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
