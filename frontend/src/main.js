@@ -4,6 +4,8 @@ import "../node_modules/picnic/picnic.min.css";
 import App from './App.vue';
 import router from './router';
 import './style.css';
+import Vue3Toasity from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
 const app = createApp(App);
 
@@ -25,6 +27,7 @@ Sentry.init({
     replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
   });
 
+app.use(Vue3Toasity);
 app.use(router);
 
 app.mount('#app');

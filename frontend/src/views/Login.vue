@@ -1,15 +1,15 @@
 <script setup>
 import { ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { toast } from 'vue3-toastify';
 import controllerAPI from '../api/resources/allMethods';
-import { getWithExpiry, setWithExpiry } from '../store';
 import { getMobileOS } from '../misc';
-import { useRoute } from 'vue-router'
 import router from '../router';
+import { setWithExpiry } from '../store';
 
 var step = ref("username");
 var username = ref("");
 var username_type = ref("mobile");
-var error_message = ref("");
 var totp = ref("");
 var os = ref(getMobileOS());
 const route = useRoute();
@@ -28,12 +28,12 @@ const selector_change = async(e) => {
 
 const mobile_update = async(e) => {
   e.target.style.setProperty('--_otp-digit', e.target.selectionStart);
-  error_message.value = "";
   if (username.value.length == 8) {
     e.target.blur();
     step.value = "totp";
     window.scrollTo({ top: 0});
     controllerAPI.request_totp(username.value, username_type.value).then(() => {
+      toast("check your " + username_type.value + " for the code 🤓");
       // listen for OTP token on sms automatic
       if ('OTPCredential' in window) {
           const input = document.querySelector('input[autocomplete="one-time-code"]');
@@ -51,7 +51,7 @@ const mobile_update = async(e) => {
     }).catch((e) => {
       step.value = "username";
       username.value = "";
-      error_message.value = "error in data or no connection to backend - try again later";
+      toast("error in data or no connection to backend - try again later");
     })
   }
 }
@@ -80,7 +80,7 @@ const totp_update = async(e) => {
         else
             router.push({name: "card"})
     }).catch((e) => {
-        error_message.value = "failed to login - check if your code mobile/email and code is correct and try again";
+        toast("failed to login - check if your code mobile/email and code is correct and try again");
         username.value = "";
         totp.value = "";
         step.value = "username";
@@ -128,9 +128,6 @@ const tryagain = async(e) => {
       </div>
       <div class="flex one jcenter email">
         <button @click="email_update">verify</button>
-      </div>
-      <div v-if="error_message" class="flex one jcenter">
-        <p>{{ error_message }}</p>
       </div>
     </div>
   </div>
