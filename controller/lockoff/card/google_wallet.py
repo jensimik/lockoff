@@ -171,7 +171,7 @@ class GooglePass:
         return new_object
 
     async def create_class(self):
-        url = f"/genericClass/{settings.google_issuer_id}.membercard"
+        url = f"/genericClass"
         response = await self.client.post(url, json=self._generate_generic_class())
         return response.status_code == 200
 
@@ -186,14 +186,13 @@ class GooglePass:
     ) -> bool:
         # ensure class is created - cache this?
         await self.create_class()
-        url = f"/genericObject/{settings.google_issuer_id}.{pass_id}"
         # check if exists?
         # response = await self.client.get(url)
         # if response.status_code == httpx._status_codes.codes.OK:
         #     return True
         # create it
         response = await self.client.post(
-            url,
+            "/genericObject",
             json=self._generate_generic_object(
                 pass_id=pass_id,
                 name=name,
