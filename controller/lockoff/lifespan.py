@@ -4,13 +4,14 @@ from contextlib import asynccontextmanager
 import redis.asyncio as redis
 from fastapi import FastAPI
 from fastapi_limiter import FastAPILimiter
+from piccolo.table import create_db_tables
 
+from .card import GooglePass
 from .config import settings
+from .db import AccessLog, APDevice, APPass, APReg, Dayticket, GPass, User
 from .klubmodul import klubmodul_runner
 from .misc import GFXDisplay, watchdog
 from .reader import Reader
-from .db import User, Dayticket, AccessLog, APDevice, APPass, APReg, GPass
-from piccolo.table import create_db_tables
 
 
 @asynccontextmanager
@@ -34,6 +35,9 @@ async def lifespan(app: FastAPI):
     # start klubmodul runner
     klubmodul_task = asyncio.create_task(klubmodul_runner())
     watchdog.watch(klubmodul_task)
+    # assure google-wallet class is created
+    async with GooglePass() as gp:
+        await gp.create_class()
     yield
     # clear things now at shutdown
     # nothing really have to be cleared

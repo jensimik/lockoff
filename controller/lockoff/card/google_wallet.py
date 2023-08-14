@@ -203,8 +203,6 @@ class GooglePass:
         qr_code_data: str,
         totp_key: str,
     ) -> bool:
-        # ensure class is created - cache this?
-        await self.create_class()
         url = f"/genericObject/{settings.google_issuer_id}.{pass_id}"
         data = self._generate_generic_object(
             pass_id=pass_id,
