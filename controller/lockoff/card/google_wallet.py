@@ -104,6 +104,7 @@ class GooglePass:
                     "value": settings.apple_pass_logo_text,
                 }
             },
+            "subheader": {"defaultValue": {"langugae": "en-US", "value": "Name"}},
             "header": {"defaultValue": {"language": "en-US", "value": name}},
             "textModulesData": [
                 {
