@@ -56,6 +56,7 @@ async def check_dayticket(user_id: int):
 
 async def check_totp(user_id: int, totp: str):
     gp = await GPass.select(GPass.totp).where(GPass.user_id == user_id).first()
+    print(gp)
     verifier = TOTP(s=gp["totp"], digits=8)
     if not verifier.verify(otp=totp, valid_window=5):
         log_and_raise_token_error(
@@ -105,7 +106,9 @@ class Reader:
     async def runner(self, one_time_run: bool = False):
         while True:
             # read a scan from the barcode reader read until carriage return CR
-            qr_code = (await self._r.readuntil(separator=b"\r")).decode("utf-8").strip()
+            qr_code: str = (
+                (await self._r.readuntil(separator=b"\r")).decode("utf-8").strip()
+            )
             try:
                 # check the qr_code (raises exception on errors)
                 await check_qrcode(qr_code=qr_code)
