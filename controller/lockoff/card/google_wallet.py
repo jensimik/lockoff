@@ -208,7 +208,8 @@ class GooglePass:
         if exists.status_code == 200:
             # update it
             response = await self.client.put(url, json=data)
-            return True
+            d = response.json()
+            print(f"updated {d}")
         elif exists.status_code == 404:
             # create it
             response = await self.client.post(
