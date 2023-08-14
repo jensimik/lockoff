@@ -172,6 +172,7 @@ class GooglePass:
                 totp_key=totp_key,
             ),
         )
+        print(response.json())
         return response.status_code == 200
 
     async def create_pass(
