@@ -42,12 +42,14 @@ export default {
           </header>
           <p>{{ user.member_type }} member exp {{ user.expires }}</p>
           <footer>
-            <div class="fleft">
-              <a class="button print" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pdf'"><span class="printicon">🖨️</span></a>
-            </div>
-            <div class="fright">
-              <a target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pkpass'"><img class="addtoapplewallet" src="/US-UK_Add_to_Apple_Wallet_RGB_101421.svg" /></a>
-              <a target="_blank" :href="baseURL + '/' + user.token + '/membership-card'"><img class="addtogooglewallet" src="/svg/enGB_add_to_google_wallet_add-wallet-badge.svg" /></a>
+            <div class="flex two">
+              <div>
+                <a class="button print" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pdf'"><span class="printicon">🖨️ print</span></a>
+              </div>
+              <div>
+                <a target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pkpass'"><img class="addtoapplewallet" src="/US-UK_Add_to_Apple_Wallet_RGB_101421.svg" /></a>
+                <a target="_blank" :href="baseURL + '/' + user.token + '/membership-card'"><img class="addtogooglewallet" src="/svg/enGB_add_to_google_wallet_add-wallet-badge.svg" /></a>
+              </div>
             </div>
           </footer>
         </article>
@@ -60,14 +62,14 @@ img[alt="Get it on Google Play"] {
   width: 100%;
 }
 .print {
-  padding-top: 1.25em;
-  padding-bottom: 1.25em;
   background-color: #000;
   color: #fff;
-  /* font-size: 1.5em; */
+  padding-top: 0.8em;
+  padding-bottom: 0.8em;
+  /* height: 100%; */
 }
 span.printicon {
-  font-size: 4em;
+  font-size: 2em;
 }
 img.addtoapplewallet {
   width: 100%;
@@ -105,11 +107,13 @@ h4 {
   text-align: right;
   padding-left: 0.5em;
   width: 50%;
+  height: 6em;
 }
 .fleft {
   display: inline-block;
   width: 50%;
   padding-right: 0.5em;
+  height: 6em;
 }
 </style>
 
