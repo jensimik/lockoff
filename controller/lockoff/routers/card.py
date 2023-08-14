@@ -170,7 +170,7 @@ async def get_google_wallet(
         day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
     )
     serial = f"{settings.current_season}{user_id}"
-    totp = secrets.token_hex(16)
+    totp_key = secrets.token_hex(16)
     async with GooglePass() as gp:
         jwt_url = gp.create_pass(
             pass_id=serial,
@@ -178,7 +178,7 @@ async def get_google_wallet(
             level=TokenType(user["token_type"]).name.capitalize(),
             expires=expires_display,
             qr_code_data=access_token.decode(),
-            totp=totp,
+            totp_key=totp_key,
         )
     async with DB.transaction():
         # mark that the user have downloaded digital for this season

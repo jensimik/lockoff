@@ -84,7 +84,7 @@ class GooglePass:
         level: str,
         expires: datetime,
         qr_code_data: str,
-        totp: str,
+        totp_key: str,
         expires_delta: relativedelta(days=15),
     ):
         now = datetime.now(tz=settings.tz)
@@ -126,7 +126,7 @@ class GooglePass:
                     "periodMillis": "30000",
                     "parameters": [
                         {
-                            "key": totp,
+                            "key": totp_key,
                             "valueLength": "8",
                         }
                     ],
@@ -150,7 +150,7 @@ class GooglePass:
         level: str,
         expires: datetime,
         qr_code_data: str,
-        totp: str,
+        totp_key: str,
     ) -> bool:
         url = f"/genericObject/{settings.google_issuer_id}.{pass_id}"
         # check if exists?
@@ -166,7 +166,7 @@ class GooglePass:
                 level=level,
                 expires=expires,
                 qr_code_data=qr_code_data,
-                totp=totp,
+                totp_key=totp_key,
             ),
         )
         return response.status_code == 200
@@ -178,6 +178,7 @@ class GooglePass:
         level: str,
         expires: datetime,
         qr_code_data: str,
+        totp_key: str,
     ):
         await self.create_object(
             pass_id=pass_id,
@@ -185,6 +186,7 @@ class GooglePass:
             level=level,
             expires=expires,
             qr_code_data=qr_code_data,
+            totp=totp,
         )
         claims = {
             "iss": self.credentials.service_account_email,
