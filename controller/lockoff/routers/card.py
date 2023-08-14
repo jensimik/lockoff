@@ -1,9 +1,9 @@
-import base64
 import io
 import secrets
 from datetime import datetime
 from typing import Annotated
 
+import pyotp
 from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import RedirectResponse
@@ -170,7 +170,7 @@ async def get_google_wallet(
         day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
     )
     serial = f"{settings.current_season}{user_id}"
-    totp_key = secrets.token_hex(16)
+    totp_key = pyotp.random_base32()
     async with GooglePass() as gp:
         jwt_url = await gp.create_pass(
             pass_id=serial,
