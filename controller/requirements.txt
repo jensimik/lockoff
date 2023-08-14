@@ -18,7 +18,7 @@ dnspython==2.4.2
 docstring-parser==0.15
 ecdsa==0.18.0
 email-validator==2.0.0.post2
-fastapi==0.101.0
+fastapi==0.101.1
 fastapi-limiter==0.1.5
 fonttools==4.42.0
 google-auth==2.22.0
@@ -48,7 +48,7 @@ pyasn1==0.5.0
 pyasn1-modules==0.3.0
 pycparser==2.21
 pydantic==2.1.1
-pydantic-settings==2.0.2
+pydantic-settings==2.0.3
 pydantic_core==2.4.0
 pydyf==0.7.0
 pyotp==2.9.0
