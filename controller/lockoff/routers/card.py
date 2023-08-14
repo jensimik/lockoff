@@ -1,9 +1,9 @@
+import base64
 import io
 import secrets
 from datetime import datetime
 from typing import Annotated
 
-import pyotp
 from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import RedirectResponse
@@ -170,7 +170,7 @@ async def get_google_wallet(
         day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
     )
     serial = f"{settings.current_season}{user_id}"
-    totp_key = pyotp.random_hex()
+    totp_key = secrets.token_bytes(16)
     async with GooglePass() as gp:
         jwt_url = await gp.create_pass(
             pass_id=serial,
@@ -178,7 +178,7 @@ async def get_google_wallet(
             level=TokenType(user["token_type"]).name.capitalize(),
             expires=expires_display,
             qr_code_data=access_token.decode(),
-            totp_key=totp_key,
+            totp_key=base64.b16encode(totp_key),
         )
     async with DB.transaction():
         # mark that the user have downloaded digital for this season
@@ -187,7 +187,7 @@ async def get_google_wallet(
         )
         # create a tracked gpass
         await GPass.insert(
-            GPass(id=serial, totp=totp_key, user_id=user_id)
+            GPass(id=serial, totp=base64.b32encode(totp_key), user_id=user_id)
         ).on_conflict(target=GPass.id, action="DO UPDATE", values=[GPass.totp])
     return RedirectResponse(
         url=jwt_url,
