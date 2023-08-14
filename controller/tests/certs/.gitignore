@@ -13,3 +13,4 @@
 !private.key
 !wwdr_certificate.pem
 !apn.key
+!service-account.json
