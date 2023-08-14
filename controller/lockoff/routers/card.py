@@ -166,7 +166,7 @@ async def get_google_wallet(
         token_type=TokenType(user["token_type"]),
         token_media=TokenMedia.DIGITAL | TokenMedia.ANDROID,
     )
-    expires_display = datetime.utcnow() + relativedelta(
+    expires_display = datetime.now(tz=settings.tz) + relativedelta(
         day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
     )
     serial = f"{settings.current_season}{user_id}"
