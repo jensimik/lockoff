@@ -1,3 +1,4 @@
+import base64
 import random
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
@@ -11,7 +12,7 @@ from fastapi.testclient import TestClient
 from fastapi_limiter import FastAPILimiter
 from lockoff.access_token import TokenMedia, TokenType
 from lockoff.config import settings
-from lockoff.db import DB, AccessLog, Dayticket, GPass, User, APDevice, APPass, APReg
+from lockoff.db import DB, AccessLog, APDevice, APPass, APReg, Dayticket, GPass, User
 from lockoff.misc import simple_hash
 from piccolo.table import create_db_tables
 
@@ -117,6 +118,9 @@ async def sample_data():
         await User.update({User.season_digital: str(settings.current_season)}).where(
             User.id == 7
         )
+        await GPass.insert(
+            GPass(id=1, user_id=1, totp=base64.b64encode(b"test123").decode(), status=0)
+        ).on_conflict(action="DO NOTHING")
 
 
 @pytest.fixture

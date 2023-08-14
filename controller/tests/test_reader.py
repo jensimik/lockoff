@@ -3,7 +3,13 @@ import asyncio
 import pytest
 from lockoff.access_token import TokenError, TokenType, generate_access_token
 from lockoff.misc import O_CMD, GFXDisplay
-from lockoff.reader import Reader, check_dayticket, check_member, check_qrcode
+from lockoff.reader import (
+    Reader,
+    check_dayticket,
+    check_member,
+    check_qrcode,
+    check_totp,
+)
 
 
 @pytest.mark.parametrize(
@@ -24,6 +30,12 @@ async def test_check_qr_code(qr_code, _raise):
             await check_qrcode(qr_code=qr_code)
     else:
         await check_qrcode(qr_code=qr_code)
+
+
+@pytest.mark.asyncio
+async def test_check_totp():
+    with pytest.raises(TokenError):
+        await check_totp(user_id=1, totp="12345678")
 
 
 @pytest.mark.asyncio
