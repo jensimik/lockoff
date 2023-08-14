@@ -43,7 +43,7 @@ export default {
           <p>{{ user.member_type }} member exp {{ user.expires }}</p>
           <footer>
             <div class="fleft">
-              <a class="button print" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pdf'"><span class="printicon">🖨️</span> pdf print</a>
+              <a class="button print" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pdf'"><span class="printicon">🖨️</span></a>
             </div>
             <div class="fright">
               <a target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pkpass'"><img class="addtoapplewallet" src="/US-UK_Add_to_Apple_Wallet_RGB_101421.svg" /></a>
@@ -64,10 +64,10 @@ img[alt="Get it on Google Play"] {
   padding-bottom: 1.25em;
   background-color: #000;
   color: #fff;
-  font-size: 1.5em;
+  /* font-size: 1.5em; */
 }
 span.printicon {
-  font-size: 2.5em;
+  font-size: 4em;
 }
 img.addtoapplewallet {
   width: 100%;
