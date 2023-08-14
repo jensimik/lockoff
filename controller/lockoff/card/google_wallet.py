@@ -121,21 +121,21 @@ class GooglePass:
                     "id": "TEXT_EXPIRES",
                 },
             ],
-            "rotatingBarcode": {
-                "type": "QR_CODE",
-                "valuePattern": f"{qr_code_data}{{totp_value_0}}",
-                "totpDetails": {
-                    "algorithm": "TOTP_SHA1",
-                    "periodMillis": "30000",
-                    "parameters": [
-                        {
-                            "key": totp_key,
-                            "valueLength": "8",
-                        }
-                    ],
-                },
-            },
-            # "barcode": {"type": "QR_CODE", "value": qr_code_data},
+            # "rotatingBarcode": {
+            #     "type": "QR_CODE",
+            #     "valuePattern": f"{qr_code_data}{{totp_value_0}}",
+            #     "totpDetails": {
+            #         "algorithm": "TOTP_SHA1",
+            #         "periodMillis": "30000",
+            #         "parameters": [
+            #             {
+            #                 "key": totp_key,
+            #                 "valueLength": "8",
+            #             }
+            #         ],
+            #     },
+            # },
+            "barcode": {"type": "QR_CODE", "value": qr_code_data},
             "hexBackgroundColor": "#fff",
             "logo": {
                 "sourceUri": {"uri": "https://lockoff.nkk.dk/apple-touch-icon.png"},
