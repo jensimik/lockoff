@@ -57,6 +57,7 @@ async def check_dayticket(user_id: int):
 async def check_totp(user_id: int, totp: str):
     gp = await GPass.select(GPass.totp).where(GPass.user_id == user_id).first()
     print(gp)
+    print(totp)
     verifier = TOTP(s=gp["totp"], digits=8)
     if not verifier.verify(otp=totp, valid_window=5):
         log_and_raise_token_error(
@@ -68,7 +69,7 @@ async def check_qrcode(qr_code: str):
     user_id, token_type, token_media, totp = verify_access_token(
         token=qr_code
     )  # it will raise TokenError if not valid
-    log.info(f"checking user {user_id} {token_type}")
+    log.info(f"checking user {user_id} {token_type} {totp}")
     # check in database
     match token_type:
         case TokenType.NORMAL | TokenType.MORNING:
