@@ -89,11 +89,8 @@ def verify_access_token(token: str) -> tuple[int, TokenType, TokenMedia, str]:
 
     """
     try:
-        print(f"length token = {len(token)}")
         raw_token = base45.b45decode(token[:39])
-        totp = token[39:]
-        print(f"raw token: {raw_token}")
-        print(f"totp: {totp}")
+        totp_suffix = token[39:]
     except Exception as ex:
         log_and_raise_token_error(
             f"could not base45 decode token data: {ex}", code=DISPLAY_CODES.QR_ERROR
@@ -107,11 +104,7 @@ def verify_access_token(token: str) -> tuple[int, TokenType, TokenMedia, str]:
         token_type = TokenType(type_)
         token_media = TokenMedia(media_)
         data = raw_token[: -settings.digest_size]
-        totp = ""
         # android have 8 digit totp in the token suffix
-        if TokenMedia.ANDROID in token_media:
-            data = raw_token[: -(settings.digest_size + 8)]
-            totp = raw_token[:-8]
         expires_datetime = datetime.fromtimestamp(expires, tz=settings.tz)
     except Exception as ex:
         log_and_raise_token_error(
@@ -131,7 +124,7 @@ def verify_access_token(token: str) -> tuple[int, TokenType, TokenMedia, str]:
             "token is expired", code=DISPLAY_CODES.QR_ERROR_EXPIRED
         )
 
-    return user_id, token_type, token_media, totp
+    return user_id, token_type, token_media, totp_suffix
 
 
 def _generate_dl_token(
