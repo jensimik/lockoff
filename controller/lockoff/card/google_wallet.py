@@ -186,7 +186,7 @@ class GooglePass:
             level=level,
             expires=expires,
             qr_code_data=qr_code_data,
-            totp=totp,
+            totp_key=totp_key,
         )
         claims = {
             "iss": self.credentials.service_account_email,
