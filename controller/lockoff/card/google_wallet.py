@@ -97,7 +97,7 @@ class GooglePass:
                 ]
             },
             "callbackOptions": {
-                "url": "https://lockoff-api.gnerd.dk/googlepass/callback"
+                "url": "https://lockoff-api.gnerd.dk/google-wallet/callback"
             },
             "multipleDevicesAndHoldersAllowedStatus": "ONE_USER_ALL_DEVICES",
             "ViewUnlockRequirement": "UNLOCK_NOT_REQUIRED",
