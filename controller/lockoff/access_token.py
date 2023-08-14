@@ -90,8 +90,10 @@ def verify_access_token(token: str) -> tuple[int, TokenType, TokenMedia, str]:
     """
     try:
         print(f"length token = {len(token)}")
-        raw_token = base45.b45decode(token)
-        totp = token[:-8]
+        raw_token = base45.b45decode(token[:39])
+        totp = token[39:]
+        print(f"raw token: {raw_token}")
+        print(f"totp: {totp}")
     except Exception as ex:
         log_and_raise_token_error(
             f"could not base45 decode token data: {ex}", code=DISPLAY_CODES.QR_ERROR
