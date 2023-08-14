@@ -21,9 +21,7 @@ class GoogleAuth(httpx.Auth):
             always_use_jwt_access=True,
             scopes=["https://www.googleapis.com/auth/wallet_object.issuer"],
         )
-        print(f"scopes: {self.credentials._scopes}")
         self.credentials._create_self_signed_jwt(audience=None)
-        print(f"expired {self.credentials.expired}")
         self.credentials.refresh(request=None)
 
     def auth_flow(self, request: httpx.Request):
@@ -194,12 +192,12 @@ class GooglePass:
         claims = {
             "iss": self.credentials.service_account_email,
             "aud": "google",
-            "origins": ["lockoff.nkk.dk"],
+            "origins": ["https://lockoff.nkk.dk"],
             "typ": "savetowallet",
             "payload": {
                 "genericObjects": [
                     {
-                        "id": pass_id,
+                        "id": f"{settings.google_issuer_id}.{pass_id}",
                         "classId": f"{settings.google_issuer_id}.membercard",
                     }
                 ]
