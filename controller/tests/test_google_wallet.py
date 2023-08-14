@@ -45,3 +45,33 @@ async def test_basic_insert(httpx_mock):
             qr_code_data="TEST_QR_CODE",
             totp_key="TOTP_KEY",
         )
+
+
+@pytest.mark.asyncio
+async def test_basic_create_class_insert(httpx_mock):
+    url = f"https://walletobjects.googleapis.com/walletobjects/v1/genericClass/{settings.google_issuer_id}.membercard"
+    httpx_mock.add_response(method="GET", url=url, status_code=404)
+    httpx_mock.add_response(
+        method="POST",
+        url="https://walletobjects.googleapis.com/walletobjects/v1/genericClass",
+        status_code=200,
+        json={},
+    )
+
+    async with GooglePass() as gp:
+        await gp.create_class()
+
+
+@pytest.mark.asyncio
+async def test_basic_create_class_update(httpx_mock):
+    url = f"https://walletobjects.googleapis.com/walletobjects/v1/genericClass/{settings.google_issuer_id}.membercard"
+    httpx_mock.add_response(method="GET", url=url, status_code=200)
+    httpx_mock.add_response(
+        method="PUT",
+        url=url,
+        status_code=200,
+        json={},
+    )
+
+    async with GooglePass() as gp:
+        await gp.create_class()
