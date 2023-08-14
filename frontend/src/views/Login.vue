@@ -33,7 +33,7 @@ const mobile_update = async(e) => {
     step.value = "totp";
     window.scrollTo({ top: 0});
     controllerAPI.request_totp(username.value, username_type.value).then(() => {
-      toast("check your " + username_type.value + " for the code 🤓");
+      toast.info("check your " + username_type.value + " for the code 🤓");
       // listen for OTP token on sms automatic
       if ('OTPCredential' in window) {
           const input = document.querySelector('input[autocomplete="one-time-code"]');
@@ -51,7 +51,7 @@ const mobile_update = async(e) => {
     }).catch((e) => {
       step.value = "username";
       username.value = "";
-      toast("error in data or no connection to backend - try again later");
+      toast.error("error in data or no connection to backend - try again later");
     })
   }
 }
@@ -61,7 +61,7 @@ const email_update = async(e) => {
   step.value = "totp";
   window.scrollTo({ top: 0});
   controllerAPI.request_totp(username.value, username_type.value).then(() => {
-    console.log("requested totp on email");
+    toast.info("check your " + username_type.value + " for the code");
   })
 }
 
@@ -74,13 +74,14 @@ const totp_update = async(e) => {
     // Cancel the WebOTP API.
     ac.abort();
     controllerAPI.login(username.value, username_type.value, totp.value).then((token_data) => {  
+        toast.success("logged in");
         setWithExpiry("access_token", token_data.access_token, 7100 * 1000);
         if (next_hop)
-            router.push({name: next_hop});
+            setTimeout(() => router.push({name: next_hop}), 500);
         else
-            router.push({name: "card"})
+            setTimeout(() => router.push({name: "card"}), 500);
     }).catch((e) => {
-        toast("failed to login - check if your code mobile/email and code is correct and try again");
+        toast.error("failed to login - check if your " + username_type.value + " and code is correct and try again later");
         username.value = "";
         totp.value = "";
         step.value = "username";
