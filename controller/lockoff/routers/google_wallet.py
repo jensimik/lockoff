@@ -4,7 +4,7 @@ from fastapi import APIRouter, Request
 
 from ..config import settings
 
-router = APIRouter(prefix="/v1", tags=["google_wallet"])
+router = APIRouter(tags=["google_wallet"])
 
 log = logging.getLogger(__name__)
 
