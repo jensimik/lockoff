@@ -171,8 +171,16 @@ class GooglePass:
         return new_object
 
     async def create_class(self):
-        url = f"/genericClass"
-        response = await self.client.post(url, json=self._generate_generic_class())
+        url = f"/genericClass/{settings.google_issuer_id}.membercard"
+        exists = await self.client.get(url)
+        if exists.status_code == 200:
+            # update it
+            response = await self.client.put(url, json=self._generate_generic_class())
+        elif exists.status_code == 404:
+            # create it
+            response = await self.client.post(
+                "/genericClass", json=self._generate_generic_class()
+            )
         return response.status_code == 200
 
     async def create_object(
@@ -186,22 +194,27 @@ class GooglePass:
     ) -> bool:
         # ensure class is created - cache this?
         await self.create_class()
-        # check if exists?
-        # response = await self.client.get(url)
-        # if response.status_code == httpx._status_codes.codes.OK:
-        #     return True
-        # create it
-        response = await self.client.post(
-            "/genericObject",
-            json=self._generate_generic_object(
-                pass_id=pass_id,
-                name=name,
-                level=level,
-                expires=expires,
-                qr_code_data=qr_code_data,
-                totp_key=totp_key,
-            ),
+        url = f"/genericObject/{settings.google_issuer_id}.{pass_id}"
+        data = self._generate_generic_object(
+            pass_id=pass_id,
+            name=name,
+            level=level,
+            expires=expires,
+            qr_code_data=qr_code_data,
+            totp_key=totp_key,
         )
+        # check if exists?
+        exists = await self.client.get(url)
+        if exists.status_code == 200:
+            # update it
+            response = await self.client.put(url, json=data)
+            return True
+        elif exists.status_code == 404:
+            # create it
+            response = await self.client.post(
+                "/genericObject",
+                json=data,
+            )
         return response.status_code == 200
 
     async def create_pass(
