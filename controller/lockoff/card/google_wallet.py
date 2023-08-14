@@ -22,6 +22,9 @@ class GoogleAuth(httpx.Auth):
             scopes=["https://www.googleapis.com/auth/wallet_object.issuer"],
         )
         print(f"scopes: {self.credentials._scopes}")
+        print(
+            f"additinal_claims: {self.credentials._jwt_credentials.additional_claims}"
+        )
         self.credentials._create_self_signed_jwt(audience=None)
         print(f"token: {self.credentials.token}")
 
