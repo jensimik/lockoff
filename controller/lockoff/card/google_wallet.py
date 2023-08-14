@@ -2,13 +2,16 @@ import json
 import os
 import typing
 import uuid
+from datetime import datetime
 from types import TracebackType
+from dateutil.relativedelta import relativedelta
 
 import httpx
 from google.auth import crypt, jwt
 from google.oauth2.service_account import Credentials
 
 from ..config import settings
+from ..db import GPass
 
 U = typing.TypeVar("U", bound="GooglePass")
 
@@ -76,18 +79,32 @@ class GooglePass:
             "callbackOptions": {
                 "url": "https://lockoff-api.gnerd.dk/googlepass/callback"
             },
+            "multipleDevicesAndHoldersAllowedStatus": "ONE_USER_ALL_DEVICES",
+            "ViewUnlockRequirement": "UNLOCK_NOT_REQUIRED",
         }
         return new_class
 
     def _generate_generic_object(
-        self, pass_id: str, name: str, level: str, expires: str, qr_code_data: str
+        self,
+        pass_id: str,
+        name: str,
+        level: str,
+        expires: datetime,
+        qr_code_data: str,
+        totp: str,
+        expires_delta: relativedelta(days=15),
     ):
+        now = datetime.now(tz=settings.tz)
         new_object = {
             "id": f"{self.issuer_id}.{pass_id}",
             "classId": f"{self.issuer_id}.membercard",
             "state": "ACTIVE",
             "genericType": "GENERIC_GYM_MEMBERSHIP",
             "passConstraints": {"screenshotEligibility": "INELIGIBLE"},
+            "TimeInterval": {
+                "start": now.isoformat(timespec="seconds"),
+                "end": (expires + expires_delta).isoformat(timespec="seconds"),
+            },
             "cardTitle": {
                 "defaultValue": {
                     "language": "en-US",
@@ -115,7 +132,7 @@ class GooglePass:
                     "periodMillis": "30000",
                     "parameters": [
                         {
-                            "key": "3132333435363738393031323334353637383930",
+                            "key": totp,
                             "valueLength": "8",
                         }
                     ],
@@ -132,30 +149,58 @@ class GooglePass:
         }
         return new_object
 
-    def create_pass(
+    async def create_object(
         self,
         pass_id: str,
         name: str,
         level: str,
-        expires: str,
+        expires: datetime,
+        qr_code_data: str,
+        totp: str,
+    ) -> bool:
+        url = f"/genericObject/{self.issuer_id}.{pass_id}"
+        # check if exists?
+        response = await self.client.get(url)
+        if response.status_code == httpx._status_codes.codes.OK:
+            return True
+        # create it
+        response = await self.client.post(
+            url,
+            json=self._generate_generic_object(
+                pass_id=pass_id,
+                name=name,
+                level=level,
+                expires=expires,
+                qr_code_data=qr_code_data,
+                totp=totp,
+            ),
+        )
+        return response.status_code == 200
+
+    async def create_pass(
+        self,
+        pass_id: str,
+        name: str,
+        level: str,
+        expires: datetime,
         qr_code_data: str,
     ):
+        await self.create_object(
+            pass_id=pass_id,
+            name=name,
+            level=level,
+            expires=expires,
+            qr_code_data=qr_code_data,
+        )
         claims = {
             "iss": self.credentials.service_account_email,
             "aud": "google",
             "origins": ["lockoff.nkk.dk"],
             "typ": "savetowallet",
             "payload": {
-                "genericClasses": [self._generate_generic_class()],
                 "genericObjects": [
-                    self._generate_generic_object(
-                        pass_id=pass_id,
-                        name=name,
-                        level=level,
-                        expires=expires,
-                        qr_code_data=qr_code_data,
-                    )
-                ],
+                    {"id": pass_id, "classId": f"{self.issuer_id}.membercard"}
+                ]
             },
         }
         token = jwt.encode(self.signer, claims).decode("utf-8")

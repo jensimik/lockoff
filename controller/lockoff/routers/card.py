@@ -1,3 +1,4 @@
+import base64
 import io
 import secrets
 from datetime import datetime
@@ -15,7 +16,7 @@ from ..access_token import (
 )
 from ..card import ApplePass, GooglePass, generate_pdf, generate_png
 from ..config import settings
-from ..db import DB, APPass, User
+from ..db import DB, APPass, GPass, User
 
 router = APIRouter(tags=["card"])
 
@@ -169,6 +170,7 @@ async def get_google_wallet(
         day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
     )
     serial = f"{settings.current_season}{user_id}"
+    totp = secrets.token_hex(16)
     async with GooglePass() as gp:
         jwt_url = gp.create_pass(
             pass_id=serial,
@@ -176,16 +178,17 @@ async def get_google_wallet(
             level=TokenType(user["token_type"]).name.capitalize(),
             expires=expires_display,
             qr_code_data=access_token.decode(),
+            totp=totp,
         )
     async with DB.transaction():
         # mark that the user have downloaded digital for this season
         await User.update({User.season_digital: str(settings.current_season)}).where(
             User.id == user_id
         )
-        # create a tracked appass
-        await APPass.insert(
-            APPass(id=serial, auth_token="", user_id=user_id, update_tag=0)
-        ).on_conflict(target=APPass.id, action="DO UPDATE", values=[APPass.update_tag])
+        # create a tracked gpass
+        await GPass.insert(GPass(id=serial, totp=totp, user_id=user_id)).on_conflict(
+            target=GPass.id, action="DO UPDATE", values=[GPass.totp]
+        )
     return RedirectResponse(
         url=jwt_url,
         headers={"Cache-Control": "no-cache", "CDN-Cache-Control": "no-store"},

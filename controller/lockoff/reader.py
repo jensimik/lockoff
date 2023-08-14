@@ -4,6 +4,7 @@ from datetime import datetime
 
 import serial_asyncio
 from dateutil.relativedelta import relativedelta
+from pyotp import TOTP
 
 from .access_token import (
     TokenError,
@@ -13,7 +14,7 @@ from .access_token import (
     verify_access_token,
 )
 from .config import settings
-from .db import DB, AccessLog, Dayticket, User
+from .db import DB, AccessLog, Dayticket, User, GPass
 from .misc import DISPLAY_CODES, O_CMD, GFXDisplay, buzz_in
 
 log = logging.getLogger(__name__)
@@ -53,6 +54,15 @@ async def check_dayticket(user_id: int):
         )
 
 
+async def check_totp(user_id: int, totp: str):
+    gp = await GPass.select(GPass.totp).where(GPass.user_id == user_id).first()
+    verifier = TOTP(s=gp["totp"], digits=8)
+    if not verifier.verify(otp=totp, valid_window=5):
+        log_and_raise_token_error(
+            "totp code did not match", code=DISPLAY_CODES.QR_ERROR_SIGNATURE
+        )
+
+
 async def check_qrcode(qr_code: str):
     user_id, token_type, token_media, totp = verify_access_token(
         token=qr_code
@@ -62,6 +72,8 @@ async def check_qrcode(qr_code: str):
     match token_type:
         case TokenType.NORMAL | TokenType.MORNING:
             await check_member(user_id=user_id, member_type=token_type)
+            if totp:
+                await check_totp(user_id=user_id, totp=totp)
         case TokenType.DAY_TICKET:
             await check_dayticket(user_id=user_id)
     log.info(f"{user_id} {token_type} access granted")
