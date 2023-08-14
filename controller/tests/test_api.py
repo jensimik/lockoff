@@ -155,11 +155,14 @@ def test_me(a0client: TestClient):
     for x, content_type in [
         ("qr-code.png", "image/png"),
         ("membership-card.pdf", "application/pdf"),
-        # ("membership-card.pkpass", "application/vnd.apple.pkpass"),
+        ("membership-card.pkpass", "application/vnd.apple.pkpass"),
     ]:
         response2 = a0client.get(f"/{token}/{x}")
         assert response2.status_code == status.HTTP_200_OK
         assert content_type == response2.headers["content-type"]
+
+    # response3 = a0client.get(f"/{token}/membership-card")
+    # assert response3.status_code == status.HTTP_307_TEMPORARY_REDIRECT
 
     # normal user do not have access to admin
     response = a0client.get("/admin/system-status")
@@ -171,7 +174,7 @@ def test_admin(a1client: TestClient, mocker):
     response = a1client.get("/admin/system-status")
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
-    assert data["digital_issued"] == 1
+    assert data["digital_issued"] == 2
     assert data["print_issued"] == 1
     assert data["total_issued"] == 2
 

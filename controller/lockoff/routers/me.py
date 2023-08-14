@@ -35,22 +35,22 @@ async def me(
     )
 
 
-@router.get("/testing123")
-async def testing123():
-    from ..card import AppleNotifier
-    from ..db import APDevice, APPass, APReg
+# @router.get("/testing123")
+# async def testing123():
+#     from ..card import AppleNotifier
+#     from ..db import APDevice, APPass, APReg
 
-    async with AppleNotifier() as an:
-        for p in await APPass.select(
-            APPass.id,
-            APPass.id.join_on(APReg.serial_number)
-            .device_library_identifier.join_on(APDevice.id)
-            .push_token.as_alias("push_token"),
-        ):
-            log.info(p)
-            # increment version
-            await APPass.update({APPass.update_tag: APPass.update_tag + 1}).where(
-                APPass.id == p["id"]
-            )
-            await an.notify_update(push_token=p["push_token"])
-    return {"status": "ok"}
+#     async with AppleNotifier() as an:
+#         for p in await APPass.select(
+#             APPass.id,
+#             APPass.id.join_on(APReg.serial_number)
+#             .device_library_identifier.join_on(APDevice.id)
+#             .push_token.as_alias("push_token"),
+#         ):
+#             log.info(p)
+#             # increment version
+#             await APPass.update({APPass.update_tag: APPass.update_tag + 1}).where(
+#                 APPass.id == p["id"]
+#             )
+#             await an.notify_update(push_token=p["push_token"])
+#     return {"status": "ok"}
