@@ -157,9 +157,9 @@ class GooglePass:
     ) -> bool:
         url = f"/genericObject/{settings.google_issuer_id}.{pass_id}"
         # check if exists?
-        response = await self.client.get(url)
-        if response.status_code == httpx._status_codes.codes.OK:
-            return True
+        # response = await self.client.get(url)
+        # if response.status_code == httpx._status_codes.codes.OK:
+        #     return True
         # create it
         response = await self.client.post(
             url,
