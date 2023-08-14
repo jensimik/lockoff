@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 async def callback(request: Request):
     # TODO: verify signature!
     # https://notificare.com/blog/2022/07/08/Handle-Google-Wallet-callbacks-with-nodejs/
-    data = request.json()
+    data = await request.json()
     event = json.loads(data["signedMessage"])
     _, pass_id = event["objectId"].split(".")
     event_type = event["eventType"]
