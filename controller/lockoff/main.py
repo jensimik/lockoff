@@ -7,7 +7,7 @@ from fastapi_limiter.depends import RateLimiter
 
 from .config import settings
 from .lifespan import lifespan, watchdog
-from .routers import admin, applepass, auth, card, me
+from .routers import admin, apple_wallet, auth, card, google_wallet, me
 
 log = logging.getLogger(__name__)
 
@@ -41,7 +41,8 @@ app.include_router(auth.router)
 app.include_router(card.router)
 app.include_router(me.router)
 app.include_router(admin.router, prefix="/admin")
-app.include_router(applepass.router, prefix="/apple-pass")
+app.include_router(apple_wallet.router, prefix="/apple-pass")
+app.include_router(google_wallet.router, prefix="/google-wallet")
 
 
 @app.get("/healtz", dependencies=[Depends(RateLimiter(times=2, seconds=5))])
