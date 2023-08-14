@@ -21,7 +21,7 @@ class GoogleAuth(httpx.Auth):
             always_use_jwt_access=True,
             scopes=["https://www.googleapis.com/auth/wallet_object.issuer"],
         )
-        print(f"scopes: {self.scopes}")
+        print(f"scopes: {self._scopes}")
         self.credentials._create_self_signed_jwt(audience=None)
         print(f"token: {self.credentials.token}")
 
