@@ -61,6 +61,32 @@ class GooglePass:
     def _generate_generic_class(self):
         new_class = {
             "id": f"{settings.google_issuer_id}.membercard",
+            "classTemplateInfo": {
+                "cardTemplateOverride": {
+                    "cardRowTemplateInfos": {
+                        "twoItems": {
+                            "startItem": {
+                                "firstValue": {
+                                    "fields": [
+                                        {
+                                            "fieldPath": "object.textModulesData['level']"
+                                        },
+                                    ]
+                                }
+                            },
+                            "endItem": {
+                                "firstValue": {
+                                    "fields": [
+                                        {
+                                            "fieldPath": "object.textModulesData['expires']"
+                                        },
+                                    ]
+                                }
+                            },
+                        }
+                    }
+                }
+            },
             "linksModuleData": {
                 "uris": [
                     {
@@ -111,12 +137,12 @@ class GooglePass:
                 {
                     "header": "Level",
                     "body": level,
-                    "id": "TEXT_NAME",
+                    "id": "level",
                 },
                 {
                     "header": "Expires",
                     "body": f"{expires:%Y-%m-%d}",
-                    "id": "TEXT_EXPIRES",
+                    "id": "expires",
                 },
             ],
             "rotatingBarcode": {
@@ -144,6 +170,11 @@ class GooglePass:
         }
         return new_object
 
+    async def create_class(self):
+        url = f"/genericClass/{settings.google_issuer_id}.membercard"
+        response = await self.client.post(url, json=self._generate_generic_class())
+        return response.status_code == 200
+
     async def create_object(
         self,
         pass_id: str,
@@ -153,6 +184,8 @@ class GooglePass:
         qr_code_data: str,
         totp_key: str,
     ) -> bool:
+        # ensure class is created - cache this?
+        await self.create_class()
         url = f"/genericObject/{settings.google_issuer_id}.{pass_id}"
         # check if exists?
         # response = await self.client.get(url)
