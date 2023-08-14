@@ -186,9 +186,9 @@ async def get_google_wallet(
             User.id == user_id
         )
         # create a tracked gpass
-        await GPass.insert(GPass(id=serial, totp=totp, user_id=user_id)).on_conflict(
-            target=GPass.id, action="DO UPDATE", values=[GPass.totp]
-        )
+        await GPass.insert(
+            GPass(id=serial, totp=totp_key, user_id=user_id)
+        ).on_conflict(target=GPass.id, action="DO UPDATE", values=[GPass.totp])
     return RedirectResponse(
         url=jwt_url,
         headers={"Cache-Control": "no-cache", "CDN-Cache-Control": "no-store"},
