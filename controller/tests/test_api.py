@@ -189,7 +189,7 @@ def test_apple_wallet_callbacks(a2client: TestClient):
     assert response.status_code == status.HTTP_200_OK
 
 
-def test_me(a0client: TestClient):
+def test_me(a0client: TestClient, mocker):
     response = a0client.get("/me")
     assert response.status_code == status.HTTP_200_OK
 
@@ -207,12 +207,16 @@ def test_me(a0client: TestClient):
         ("membership-card.pdf", "application/pdf"),
         ("membership-card.pkpass", "application/vnd.apple.pkpass"),
     ]:
-        response2 = a0client.get(f"/{token}/{x}")
-        assert response2.status_code == status.HTTP_200_OK
-        assert content_type == response2.headers["content-type"]
+        response = a0client.get(f"/{token}/{x}")
+        assert response.status_code == status.HTTP_200_OK
+        assert content_type == response.headers["content-type"]
 
-    # response3 = a0client.get(f"/{token}/membership-card")
-    # assert response3.status_code == status.HTTP_307_TEMPORARY_REDIRECT
+    async def _create_pass(*args, **kwargs):
+        return "http://localhost/jwt-redirect-url"
+
+    mocker.patch("lockoff.routers.card.GooglePass.create_pass", _create_pass)
+    response = a0client.get(f"/{token}/membership-card", follow_redirects=False)
+    assert response.status_code == status.HTTP_307_TEMPORARY_REDIRECT
 
     # normal user do not have access to admin
     response = a0client.get("/admin/system-status")
