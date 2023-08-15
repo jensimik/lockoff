@@ -1,12 +1,15 @@
+import json
+
 import pyotp
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 from lockoff.access_token import (
+    TokenType,
     generate_access_token,
     generate_dl_admin_token,
-    TokenType,
 )
+from lockoff.config import settings
 from lockoff.routers.auth import send_email, send_mobile
 
 
@@ -137,6 +140,46 @@ def test_login_mobile(user_id, use_correct_totp, ok, client: TestClient):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "access_token" not in json
         assert "token_type" not in json
+
+
+def test_google_wallet_callback(client: TestClient):
+    data = {"signedMessage": json.dumps({"objectId": "12345.1", "eventType": "save"})}
+    response = client.post("/google-wallet/callback", json=data)
+    assert response.status_code == status.HTTP_200_OK
+
+    data = {"signedMessage": json.dumps({"objectId": "12345.1", "eventType": "del"})}
+    response = client.post("/google-wallet/callback", json=data)
+    assert response.status_code == status.HTTP_200_OK
+
+
+def test_apple_wallet_callbacks(a2client: TestClient):
+    response = a2client.post("/apple-wallet/v1/log", json={"message": "test"})
+    assert response.status_code == status.HTTP_200_OK
+
+    device_library_identifier = "test-device"
+    pass_type_identifier = "pass-type-id"
+    serial_number = "20231"
+    data = {"pushToken": "push-token", "pushServiceUrl": "https://localhost/something"}
+    response = a2client.post(
+        f"/apple-wallet/v1/devices/{device_library_identifier}/registrations/{pass_type_identifier}/{serial_number}",
+        json=data,
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    response = a2client.get(
+        f"/apple-wallet/v1/devices/{device_library_identifier}/registrations/{pass_type_identifier}"
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    response = a2client.get(
+        f"/apple-wallet/v1/passes/{pass_type_identifier}/{serial_number}"
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    response = a2client.delete(
+        f"/apple-wallet/v1/devices/{device_library_identifier}/registrations/{pass_type_identifier}/{serial_number}"
+    )
+    assert response.status_code == status.HTTP_200_OK
 
 
 def test_me(a0client: TestClient):

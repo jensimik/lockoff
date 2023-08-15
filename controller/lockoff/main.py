@@ -41,7 +41,7 @@ app.include_router(auth.router)
 app.include_router(card.router)
 app.include_router(me.router)
 app.include_router(admin.router, prefix="/admin")
-app.include_router(apple_wallet.router, prefix="/apple-pass")
+app.include_router(apple_wallet.router, prefix="/apple-wallet")
 app.include_router(google_wallet.router, prefix="/google-wallet")
 
 

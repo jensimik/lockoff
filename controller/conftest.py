@@ -17,6 +17,7 @@ from lockoff.misc import simple_hash
 from piccolo.table import create_db_tables
 
 TOTP_SECRET = "H6IC425Q5IFZYAP4VINKRVHX7ZIEKO7E"
+UPDATE_AUTH_TOKEN = "qwerty"
 
 
 @asynccontextmanager
@@ -122,6 +123,11 @@ async def sample_data():
             GPass(id=1, user_id=1, totp=base64.b64encode(b"test123").decode(), status=0)
         ).on_conflict(action="DO NOTHING")
 
+        serial = "20231"
+        await APPass.insert(
+            APPass(id=serial, auth_token=UPDATE_AUTH_TOKEN, user_id=1, update_tag=0)
+        ).on_conflict(target=APPass.id, action="DO UPDATE", values=[APPass.update_tag])
+
 
 @pytest.fixture
 def client(mocker) -> TestClient:
@@ -177,4 +183,18 @@ def a1client(mocker) -> TestClient:
             "Authorization": f"{json['token_type']} {json['access_token']}"
         }
 
+        yield client
+
+
+@pytest.fixture
+def a2client(mocker) -> TestClient:
+    """authenticated client with apple callback token"""
+    mocker.patch("lockoff.lifespan.lifespan", testing_lifespan)
+    from lockoff.main import app
+
+    with TestClient(
+        app=app,
+        base_url="http://test",
+    ) as client:
+        client.headers = {"Authorization": f"ApplePass {UPDATE_AUTH_TOKEN}"}
         yield client
