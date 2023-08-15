@@ -153,7 +153,7 @@ def test_google_wallet_callback(client: TestClient):
 
 
 def test_apple_wallet_callbacks(a2client: TestClient):
-    response = a2client.post("/apple-wallet/v1/log", json={"message": "test"})
+    response = a2client.post("/apple-wallet/v1/log", json={"logs": ["test1", "test2"]})
     assert response.status_code == status.HTTP_200_OK
 
     device_library_identifier = "test-device"
@@ -170,6 +170,13 @@ def test_apple_wallet_callbacks(a2client: TestClient):
         f"/apple-wallet/v1/devices/{device_library_identifier}/registrations/{pass_type_identifier}"
     )
     assert response.status_code == status.HTTP_200_OK
+
+    last_updated = response.json()["lastUpdated"]
+
+    response = a2client.get(
+        f"/apple-wallet/v1/devices/{device_library_identifier}/registrations/{pass_type_identifier}?passesUpdatedSince={last_updated}"
+    )
+    assert response.status_code == status.HTTP_204_NO_CONTENT
 
     response = a2client.get(
         f"/apple-wallet/v1/passes/{pass_type_identifier}/{serial_number}"
