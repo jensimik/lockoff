@@ -294,9 +294,6 @@ class KMClient:
         await self._km_login()
         return self
 
-    async def aclose(self) -> None:
-        await self.client.aclose()
-
     async def __aexit__(
         self,
         exc_type: typing.Optional[typing.Type[BaseException]] = None,
@@ -341,10 +338,7 @@ async def refresh():
                     ],
                 )
             # mark old data as inactive
-            try:
-                await User.update({User.active: False}).where(User.batch_id != batch_id)
-            except Exception as ex:
-                log.exception("failed on update?")
+            await User.update({User.active: False}).where(User.batch_id != batch_id)
 
 
 async def klubmodul_runner(one_time_run: bool = False):
