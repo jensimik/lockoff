@@ -50,13 +50,9 @@ class Reader:
                     await self.o_cmd(cmds=[O_CMD.OK_SOUND, O_CMD.OK_LED])
                 else:
                     # if error then get the 418 teapot error in the json detail
-                    d = response.json()
-                    log.info(d)
                     data = response.json().get("detail", {})
                     await self.display.send_message(
-                        data.get(
-                            "error_code", DISPLAY_CODES.GENERIC_ERROR.decode()
-                        ).encode()
+                        data.get("code", DISPLAY_CODES.GENERIC_ERROR.decode()).encode()
                     )
                     await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
             # generic error? show system error on display
