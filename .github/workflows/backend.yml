@@ -1,4 +1,4 @@
-name: lockoff-backend-testing
+name: backend
 
 on:
   push:

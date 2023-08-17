@@ -1,4 +1,4 @@
-name: lockoff-reader-testing
+name: reader
 
 on:
   push:
