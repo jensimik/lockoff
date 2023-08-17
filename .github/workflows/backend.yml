@@ -8,7 +8,6 @@ permissions:
 env:
   KLUBMODUL_USERNAME: NONE
   KLUBMODUL_PASSWORD: NONE
-  GPIOZERO_PIN_FACTORY: mock
   DB_FILE: "/tmp/lockoff.db3"
   APPLE_PASS_KEY_PASSWORD: testing-123-drop-mic
   APPLE_PASS_CERTIFICATE: ./tests/certs/certificate.pem

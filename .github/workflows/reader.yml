@@ -6,18 +6,8 @@ permissions:
   contents: read
 
 env:
-  KLUBMODUL_USERNAME: NONE
-  KLUBMODUL_PASSWORD: NONE
   GPIOZERO_PIN_FACTORY: mock
-  DB_FILE: "/tmp/lockoff.db3"
-  APPLE_PASS_KEY_PASSWORD: testing-123-drop-mic
-  APPLE_PASS_CERTIFICATE: ./tests/certs/certificate.pem
-  APPLE_PASS_KEY: ./tests/certs/private.key
-  APPLE_PASS_WWDR_CERT: ./tests/certs/wwdr_certificate.pem
-  APPLE_APN_AUTH_KEY: ./tests/certs/apn.key
-  GOOGLE_SERVICE_ACCOUNT: ./tests/certs/service-account.json
-  GOOGLE_ISSUER_ID: 12345
-
+  BACKEND_URL: http://some-backend/check-token
 jobs:
   test:
     runs-on: ubuntu-latest
