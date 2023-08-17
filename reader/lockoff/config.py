@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     display_url: str = "/dev/DISPLAY"
     tz: tzfile = gettz("Europe/Copenhagen")
     backend_url: str = ""
-    reader_auth_token: str = ""
+    reader_token: str = ""
 
     @classmethod
     def settings_customise_sources(

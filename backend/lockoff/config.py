@@ -66,7 +66,7 @@ class Settings(BaseSettings):
     google_issuer_id: str = ""
     current_season: int = 2023
     tz: tzfile = gettz("Europe/Copenhagen")
-    reader_auth_token: str = ""
+    reader_token: str = ""
 
     @classmethod
     def settings_customise_sources(

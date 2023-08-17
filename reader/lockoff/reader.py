@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 
 class ReaderAuth(httpx.Auth):
     def auth_flow(self, request: httpx.Request):
-        request.headers["reader-token"] = settings.reader_auth_token
+        request.headers["reader-token"] = settings.reader_token
         yield request
 
 
