@@ -25,7 +25,7 @@ api_key_header = APIKeyHeader(name="reader-token", auto_error=False)
 
 
 async def get_api_key(api_key_header: str = Security(api_key_header)):
-    if api_key_header == settings.reader_auth_token:
+    if api_key_header == settings.reader_token:
         return api_key_header
     else:
         raise HTTPException(
