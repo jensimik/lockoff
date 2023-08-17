@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 router = APIRouter(tags=["reader"])
 
-api_key_header = APIKeyHeader(name="reader_token", auto_error=False)
+api_key_header = APIKeyHeader(name="reader-token", auto_error=False)
 
 
 async def get_api_key(api_key_header: str = Security(api_key_header)):
