@@ -52,7 +52,7 @@ services:
       - jwt_secret=${JWT_SECRET}
       - secret=${SECRET}
       - dl_secret=${DL_SECRET}
-      - apple_key_password=${APPLE_KEY_PASSWORD}
+      - apple_pass_key_password=${APPLE_PASS_KEY_PASSWORD}
       - admin_user_ids=${ADMIN_USER_IDS}
       - hash_salt=${HASH_SALT}
       - apple_apn_key_id=${APPLE_APN_KEY_ID}
