@@ -1,14 +1,6 @@
 name: frontend
 
-on:
-  push:
-    paths:
-      - "frontend/**/*"
-      - ".github/workflows/frontend.yml"
-  pull_request:
-    paths:
-      - "frontend/**/*"
-      - ".github/workflows/frontend.yml"
+on: [push, pull_request]
 
 jobs:
   build:
