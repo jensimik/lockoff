@@ -1,4 +1,4 @@
-# Lockoff - a multi door access system
+# Lockoff - a door access system
 
 _Lock-off (n): the act of pulling on a hold until your arm is in a bent position, then holding that position using body tension in order to reach the next hold with your free hand._
 
