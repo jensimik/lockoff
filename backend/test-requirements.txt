@@ -1,5 +1,4 @@
 pytest==7.4.0
-mock_serial==0.0.1
 fakeredis==2.18.0
 lupa==2.0
 sortedcontainers==2.4.0

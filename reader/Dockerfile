@@ -2,7 +2,7 @@ FROM python:3.11-slim-bookworm
 
 # get curl for health check and libpango for weazyprint and sqlite3 for db
 RUN apt-get update && \
-    apt-get install curl libpango-1.0-0 libpangoft2-1.0-0 sqlite3 libsqlite3-dev -y && \
+    apt-get install curl -y && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /code

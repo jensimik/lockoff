@@ -4,16 +4,11 @@ import logging
 import pathlib
 from datetime import datetime
 
-import serial_asyncio
-from gpiozero import LED
-
 from .config import settings
 
 log = logging.getLogger(__name__)
 lock = asyncio.Lock()
 module_directory = pathlib.Path(__file__).resolve().parent
-# automation hat mini relay 1 is on gpio pin 16
-relay = LED(16)
 
 
 class DISPLAY_CODES:
@@ -66,13 +61,6 @@ async def async_chunks(
 
         if results:
             yield results
-
-
-async def buzz_in(sleep: int = 4):
-    print("buzzing in")
-    relay.on()
-    await asyncio.sleep(sleep)
-    relay.off()
 
 
 class Watchdog:
