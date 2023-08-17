@@ -58,7 +58,7 @@ class Reader:
                     )
                     await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
             # generic error? show system error on display
-            except Exception:
+            except Exception as ex:
                 log.exception(f"generic error in reader {ex}")
                 await self.display.send_message(DISPLAY_CODES.GENERIC_ERROR)
                 await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
