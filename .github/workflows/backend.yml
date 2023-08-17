@@ -1,0 +1,97 @@
+name: lockoff-backend-testing
+
+on:
+  push:
+    paths:
+      - "backend/**/*"
+      - ".github/workflows/backend.yml"
+  pull_request:
+    paths:
+      - "backend/**/*"
+      - ".github/workflows/backend.yml"
+
+permissions:
+  contents: read
+
+env:
+  KLUBMODUL_USERNAME: NONE
+  KLUBMODUL_PASSWORD: NONE
+  GPIOZERO_PIN_FACTORY: mock
+  DB_FILE: "/tmp/lockoff.db3"
+  APPLE_PASS_KEY_PASSWORD: testing-123-drop-mic
+  APPLE_PASS_CERTIFICATE: ./tests/certs/certificate.pem
+  APPLE_PASS_KEY: ./tests/certs/private.key
+  APPLE_PASS_WWDR_CERT: ./tests/certs/wwdr_certificate.pem
+  APPLE_APN_AUTH_KEY: ./tests/certs/apn.key
+  GOOGLE_SERVICE_ACCOUNT: ./tests/certs/service-account.json
+  GOOGLE_ISSUER_ID: 12345
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest anyio
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f test-requirements.txt ]; then pip install -r test-requirements.txt; fi
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Test with pytest
+        run: |
+          pytest --cov=lockoff --cov-report=xml
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  dockerhub:
+    name: push to docker hub
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: arm64
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          platforms: linux/arm64
+          context: "{{defaultContext}}:backend"
+          push: true
+          cache-from: type=registry,ref=jensimik/lockoff:buildcache
+          cache-to: type=registry,ref=jensimik/lockoff:buildcache,mode=max
+          tags: |
+            jensimik/lockoff-backend:1
+            jensimik/lockoff-backend:1.0
+            jensimik/lockoff-backend:latest
+      - name: trigger docker-compose-watchtower
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: "https://lockoff-watchtower.gnerd.dk/v1/update"
+          method: "GET"
+          bearerToken: ${{ secrets.WATCHTOWER_TOKEN }}
+          timeout: 1200000

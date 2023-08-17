@@ -1,14 +1,14 @@
-name: lockoff-testing
+name: lockoff-reader-testing
 
 on:
   push:
     paths:
-      - "controller/**/*"
-      - ".github/workflows/controller.yml"
+      - "reader/**/*"
+      - ".github/workflows/reader.yml"
   pull_request:
     paths:
-      - "controller/**/*"
-      - ".github/workflows/controller.yml"
+      - "reader/**/*"
+      - ".github/workflows/reader.yml"
 
 permissions:
   contents: read
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: controller
+        working-directory: reader
 
     steps:
       - uses: actions/checkout@v3
@@ -80,14 +80,14 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           platforms: linux/arm64
-          context: "{{defaultContext}}:controller"
+          context: "{{defaultContext}}:reader"
           push: true
-          cache-from: type=registry,ref=jensimik/lockoff:buildcache
-          cache-to: type=registry,ref=jensimik/lockoff:buildcache,mode=max
+          cache-from: type=registry,ref=jensimik/lockoff-reader:buildcache
+          cache-to: type=registry,ref=jensimik/lockoff-reader:buildcache,mode=max
           tags: |
-            jensimik/lockoff:1
-            jensimik/lockoff:1.0
-            jensimik/lockoff:latest
+            jensimik/lockoff-reader:1
+            jensimik/lockoff-reader:1.0
+            jensimik/lockoff-reader:latest
       - name: trigger docker-compose-watchtower
         uses: fjogeleit/http-request-action@v1
         with:
