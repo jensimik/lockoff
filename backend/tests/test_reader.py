@@ -2,9 +2,10 @@ import asyncio
 
 import pytest
 from lockoff.access_token import TokenError, TokenType, generate_access_token
-from lockoff.misc import O_CMD, GFXDisplay
-from lockoff.reader import (
-    Reader,
+
+# from lockoff.misc import O_CMD, GFXDisplay
+from lockoff.routers.reader import (
+    # Reader,
     check_dayticket,
     check_member,
     check_qrcode,
@@ -52,7 +53,7 @@ async def test_dayticket():
 
 
 @pytest.mark.asyncio
-async def test_reader_ok_token(mocker, mock_serial):
+async def na_test_reader_ok_token(mocker, mock_serial):
     send_message = mocker.patch("lockoff.misc.GFXDisplay.send_message")
     buzz_in = mocker.patch("lockoff.reader.buzz_in")
     ok_token = generate_access_token(user_id=1, token_type=TokenType.NORMAL)
@@ -80,7 +81,7 @@ async def test_reader_ok_token(mocker, mock_serial):
 
 
 @pytest.mark.asyncio
-async def test_reader_bad_token(mocker, mock_serial):
+async def na_test_reader_bad_token(mocker, mock_serial):
     send_message = mocker.patch("lockoff.misc.GFXDisplay.send_message")
     buzz_in = mocker.patch("lockoff.reader.buzz_in")
     ok_token = generate_access_token(user_id=1, token_type=TokenType.NORMAL)

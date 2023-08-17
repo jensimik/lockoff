@@ -1,23 +1,37 @@
-import asyncio
 import logging
 from datetime import datetime
 
-import serial_asyncio
 from dateutil.relativedelta import relativedelta
+from fastapi import APIRouter, Depends, HTTPException, Security, status
+from fastapi.security import APIKeyHeader
 from pyotp import TOTP
 
-from .access_token import (
+from .. import schemas
+from ..access_token import (
     TokenError,
-    TokenMedia,
     TokenType,
     log_and_raise_token_error,
     verify_access_token,
 )
-from .config import settings
-from .db import DB, AccessLog, Dayticket, User, GPass
-from .misc import DISPLAY_CODES, O_CMD, GFXDisplay, buzz_in
+from ..config import settings
+from ..db import DB, AccessLog, Dayticket, GPass, User
+from ..misc import DISPLAY_CODES
 
 log = logging.getLogger(__name__)
+
+router = APIRouter(tags=["reader"])
+
+api_key_header = APIKeyHeader(name="reader_token", auto_error=False)
+
+
+async def get_api_key(api_key_header: str = Security(api_key_header)):
+    if api_key_header == settings.reader_auth_token:
+        return api_key_header
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"code": "Q", "reason": "Could not validate API KEY"},
+        )
 
 
 async def check_member(user_id: int, member_type: TokenType):
@@ -92,45 +106,13 @@ async def check_qrcode(qr_code: str):
         )
 
 
-class Reader:
-    async def setup(self, display: GFXDisplay, url=settings.opticon_url):
-        self.display = display
-        self._r, self._w = await serial_asyncio.open_serial_connection(url=url)
-        self.background_tasks = set()
-
-    # write opticon command to serial
-    async def o_cmd(self, cmds: list[bytes]):
-        for cmd in cmds:
-            self._w.write(cmd)
-        await self._w.drain()
-
-    async def runner(self, one_time_run: bool = False):
-        while True:
-            # read a scan from the barcode reader read until carriage return CR
-            qr_code: str = (
-                (await self._r.readuntil(separator=b"\r")).decode("utf-8").strip()
-            )
-            try:
-                # check the qr_code (raises exception on errors)
-                await check_qrcode(qr_code=qr_code)
-                # buzz in
-                task = asyncio.create_task(buzz_in())
-                self.background_tasks.add(task)
-                task.add_done_callback(self.background_tasks.discard)
-                # show OK on display
-                await self.display.send_message(DISPLAY_CODES.OK)
-                # give good sound+led on opticon now qr code is verified
-                await self.o_cmd(cmds=[O_CMD.OK_SOUND, O_CMD.OK_LED])
-            except TokenError as ex:
-                # show error message on display
-                log.warning(ex)
-                await self.display.send_message(ex.code)
-                await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
-            # generic error? show system error on display
-            except Exception:
-                log.exception("generic error in reader")
-                await self.display.send_message(DISPLAY_CODES.GENERIC_ERROR)
-                await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
-            # one_time_run is used for testing
-            if one_time_run:
-                break
+@router.post("/reader-check-code", dependencies=[Depends(get_api_key)])
+async def reader_check_code(data: schemas.ReaderCheckCode):
+    try:
+        await check_qrcode(qr_code=data.qr_code)
+    except TokenError as ex:
+        raise HTTPException(
+            status_code=status.HTTP_418_IM_A_TEAPOT,
+            detail={"code": ex.code.decode(), "reason": str(ex)},
+        )
+    return schemas.StatusReply(status="OK")

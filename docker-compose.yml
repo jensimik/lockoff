@@ -35,9 +35,9 @@ services:
     command: tunnel --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
-  lockoff:
-    image: jensimik/lockoff:latest
-    container_name: lockoff
+  lockoff-backend:
+    image: jensimik/lockoff-backend:latest
+    container_name: lockoff-backend
     restart: always
     volumes:
       - $PWD/lockoff.db3:/db/lockoff.db3
@@ -48,20 +48,39 @@ services:
       - klubmodul_base_url=${KLUBMODUL_BASE_URL}
       - klubmodul_username=${KLUBMODUL_USERNAME}
       - klubmodul_password=${KLUBMODUL_PASSWORD}
-      - opticon_url=/dev/OPTICON
-      - display_url=/dev/DISPLAY
       - redis_url=${REDIS_URL}
       - jwt_secret=${JWT_SECRET}
       - secret=${SECRET}
       - dl_secret=${DL_SECRET}
       - apple_key_password=${APPLE_KEY_PASSWORD}
-      - GPIOZERO_PIN_FACTORY=native
       - admin_user_ids=${ADMIN_USER_IDS}
       - hash_salt=${HASH_SALT}
       - apple_apn_key_id=${APPLE_APN_KEY_ID}
       - walletpass_token=${WALLETPASS_TOKEN}
       - sentry_dsn=${SENTRY_DSN}
       - google_issuer_id=${GOOGLE_ISSUER_ID}
+      - reader_token=${READER_TOKEN}
+    depends_on:
+      - redis
+    healthcheck:
+      test: "curl --fail http://localhost:80/healtz || exit 1"
+      interval: 60s
+      timeout: 3s
+      start_period: 20s
+      retries: 5
+  lockoff-reader:
+    image: jensimik/lockoff-reader:latest
+    container_name: lockoff-reader
+    restart: always
+    environment:
+      - tz=Europe/Copenhagen
+      - opticon_url=/dev/OPTICON
+      - display_url=/dev/DISPLAY
+      - GPIOZERO_PIN_FACTORY=native
+      # use lockoff-backend and ok to use http as inside the docker container virtual network
+      # if using multi-doors and a reader on another host then use https
+      - backend_url=http://lockoff-backend/reader-check-code
+      - reader_token=${READER_TOKEN}
     group_add:
       - dialout
     devices:
@@ -69,7 +88,7 @@ services:
       - /dev/DISPLAY:/dev/DISPLAY
       - /dev/gpiomem:/dev/gpiomem
     depends_on:
-      - redis
+      - lockoff-backend
     healthcheck:
       test: "curl --fail http://localhost:80/healtz || exit 1"
       interval: 60s

@@ -62,3 +62,7 @@ class MeReplyUser(BaseModel):
 
 class MeReply(BaseModel):
     users: list[MeReplyUser]
+
+
+class ReaderCheckCode(BaseModel):
+    qr_code: str

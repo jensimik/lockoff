@@ -7,7 +7,7 @@ from fastapi_limiter.depends import RateLimiter
 
 from .config import settings
 from .lifespan import lifespan, watchdog
-from .routers import admin, apple_wallet, auth, card, google_wallet, me
+from .routers import admin, apple_wallet, auth, card, google_wallet, me, reader
 
 log = logging.getLogger(__name__)
 
@@ -40,6 +40,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(card.router)
 app.include_router(me.router)
+app.include_router(reader.router)
 app.include_router(admin.router, prefix="/admin")
 app.include_router(apple_wallet.router, prefix="/apple-wallet")
 app.include_router(google_wallet.router, prefix="/google-wallet")

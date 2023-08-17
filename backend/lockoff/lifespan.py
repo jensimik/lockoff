@@ -10,8 +10,7 @@ from .card import GooglePass
 from .config import settings
 from .db import AccessLog, APDevice, APPass, APReg, Dayticket, GPass, User
 from .klubmodul import klubmodul_runner
-from .misc import GFXDisplay, watchdog
-from .reader import Reader
+from .misc import watchdog
 
 
 @asynccontextmanager
@@ -22,16 +21,6 @@ async def lifespan(app: FastAPI):
     await create_db_tables(
         User, Dayticket, AccessLog, APReg, APDevice, APPass, GPass, if_not_exists=True
     )
-    # start display
-    display = GFXDisplay()
-    await display.setup()
-    display_task = asyncio.create_task(display.runner())
-    watchdog.watch(display_task)
-    # start opticon reader
-    reader = Reader()
-    await reader.setup(display=display)
-    opticon_task = asyncio.create_task(reader.runner())
-    watchdog.watch(opticon_task)
     # start klubmodul runner
     klubmodul_task = asyncio.create_task(klubmodul_runner())
     watchdog.watch(klubmodul_task)

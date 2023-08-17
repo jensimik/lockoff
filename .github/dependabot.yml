@@ -1,7 +1,19 @@
 version: 2
 updates:
   - package-ecosystem: "pip"
-    directory: "/controller"
+    directory: "/backend"
+    schedule:
+      interval: "daily"
+    groups:
+      pip-dep:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "starlette"
+    ignore:
+      - dependency-name: "cryptography"
+  - package-ecosystem: "pip"
+    directory: "/reader"
     schedule:
       interval: "daily"
     groups:
