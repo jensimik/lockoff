@@ -57,8 +57,9 @@ jobs:
           pytest --cov=lockoff --cov-report=xml
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          flags: reader
+          token: ${{ secrets.CODECOV_TOKEN }}
   dockerhub:
     name: push to docker hub
     needs: test
