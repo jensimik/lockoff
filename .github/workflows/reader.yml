@@ -1,6 +1,14 @@
 name: reader
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - "reader/**/*"
+      - ".github/workflows/reader.yml"
+  pull_request:
+    paths:
+      - "reader/**/*"
+      - ".github/workflows/reader.yml"
 
 permissions:
   contents: read
