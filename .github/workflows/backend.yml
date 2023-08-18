@@ -88,10 +88,10 @@ jobs:
             jensimik/lockoff-backend:1
             jensimik/lockoff-backend:1.0
             jensimik/lockoff-backend:latest
-      - name: trigger docker-compose-watchtower
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: "https://lockoff-watchtower.gnerd.dk/v1/update"
-          method: "GET"
-          bearerToken: ${{ secrets.WATCHTOWER_TOKEN }}
-          timeout: 1200000
+      # - name: trigger docker-compose-watchtower
+      #   uses: fjogeleit/http-request-action@v1
+      #   with:
+      #     url: "https://lockoff-watchtower.gnerd.dk/v1/update"
+      #     method: "GET"
+      #     bearerToken: ${{ secrets.WATCHTOWER_TOKEN }}
+      #     timeout: 1200000

@@ -43,7 +43,6 @@ services:
       - $PWD/lockoff.db3:/db/lockoff.db3
       - $PWD/secret/secret:ro
     environment:
-      - tz=Europe/Copenhagen
       - db_file=/db/lockoff.db3
       - klubmodul_base_url=${KLUBMODUL_BASE_URL}
       - klubmodul_username=${KLUBMODUL_USERNAME}
@@ -73,9 +72,6 @@ services:
     container_name: lockoff-reader
     restart: always
     environment:
-      - tz=Europe/Copenhagen
-      - opticon_url=/dev/OPTICON
-      - display_url=/dev/DISPLAY
       - GPIOZERO_PIN_FACTORY=native
       # use lockoff-backend and ok to use http as inside the docker container virtual network
       # if using multi-doors and a reader on another host then use https

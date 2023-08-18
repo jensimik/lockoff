@@ -55,9 +55,8 @@ class Settings(BaseSettings):
     dl_secret: bytes = "changeme"
     secret: bytes = "changeme"
     jwt_secret: str = ""
-    opticon_url: str = "/dev/OPTICON"
-    display_url: str = "/dev/DISPLAY"
     admin_user_ids: list[int] = [1]
+    eljefe: list[int] = [3587, 4281]
     db_file: str = "/tmp/lockoff.db3"
     redis_url: str = "redis://localhost"
     google_service_account: pathlib.Path = pathlib.Path(
