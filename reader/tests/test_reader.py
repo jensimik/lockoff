@@ -11,7 +11,7 @@ from lockoff.config import settings
 @pytest.mark.asyncio
 async def test_reader_ok(mocker, mock_serial, httpx_mock):
     httpx_mock.add_response(
-        method="POST", url=settings.backend_url, json={"status": "OK"}
+        method="POST", url=settings.backend_url, json={"status": "K"}
     )
     buzz_in = mocker.patch("lockoff.reader.buzz_in")
     send_message = mocker.patch("lockoff.misc.GFXDisplay.send_message")
