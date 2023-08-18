@@ -3,6 +3,7 @@ import logging
 
 import httpx
 import serial_asyncio
+
 from .config import settings
 from .misc import DISPLAY_CODES, O_CMD, GFXDisplay, buzz_in
 
@@ -44,8 +45,13 @@ class Reader:
                     task = asyncio.create_task(buzz_in())
                     self.background_tasks.add(task)
                     task.add_done_callback(self.background_tasks.discard)
-                    # show OK on display
-                    await self.display.send_message(DISPLAY_CODES.OK)
+                    # get message to show on display from status and fallback to OK
+                    message = (
+                        response.json()
+                        .get("status", DISPLAY_CODES.OK.decode())
+                        .encode()
+                    )
+                    await self.display.send_message(message)
                     # give good sound+led on opticon now qr code is verified
                     await self.o_cmd(cmds=[O_CMD.OK_SOUND, O_CMD.OK_LED])
                 else:

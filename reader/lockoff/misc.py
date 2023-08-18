@@ -23,6 +23,7 @@ class DISPLAY_CODES:
     QR_ERROR = b"Q"
     QR_ERROR_SIGNATURE = b"S"
     QR_ERROR_EXPIRED = b"X"
+    ELJEFE = b"J"
 
 
 class O_CMD:

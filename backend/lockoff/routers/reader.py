@@ -79,7 +79,7 @@ async def check_totp(user_id: int, totp: str):
         )
 
 
-async def check_qrcode(qr_code: str):
+async def check_qrcode(qr_code: str) -> tuple[int, str, str]:
     user_id, token_type, token_media, totp = verify_access_token(
         token=qr_code
     )  # it will raise TokenError if not valid
@@ -104,15 +104,16 @@ async def check_qrcode(qr_code: str):
                 timestamp=datetime.now(tz=settings.tz).isoformat(timespec="seconds"),
             )
         )
+    return (user_id, token_type, token_media)
 
 
 @router.post("/reader-check-code", dependencies=[Depends(get_api_key)])
 async def reader_check_code(data: schemas.ReaderCheckCode):
     try:
-        await check_qrcode(qr_code=data.qr_code)
+        user_id, _, _ = await check_qrcode(qr_code=data.qr_code)
     except TokenError as ex:
         raise HTTPException(
             status_code=status.HTTP_418_IM_A_TEAPOT,
             detail={"code": ex.code.decode(), "reason": str(ex)},
         )
-    return schemas.StatusReply(status="OK")
+    return schemas.StatusReply(status="J" if user_id in settings.eljefe else "K")
