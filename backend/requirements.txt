@@ -19,7 +19,7 @@ ecdsa==0.18.0
 email-validator==2.0.0.post2
 fastapi==0.101.1
 fastapi-limiter==0.1.5
-fonttools==4.42.0
+fonttools==4.42.1
 google-auth==2.22.0
 h11==0.14.0
 h2==4.1.0
@@ -45,9 +45,9 @@ pluggy==1.2.0
 pyasn1==0.5.0
 pyasn1-modules==0.3.0
 pycparser==2.21
-pydantic==2.2.0
+pydantic==2.2.1
 pydantic-settings==2.0.3
-pydantic_core==2.6.0
+pydantic_core==2.6.1
 pydyf==0.7.0
 pyotp==2.9.0
 pyphen==0.14.0
@@ -58,7 +58,7 @@ python-jose==3.3.0
 python-multipart==0.0.6
 PyYAML==6.0.1
 qrcode==7.4.2
-redis==4.6.0
+redis==5.0.0
 requests==2.31.0
 rsa==4.9
 sentry-sdk==1.29.2
@@ -68,7 +68,7 @@ starlette==0.27.0
 targ==0.3.8
 tinycss2==1.2.1
 typing_extensions==4.7.1
-urllib3==1.26.16
+urllib3==2.0.4
 uvicorn==0.23.2
 uvloop==0.17.0
 watchfiles==0.19.0
