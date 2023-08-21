@@ -4,11 +4,22 @@ from contextlib import asynccontextmanager
 import redis.asyncio as redis
 from fastapi import FastAPI
 from fastapi_limiter import FastAPILimiter
+from piccolo import columns
 from piccolo.table import create_db_tables
 
 from .card import GooglePass
 from .config import settings
-from .db import AccessLog, APDevice, APPass, APReg, Dayticket, GPass, User
+from .db import (
+    DB,
+    AccessLog,
+    APDevice,
+    APPass,
+    APReg,
+    Dayticket,
+    GPass,
+    Otherticket,
+    User,
+)
 from .klubmodul import klubmodul_runner
 from .misc import watchdog
 
@@ -19,8 +30,22 @@ async def lifespan(app: FastAPI):
     await FastAPILimiter.init(_redis)
     # init db and create tables if not exists
     await create_db_tables(
-        User, Dayticket, AccessLog, APReg, APDevice, APPass, GPass, if_not_exists=True
+        User,
+        Dayticket,
+        AccessLog,
+        APReg,
+        APDevice,
+        APPass,
+        GPass,
+        Otherticket,
+        if_not_exists=True,
     )
+    # # simple "migrations"
+    # try:
+    #     await User.alter().add_column("test", columns.Integer(default=0))
+
+    # except Exception:
+    #     pass
     # start klubmodul runner
     klubmodul_task = asyncio.create_task(klubmodul_runner())
     watchdog.watch(klubmodul_task)

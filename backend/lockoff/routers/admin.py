@@ -26,7 +26,7 @@ from ..access_token import (
 )
 from ..card import generate_png
 from ..config import settings
-from ..db import DB, AccessLog, Dayticket, Max, User, UserModel
+from ..db import DB, AccessLog, Dayticket, Max, Otherticket, User, UserModel
 from ..klubmodul import refresh
 
 router = APIRouter(tags=["admin"])
@@ -34,7 +34,7 @@ router = APIRouter(tags=["admin"])
 log = logging.getLogger(__name__)
 
 
-@router.post("/generate-daytickets")
+@router.post("/daytickets")
 async def generate_daytickets(
     pages_to_print: schemas.PagesToPrint,
     _: Annotated[
@@ -61,7 +61,7 @@ async def generate_daytickets(
 
 
 @router.get(
-    "/{token}/qr-code.png",
+    "daytickets/{token}/qr-code.png",
     response_class=Response,
     responses={
         200: {"content": {"image/png": {}}},
@@ -86,6 +86,79 @@ async def get_qr_code_png(
         img.save(f, format="png")
         content = f.getvalue()
     return Response(content=content, media_type="image/png")
+
+
+@router.get(
+    "othertickets/{token}/qr-code.png",
+    response_class=Response,
+    responses={
+        200: {"content": {"image/png": {}}},
+    },
+)
+async def get_qr_code_png(
+    ticket_id: Annotated[int, Depends(verify_dl_admin_token)],
+):
+    log.info(f"getting qr code for ticket_id {ticket_id}")
+    ticket = await Otherticket.select().where(Otherticket.id == ticket_id)
+    if not ticket:
+        log.error(f"could not find ticket with id {ticket_id}")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    access_token = generate_access_token(
+        user_id=ticket_id,
+        token_type=TokenType.OTHER,
+        token_media=TokenMedia.PRINT,
+        expire_delta=relativedelta(months=48),
+    )
+    img = generate_png(qr_code_data=access_token.decode())
+    with io.BytesIO() as f:
+        img.save(f, format="png")
+        content = f.getvalue()
+    return Response(content=content, media_type="image/png")
+
+
+@router.get("othertickets")
+async def get_other_tickets(
+    _: Annotated[
+        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
+    ],
+):
+    tickets = await Otherticket.select().where(Otherticket.active == True)
+    return tickets
+
+
+@router.post("othertickets")
+async def create_other_ticket(
+    data: schemas.OtherTicket,
+    _: Annotated[
+        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
+    ],
+):
+    ticket_id = await Otherticket.insert(Otherticket(name=data.name, active=True))
+    ticket = await Otherticket.select(Otherticket.id == ticket_id)
+    return ticket
+
+
+@router.get("othertickets/{id}")
+async def get_other_tickets(
+    id: int,
+    _: Annotated[
+        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
+    ],
+):
+    ticket = Otherticket.select().where(Otherticket.id == id)
+    ticket["dl_token"] = generate_dl_admin_token(user_id=ticket["id"])
+    return ticket
+
+
+@router.delete("othertickets/{id}")
+async def delete_other_ticket(
+    id: int,
+    _: Annotated[
+        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
+    ],
+) -> schemas.StatusReply:
+    await Otherticket.update({Otherticket.active: False}).where(Otherticket.id == id)
+    return schemas.StatusReply(status="OK")
 
 
 @router.post("/check-token")
@@ -146,6 +219,15 @@ async def check_token(
                             status_code=status.HTTP_400_BAD_REQUEST,
                             detail=f"dayticket is expired {expires}",
                         )
+        case TokenType.OTHER:
+            ticket = await Otherticket.select(Otherticket.id).where(
+                Otherticket.id == user_id, Otherticket.active == True
+            )
+            if not ticket:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="ticket not found or inactive",
+                )
     return schemas.TokenCheck(user_id=user_id, token_type=token_type.name, name=name)
 
 

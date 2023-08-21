@@ -72,7 +72,7 @@ export default {
     },
     async generate_daytickets(pages_to_print) {
         var access_token = getWithExpiry("access_token");
-        const response = await fetch(APISettings.baseURL + '/admin/generate-daytickets', {
+        const response = await fetch(APISettings.baseURL + '/admin/daytickets', {
             method: 'POST',
             headers: {...APISettings.headers, 'Content-Type': 'Application/json', Authorization: "Bearer " + access_token},
             body: JSON.stringify({pages_to_print: pages_to_print})

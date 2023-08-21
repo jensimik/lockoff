@@ -14,7 +14,7 @@ from ..access_token import (
     verify_access_token,
 )
 from ..config import settings
-from ..db import DB, AccessLog, Dayticket, GPass, User
+from ..db import DB, AccessLog, GPass, User, Dayticket, Otherticket
 from ..misc import DISPLAY_CODES
 
 log = logging.getLogger(__name__)
@@ -34,13 +34,13 @@ async def get_api_key(api_key_header: str = Security(api_key_header)):
         )
 
 
-async def check_member(user_id: int, member_type: TokenType):
+async def check_member(user_id: int, token_type: TokenType):
     user = await User.select(User.id).where(User.id == user_id).first()
     if not user:
         log_and_raise_token_error(
             "did you cancel your membership?", code=DISPLAY_CODES.NO_MEMBER
         )
-    if member_type == TokenType.MORNING:
+    if token_type == TokenType.MORNING:
         # TODO: check if morning member has access in current hour?
         pass
 
@@ -70,13 +70,21 @@ async def check_dayticket(user_id: int):
 
 async def check_totp(user_id: int, totp: str):
     gp = await GPass.select(GPass.totp).where(GPass.user_id == user_id).first()
-    print(gp)
-    print(totp)
     verifier = TOTP(s=gp["totp"], digits=8)
     if not verifier.verify(otp=totp, valid_window=5):
         log_and_raise_token_error(
             "totp code did not match", code=DISPLAY_CODES.QR_ERROR_SIGNATURE
         )
+
+
+async def check_otherticket(user_id: int):
+    ticket = (
+        await Otherticket.select(Otherticket.id)
+        .where(Otherticket.id == user_id)
+        .first()
+    )
+    if not ticket:
+        log_and_raise_token_error("no such ticket", code=DISPLAY_CODES.NO_MEMBER)
 
 
 async def check_qrcode(qr_code: str) -> tuple[int, str, str]:
@@ -87,11 +95,13 @@ async def check_qrcode(qr_code: str) -> tuple[int, str, str]:
     # check in database
     match token_type:
         case TokenType.NORMAL | TokenType.MORNING:
-            await check_member(user_id=user_id, member_type=token_type)
+            await check_member(user_id=user_id, token_type=token_type)
             if totp:
                 await check_totp(user_id=user_id, totp=totp)
         case TokenType.DAY_TICKET:
             await check_dayticket(user_id=user_id)
+        case TokenType.OTHER:
+            await check_otherticket(user_id=user_id)
     log.info(f"{user_id} {token_type} access granted")
     # log in access_log db
     async with DB.transaction():

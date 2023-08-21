@@ -66,3 +66,7 @@ class MeReply(BaseModel):
 
 class ReaderCheckCode(BaseModel):
     qr_code: str
+
+
+class OtherTicket(BaseModel):
+    name: str
