@@ -42,13 +42,15 @@ export default {
           </header>
           <p>{{ user.member_type }} member exp {{ user.expires }}</p>
           <footer>
-            <div class="flex two">
-              <div>
-                <a class="button print" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pdf'"><span class="printicon">🖨️ print</span></a>
-              </div>
+            <div class="flex one three-1200">
               <div>
                 <a target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pkpass'"><img class="addtoapplewallet" src="/US-UK_Add_to_Apple_Wallet_RGB_101421.svg" /></a>
+              </div>
+              <div>
                 <a target="_blank" :href="baseURL + '/' + user.token + '/membership-card'"><img class="addtogooglewallet" src="/svg/enGB_add_to_google_wallet_add-wallet-badge.svg" /></a>
+              </div>
+              <div>
+                <a class="button print" target="_blank" :href="baseURL + '/' + user.token + '/membership-card.pdf'"><span class="printicon">🖨️ print</span></a>
               </div>
             </div>
           </footer>
@@ -64,12 +66,12 @@ img[alt="Get it on Google Play"] {
 .print {
   background-color: #000;
   color: #fff;
-  padding-top: 0.8em;
-  padding-bottom: 0.8em;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
   /* height: 100%; */
 }
 span.printicon {
-  font-size: 2em;
+  font-size: 1.5em;
 }
 img.addtoapplewallet {
   width: 100%;
