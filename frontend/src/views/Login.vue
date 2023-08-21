@@ -33,7 +33,7 @@ const mobile_update = async(e) => {
     step.value = "totp";
     window.scrollTo({ top: 0});
     controllerAPI.request_totp(username.value, username_type.value).then(() => {
-      toast.info("check your " + username_type.value + " for the code 🤓");
+      toast.info("check your " + username_type.value + " for the code");
       // listen for OTP token on sms automatic
       if ('OTPCredential' in window) {
           const input = document.querySelector('input[autocomplete="one-time-code"]');

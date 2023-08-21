@@ -22,7 +22,7 @@ from lockoff.routers.auth import send_email, send_mobile
         ("/wrongtoken/membership-card.pdf", 400),
         ("/wrongtoken/membership-card.pkpass", 400),
         ("/me", 401),
-        ("/admin/wrongtoken/qr-code.png", 400),
+        ("/admin/daytickets/wrongtoken/qr-code.png", 400),
         ("/admin/system-status", 401),
     ),
 )
@@ -34,7 +34,7 @@ def test_endpoint_generic(url, expected_status_code, client: TestClient):
 @pytest.mark.parametrize(
     ["url", "expected_status_code"],
     (
-        ("/admin/wrongtoken/qr-code.png", 400),
+        ("/admin/daytickets/wrongtoken/qr-code.png", 400),
         ("/admin/system-status", 401),
     ),
 )
@@ -233,12 +233,12 @@ def test_admin(a1client: TestClient, mocker):
     assert data["total_issued"] == 2
 
     # generate daytickets
-    response = a1client.post("/admin/generate-daytickets", json={"pages_to_print": 1})
+    response = a1client.post("/admin/daytickets", json={"pages_to_print": 1})
     assert response.status_code == status.HTTP_200_OK
 
     # check qr-codes on the dayticket print
     dl_token = generate_dl_admin_token(user_id=1)
-    response = a1client.get(f"/admin/{dl_token}/qr-code.png")
+    response = a1client.get(f"/admin/daytickets/{dl_token}/qr-code.png")
     assert response.status_code == status.HTTP_200_OK
 
     # check token

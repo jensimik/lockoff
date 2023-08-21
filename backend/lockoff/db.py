@@ -1,12 +1,12 @@
 from piccolo import columns
 from piccolo.engine import SQLiteEngine
-from piccolo.query import Min, Max  # noqa: F401
-from piccolo.query.methods.select import Count  # noqa: F401
 from piccolo.query import WhereRaw  # noqa: F401
+from piccolo.query import Max, Min  # noqa: F401
+from piccolo.query.methods.select import Count  # noqa: F401
 from piccolo.table import Table
 from piccolo.utils.pydantic import create_pydantic_model
 
-from .access_token import TokenType, TokenMedia
+from .access_token import TokenMedia, TokenType
 from .config import settings
 
 DB = SQLiteEngine(path=settings.db_file)
@@ -29,6 +29,12 @@ class Dayticket(Table, tablename="dayticket", db=DB):
     id = columns.Integer(primary_key=True)
     batch_id = columns.Varchar(length=25)
     expires = columns.Integer()
+
+
+class Otherticket(Table, tablename="otherticket", db=DB):
+    id = columns.Integer(primary_key=True)
+    name = columns.Varchar(length=100)
+    active = columns.Boolean()
 
 
 class AccessLog(Table, tablename="accesslog", db=DB):

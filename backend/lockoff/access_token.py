@@ -21,6 +21,7 @@ class TokenType(Enum):
     NORMAL = 1
     MORNING = 2
     DAY_TICKET = 3
+    OTHER = 9
 
 
 class TokenMedia(IntFlag):

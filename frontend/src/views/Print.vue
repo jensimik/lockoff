@@ -28,7 +28,7 @@ export default {
 <template>
     <div class="print-container">
         <article class="ticket" v-for="ticket in data" :key="ticket.dayticket_id">
-            <img class="qrcode" :src="'https://lockoff-api.gnerd.dk/admin/' + ticket.dl_token + '/qr-code.png'" />
+            <img class="qrcode" :src="'https://lockoff-api.gnerd.dk/admin/daytickets/' + ticket.dl_token + '/qr-code.png'" />
             <div class="padding"></div>
             <div class="ticket-text">
                 <p class="nkk-title">Nørrebro klatreklub</p>

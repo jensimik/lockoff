@@ -17,9 +17,9 @@ mock-serial==0.0.1
 orjson==3.9.5
 packaging==23.1
 pluggy==1.2.0
-pydantic==2.2.0
+pydantic==2.2.1
 pydantic-settings==2.0.3
-pydantic_core==2.6.0
+pydantic_core==2.6.1
 pyserial==3.5
 pyserial-asyncio==0.6
 pytest==7.4.0
