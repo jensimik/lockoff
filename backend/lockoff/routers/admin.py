@@ -61,7 +61,7 @@ async def generate_daytickets(
 
 
 @router.get(
-    "daytickets/{token}/qr-code.png",
+    "/daytickets/{token}/qr-code.png",
     response_class=Response,
     responses={
         200: {"content": {"image/png": {}}},
@@ -89,7 +89,7 @@ async def get_qr_code_png(
 
 
 @router.get(
-    "othertickets/{token}/qr-code.png",
+    "/othertickets/{token}/qr-code.png",
     response_class=Response,
     responses={
         200: {"content": {"image/png": {}}},
@@ -116,7 +116,7 @@ async def get_qr_code_png(
     return Response(content=content, media_type="image/png")
 
 
-@router.get("othertickets")
+@router.get("/othertickets")
 async def get_other_tickets(
     _: Annotated[
         list[UserModel], Security(depends.get_current_users, scopes=["admin"])
@@ -126,7 +126,7 @@ async def get_other_tickets(
     return tickets
 
 
-@router.post("othertickets")
+@router.post("/othertickets")
 async def create_other_ticket(
     data: schemas.OtherTicket,
     _: Annotated[
@@ -138,7 +138,7 @@ async def create_other_ticket(
     return ticket
 
 
-@router.get("othertickets/{id}")
+@router.get("/othertickets/{id}")
 async def get_other_tickets(
     id: int,
     _: Annotated[
@@ -150,7 +150,7 @@ async def get_other_tickets(
     return ticket
 
 
-@router.delete("othertickets/{id}")
+@router.delete("/othertickets/{id}")
 async def delete_other_ticket(
     id: int,
     _: Annotated[

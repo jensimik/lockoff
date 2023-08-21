@@ -44,7 +44,7 @@ async def test_member():
     await check_member(user_id=0, token_type=TokenType.NORMAL)
 
     with pytest.raises(TokenError):
-        await check_member(user_id=1000, member_type=TokenType.NORMAL)
+        await check_member(user_id=1000, token_type=TokenType.NORMAL)
 
 
 @pytest.mark.asyncio
