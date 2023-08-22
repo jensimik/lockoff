@@ -48,6 +48,28 @@ export default {
         <p><span class="bold">{{ data.total_issued }}</span> members have issued access cards (hereof {{ data.digital_issued }} digital and {{ data.print_issued }} print)</p>
     </div>
     <div class="flex two">
+        <h3>Fixed cards</h3>
+        <div class="right">
+            <input id="fixed_card_name" type="text" name="fixed_card_name" placeholder="name of card" /><button @click="generate_fixed_card">generate fixed card</button>
+        </div>
+    </div>
+    <div class="flex one">
+        <table>
+            <thead>
+                <tr>
+                    <th>name</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="ft in data.fixed_tickets" :key="ft.id">
+                    <td>{{ ft.name }}</td>
+                    <td class="right"><button @click="remove_fixed_card(ft.id)">remove</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="flex two">
         <h3>Daytickets</h3>
         <div class="right">
             <input id="pages_to_print" type="number" v-model="pages_to_print" />
@@ -69,7 +91,7 @@ export default {
             </thead>
             <tbody>
                 <tr v-for="batch in data.dt_stats" :key="batch.batch_id">
-                    <td>{{ batch.batch_id }}</td>
+                    <td>{{ batch.batch_id.substring(0,16) }}</td>
                     <td class="center">{{ batch.range_start }}-{{ batch.range_end }}</td>
                     <td class="right">{{ batch.used }}</td>
                     <td class="right">{{ batch.unused }}</td>
@@ -91,7 +113,7 @@ export default {
             </thead>
             <tbody>
                 <tr v-for="log in data.member_access" :key="log.id">
-                    <td>{{ log.timestamp }}</td>
+                    <td>{{ log.timestamp.substring(0,16) }}</td>
                     <td>{{ log.obj_id }}</td>
                     <td>{{ log.token_type }}</td>
                     <td>{{ log.token_media }}</td>
@@ -102,6 +124,12 @@ export default {
 </template>
 
 <style scoped>
+td {
+    padding-right: 0.6em;
+}
+th {
+    padding-right: 0.6em;
+}
 .bold {
     font-weight: bolder;
 }
@@ -114,5 +142,9 @@ export default {
 #pages_to_print {
     display: inline-block;
     width: 5em;
+}
+#fixed_card_name {
+    display: inline-block;
+    width: 6em;
 }
 </style>
