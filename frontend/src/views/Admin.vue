@@ -71,12 +71,14 @@ export default {
             <thead>
                 <tr>
                     <th>name</th>
+                    <th>qr_code</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="ft in data.fixed_tickets" :key="ft.id">
                     <td>{{ ft.name }}</td>
+                    <td class="center"><a target="_blank" :href="'https://lockoff-api.gnerd.dk/admin/othertickets/' + ft.dl_token + '/qr-code.png'"><img :src="'https://lockoff-api.gnerd.dk/admin/othertickets/' + ft.dl_token + '/qr-code.png'" /></a></td>
                     <td class="right"><button @click="remove_fixed_card(ft.id)">remove</button></td>
                 </tr>
             </tbody>

@@ -281,6 +281,8 @@ group by batch_id"""
         .where(Otherticket.active == True)
         .order_by(Otherticket.name)
     )
+    for ft in ft_stats:
+        ft["dl_token"] = generate_dl_admin_token(user_id=ft["id"])
     dayticket_reception = await Dayticket.count().where(Dayticket.expires == 0)
     dayticket_used = await Dayticket.count().where(Dayticket.expires > 0)
     digital_issued = await User.count().where(
