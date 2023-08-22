@@ -12,7 +12,17 @@ from fastapi.testclient import TestClient
 from fastapi_limiter import FastAPILimiter
 from lockoff.access_token import TokenMedia, TokenType
 from lockoff.config import settings
-from lockoff.db import DB, AccessLog, APDevice, APPass, APReg, Dayticket, GPass, User
+from lockoff.db import (
+    DB,
+    AccessLog,
+    APDevice,
+    APPass,
+    APReg,
+    Dayticket,
+    GPass,
+    Otherticket,
+    User,
+)
 from lockoff.misc import simple_hash
 from piccolo.table import create_db_tables
 
@@ -39,6 +49,7 @@ async def sample_data():
             APDevice,
             APPass,
             GPass,
+            Otherticket,
             if_not_exists=True,
         )
     # make some sample data in the database to run tests agains
