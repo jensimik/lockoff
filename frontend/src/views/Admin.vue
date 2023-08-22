@@ -34,8 +34,8 @@ export default {
         return false;
     },
     generate_fixed_card() {
-        controllerAPI.create_fixed_card(self.fixed_card_name).then(() => {
-            console.log("card created");
+        controllerAPI.create_fixed_card(this.fixed_card_name).then(() => {
+            console.log("card created: " + this.fixed_card_name);
             window.location.reload();
         });
     },
