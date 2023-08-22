@@ -67,22 +67,24 @@ export default {
         </div>
     </div>
     <div class="flex one">
-        <table>
-            <thead>
-                <tr>
-                    <th>name</th>
-                    <th>qr_code</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="ft in data.fixed_tickets" :key="ft.id">
-                    <td>{{ ft.name }}</td>
-                    <td class="center"><a target="_blank" :href="'https://lockoff-api.gnerd.dk/admin/othertickets/' + ft.dl_token + '/qr-code.png'"><img class="qr_code" :src="'https://lockoff-api.gnerd.dk/admin/othertickets/' + ft.dl_token + '/qr-code.png'" /></a></td>
-                    <td class="right"><button @click="remove_fixed_card(ft.id)">remove</button></td>
-                </tr>
-            </tbody>
-        </table>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>name</th>
+                        <th>qr_code</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="ft in data.fixed_tickets" :key="ft.id">
+                        <td>{{ ft.name }}</td>
+                        <td class="center"><a target="_blank" :href="'https://lockoff-api.gnerd.dk/admin/othertickets/' + ft.dl_token + '/qr-code.png'"><img class="qr_code" :src="'https://lockoff-api.gnerd.dk/admin/othertickets/' + ft.dl_token + '/qr-code.png'" /></a></td>
+                        <td class="right"><button @click="remove_fixed_card(ft.id)">remove</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="flex two">
         <h3>Daytickets</h3>
@@ -95,50 +97,58 @@ export default {
         <p><span class="bold">{{ data.dayticket_reception }}</span> tickets in the reception and <span class="bold">{{ data.dayticket_used }}</span> used in total this season.</p>
     </div>
     <div class="flex one">
-        <table>
-            <thead>
-                <tr>
-                    <th>batch_id</th>
-                    <th class="center">ticket_ids</th>
-                    <th class="right">used</th>
-                    <th class="right">unused</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="batch in data.dt_stats" :key="batch.batch_id">
-                    <td>{{ batch.batch_id.substring(0,16) }}</td>
-                    <td class="center">{{ batch.range_start }}-{{ batch.range_end }}</td>
-                    <td class="right">{{ batch.used }}</td>
-                    <td class="right">{{ batch.unused }}</td>
-                </tr>
-            </tbody>
-        </table>
-
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>batch_id</th>
+                        <th class="center">ticket_ids</th>
+                        <th class="right">used</th>
+                        <th class="right">unused</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="batch in data.dt_stats" :key="batch.batch_id">
+                        <td>{{ batch.batch_id.substring(0,16) }}</td>
+                        <td class="center">{{ batch.range_start }}-{{ batch.range_end }}</td>
+                        <td class="right">{{ batch.used }}</td>
+                        <td class="right">{{ batch.unused }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="flex one">
-        <h3>Access log most recent</h3>
-        <table class="primary">
-            <thead>
-                <tr>
-                    <th>timestamp</th>
-                    <th>id</th>
-                    <th>type</th>
-                    <th>media</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="log in data.member_access" :key="log.id">
-                    <td>{{ log.timestamp.substring(0,16) }}</td>
-                    <td>{{ log.obj_id }}</td>
-                    <td>{{ log.token_type }}</td>
-                    <td>{{ log.token_media }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div>
+            <h3>Access log most recent</h3>
+        </div>
+        <div>
+            <table class="primary">
+                <thead>
+                    <tr>
+                        <th>timestamp</th>
+                        <th>id</th>
+                        <th>type</th>
+                        <th>media</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="log in data.member_access" :key="log.id">
+                        <td>{{ log.timestamp.substring(0,16) }}</td>
+                        <td>{{ log.obj_id }}</td>
+                        <td>{{ log.token_type }}</td>
+                        <td>{{ log.token_media }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
 <style scoped>
+table {
+    width:100%;
+}
 img.qr_code {
     width: 1.5em;
     height: 1.5em;
