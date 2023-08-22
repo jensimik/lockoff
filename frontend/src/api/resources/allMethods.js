@@ -97,4 +97,29 @@ export default {
             return response.json();
         }
     },
+    async create_fixed_card(card_name) {
+        var access_token = getWithExpiry("access_token");
+        const response = await fetch(APISettings.baseURL + '/admin/othertickets', {
+            method: 'POST',
+            headers: {...APISettings.headers, 'Content-Type': 'Application/json', Authorization: "Bearer " + access_token},
+            body: JSON.stringify({name: card_name})
+        });
+        if (response.status != 200) {
+            throw response.status;
+        } else {
+            return response.json();
+        }
+    },
+    async remove_fixed_card(card_id) {
+        var access_token = getWithExpiry("access_token");
+        const response = await fetch(APISettings.baseURL + '/admin/othertickets/' + card_id, {
+            method: 'DELETE',
+            headers: {...APISettings.headers, Authorization: "Bearer " + access_token},
+        });
+        if (response.status != 200) {
+            throw response.status;
+        } else {
+            return response.json();
+        }
+    }
 }

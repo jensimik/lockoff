@@ -8,6 +8,7 @@ export default {
     return { 
         data: {}, 
         pages_to_print: 1,
+        fixed_card_name: "",
     };
   },
   created() {
@@ -31,6 +32,18 @@ export default {
     print() {
         router.push({name: "dayticket_print", query: {pages_to_print: this.pages_to_print}});
         return false;
+    },
+    generate_fixed_card() {
+        controllerAPI.create_fixed_card(self.fixed_card_name).then(() => {
+            console.log("card created");
+            window.location.reload();
+        });
+    },
+    remove_fixed_card(card_id) {
+        controllerAPI.remove_fixed_card(card_id).then(() => {
+            console.log("removed");
+            window.location.reload();
+        })
     }
   }
 }
@@ -50,7 +63,7 @@ export default {
     <div class="flex two">
         <h3>Fixed cards</h3>
         <div class="right">
-            <input id="fixed_card_name" type="text" name="fixed_card_name" placeholder="name of card" /><button @click="generate_fixed_card">generate fixed card</button>
+            <input id="fixed_card_name" type="text" name="fixed_card_name" v-model="fixed_card_name" placeholder="name of card" /><button @click="generate_fixed_card">generate fixed card</button>
         </div>
     </div>
     <div class="flex one">
