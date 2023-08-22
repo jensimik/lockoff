@@ -276,6 +276,11 @@ SUM(CASE WHEN expires > 0 THEN 1 ELSE 0 END) as used
 from dayticket
 group by batch_id"""
     )
+    ft_stats = (
+        await Otherticket.select()
+        .where(Otherticket.active == True)
+        .order_by(Otherticket.name)
+    )
     dayticket_reception = await Dayticket.count().where(Dayticket.expires == 0)
     dayticket_used = await Dayticket.count().where(Dayticket.expires > 0)
     digital_issued = await User.count().where(
@@ -293,6 +298,7 @@ group by batch_id"""
         "active_users": active_users,
         "member_access": member_access,
         "dt_stats": dt_stats,
+        "fixed_tickets": ft_stats,
         "dayticket_reception": dayticket_reception,
         "dayticket_used": dayticket_used,
         "digital_issued": digital_issued,
