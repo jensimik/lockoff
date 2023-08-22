@@ -78,7 +78,7 @@ export default {
             <tbody>
                 <tr v-for="ft in data.fixed_tickets" :key="ft.id">
                     <td>{{ ft.name }}</td>
-                    <td class="center"><a target="_blank" :href="'https://lockoff-api.gnerd.dk/admin/othertickets/' + ft.dl_token + '/qr-code.png'"><img :src="'https://lockoff-api.gnerd.dk/admin/othertickets/' + ft.dl_token + '/qr-code.png'" /></a></td>
+                    <td class="center"><a target="_blank" :href="'https://lockoff-api.gnerd.dk/admin/othertickets/' + ft.dl_token + '/qr-code.png'"><img class="qr_code" :src="'https://lockoff-api.gnerd.dk/admin/othertickets/' + ft.dl_token + '/qr-code.png'" /></a></td>
                     <td class="right"><button @click="remove_fixed_card(ft.id)">remove</button></td>
                 </tr>
             </tbody>
@@ -139,6 +139,10 @@ export default {
 </template>
 
 <style scoped>
+img.qr_code {
+    width: 1.5em;
+    height: 1.5em;
+}
 td {
     padding-right: 0.6em;
 }
