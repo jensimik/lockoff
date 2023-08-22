@@ -133,7 +133,9 @@ async def create_other_ticket(
         list[UserModel], Security(depends.get_current_users, scopes=["admin"])
     ],
 ):
-    await Otherticket.insert(Otherticket(name=data.name, active=True))
+    inserted = await Otherticket.insert(
+        Otherticket(id=None, name=data.name, active=True)
+    ).returning(Otherticket.id)
 
 
 @router.get("/othertickets/{id}")
