@@ -51,7 +51,7 @@ const mobile_update = async(e) => {
     }).catch((e) => {
       step.value = "username";
       username.value = "";
-      toast.error("error in data or no connection to backend - try again later");
+      toast.error("unknown " + username_type.value + " or no connection to backend");
     })
   }
 }
@@ -62,6 +62,10 @@ const email_update = async(e) => {
   window.scrollTo({ top: 0});
   controllerAPI.request_totp(username.value, username_type.value).then(() => {
     toast.info("check your " + username_type.value + " for the code");
+  }).catch((e) => {
+      step.value = "username";
+      username.value = "";
+      toast.error("unknown " + username_type.value + " or no connection to backend");
   })
 }
 
@@ -140,7 +144,7 @@ const tryagain = async(e) => {
       <input id="otp" type="text" inputmode="numeric" pattern="\d{6}" placeholder="000000" autocomplete="one-time-code" @input="totp_update" v-model="totp" size="6" maxlength="6" required>
     </div>
     <div class="flex one jcenter">
-      <p>if you did not receive a code then double check if your {{ username_type }} is set correct in nkk.klub-modul.dk and <a @click="tryagain">try again later</a></p>
+      <p>if you did not receive a code then double check if your {{ username_type }} is set correct in nkk.klub-modul.dk and <a @click="tryagain">try again later (after 24 hours as we sync klubmodul every day)</a></p>
     </div>
   </div>
 </template>

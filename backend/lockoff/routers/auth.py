@@ -49,19 +49,16 @@ async def request_totp(
             User.mobile == simple_hash(rt.username), User.active == True
         )
     user_ids = [u["id"] for u in users]
-    if user_ids:
-        totp = pyotp.TOTP(users[0]["totp_secret"])
-        log.info(
-            f"send_{rt.username_type}(user_id={user_ids[0]}, message={totp.now()})"
-        )
-        code = totp.now()
-        background_tasks.add_task(
-            send_funcs[rt.username_type],
-            user_id=user_ids[0],
-            message=f"code is {code}\n\n@nkk.dk #{code}",
-        )
-    else:
-        log.error("no users found!?")
+    if not user_ids:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="no user found")
+    totp = pyotp.TOTP(users[0]["totp_secret"])
+    log.info(f"send_{rt.username_type}(user_id={user_ids[0]}, message={totp.now()})")
+    code = totp.now()
+    background_tasks.add_task(
+        send_funcs[rt.username_type],
+        user_id=user_ids[0],
+        message=f"code is {code}\n\n@nkk.dk #{code}",
+    )
     return schemas.StatusReply(status=f"{rt.username_type} message sent")
 
 
