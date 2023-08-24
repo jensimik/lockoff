@@ -4,11 +4,9 @@ import pyotp
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
-from lockoff.access_token import (
-    TokenType,
-    generate_access_token,
-    generate_dl_admin_token,
-)
+
+from lockoff.access_token import (TokenType, generate_access_token,
+                                  generate_dl_admin_token)
 from lockoff.config import settings
 from lockoff.routers.auth import send_email, send_mobile
 
@@ -54,6 +52,7 @@ def test_bad_jwt(client: TestClient):
         (0, True),  # normal user
         (5, True),  # morning user
         (9, False),  # inactive user
+        (1000, False),  # unknown user
     ),
 )
 def test_request_totp_mobile(user_id, ok, mocker, client: TestClient):
@@ -62,11 +61,12 @@ def test_request_totp_mobile(user_id, ok, mocker, client: TestClient):
     data = {"username": mobile, "username_type": "mobile"}
     response = client.post("/request-totp", json=data)
 
-    assert response.status_code == status.HTTP_200_OK
     if ok:
+        assert response.status_code == status.HTTP_200_OK
         mock.assert_called_once()
         mock.assert_called_with(send_mobile, user_id=user_id, message=mocker.ANY)
     else:
+        assert response.status_code == status.HTTP_404_NOT_FOUND
         mock.assert_not_called()
 
 
@@ -76,6 +76,7 @@ def test_request_totp_mobile(user_id, ok, mocker, client: TestClient):
         (0, True),  # normal user
         (5, True),  # morning user
         (9, False),  # inactive user
+        (1000, False),  # unknown user
     ),
 )
 def test_request_totp_email(user_id, ok, mocker, client: TestClient):
@@ -84,11 +85,12 @@ def test_request_totp_email(user_id, ok, mocker, client: TestClient):
     data = {"username": email, "username_type": "email"}
     response = client.post("/request-totp", json=data)
 
-    assert response.status_code == status.HTTP_200_OK
     if ok:
+        assert response.status_code == status.HTTP_200_OK
         mock.assert_called_once()
         mock.assert_called_with(send_email, user_id=user_id, message=mocker.ANY)
     else:
+        assert response.status_code == status.HTTP_404_NOT_FOUND
         mock.assert_not_called()
 
 

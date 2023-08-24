@@ -49,7 +49,9 @@ async def request_totp(
             User.mobile == simple_hash(rt.username), User.active == True
         )
     user_ids = [u["id"] for u in users]
+    print(f"username: {rt.username} user_ids: {user_ids}")
     if not user_ids:
+        print("HER!")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="no user found")
     totp = pyotp.TOTP(users[0]["totp_secret"])
     log.info(f"send_{rt.username_type}(user_id={user_ids[0]}, message={totp.now()})")
