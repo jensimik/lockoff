@@ -1,0 +1,4 @@
+dbs:
+  - path: /db/lockoff
+    replicas:
+      - url: s3://lockoff/db

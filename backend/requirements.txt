@@ -71,7 +71,7 @@ typing_extensions==4.7.1
 urllib3==1.26.16
 uvicorn==0.23.2
 uvloop==0.17.0
-watchfiles==0.19.0
+watchfiles==0.20.0
 weasyprint==59.0
 webencodings==0.5.1
 websockets==11.0.3

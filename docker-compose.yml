@@ -35,15 +35,27 @@ services:
     command: tunnel --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+  litestream:
+    image: litestream/litestream
+    container_name: litestream
+    restart: always
+    command: >
+      replicate
+    volumes:
+      - $PWD/db:/db
+      - $PWD/litestream.yml:/etc/litestream.yml:ro
+    environment:
+      - LITESTREAM_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - LITESTREAM_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
   lockoff-backend:
     image: jensimik/lockoff-backend:latest
     container_name: lockoff-backend
     restart: always
     volumes:
-      - $PWD/lockoff.db3:/db/lockoff.db3
-      - $PWD/secret/secret:ro
+      - $PWD/db:/db
+      - $PWD/secret:/secret:ro
     environment:
-      - db_file=/db/lockoff.db3
+      - db_file=/db/lockoff
       - klubmodul_base_url=${KLUBMODUL_BASE_URL}
       - klubmodul_username=${KLUBMODUL_USERNAME}
       - klubmodul_password=${KLUBMODUL_PASSWORD}
