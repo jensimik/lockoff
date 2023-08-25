@@ -85,7 +85,7 @@ async def login(
     totp_secrets = [u["totp_secret"] for u in users]
     user_ids = [u["id"] for u in users]
     totp = pyotp.TOTP(totp_secrets[0])
-    if not totp.verify(otp=login_data.totp, valid_window=2):
+    if not totp.verify(otp=login_data.totp, valid_window=6):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="no such user, code is expired or not valid",
