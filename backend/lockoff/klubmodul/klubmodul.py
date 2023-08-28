@@ -86,7 +86,7 @@ class KMClient:
         for row in csv.DictReader(response.iter_lines(), delimiter=";", quotechar='"'):
             user_id = int(row["Id"])
             hold = [int(i) for i in row["Hold"].split(", ") if i]
-            lowest_hold_number = min(hold)
+            lowest_hold_number = min(hold) if hold else -1
             member_type = KM_MEMBER_TYPES.get(lowest_hold_number)
             name = row["Fornavn"].capitalize() + " " + row["Efternavn"].capitalize()
             email = row["Email"].lower()
