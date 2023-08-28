@@ -14,7 +14,7 @@ from ..access_token import (
     verify_access_token,
 )
 from ..config import settings
-from ..db import DB, AccessLog, GPass, User, Dayticket, Otherticket
+from ..db import DB, AccessLog, Dayticket, GPass, Otherticket, User
 from ..misc import DISPLAY_CODES
 
 log = logging.getLogger(__name__)
@@ -41,8 +41,21 @@ async def check_member(user_id: int, token_type: TokenType):
             "did you cancel your membership?", code=DISPLAY_CODES.NO_MEMBER
         )
     if token_type == TokenType.MORNING:
-        # TODO: check if morning member has access in current hour?
-        pass
+        now = datetime.now(tz=settings.tz)
+        # weekday
+        if now.weekday() < 5:
+            if now.hour >= 15:
+                log_and_raise_token_error(
+                    message="morning member outside hours",
+                    code=DISPLAY_CODES.MORNING_OUTSIDE_HOURS,
+                )
+        # weekend
+        else:
+            if now.hour >= 12:
+                log_and_raise_token_error(
+                    message="morning member outside hours",
+                    code=DISPLAY_CODES.MORNING_OUTSIDE_HOURS,
+                )
 
 
 async def check_dayticket(user_id: int):
@@ -94,7 +107,7 @@ async def check_qrcode(qr_code: str) -> tuple[int, str, str]:
     log.info(f"checking user {user_id} {token_type} {totp}")
     # check in database
     match token_type:
-        case TokenType.NORMAL | TokenType.MORNING:
+        case TokenType.NORMAL | TokenType.MORNING:  # | TokenType.JUNIOR_HOLD | TokenType.BØRNE_HOLD | TokenType.MINI_HOLD:
             await check_member(user_id=user_id, token_type=token_type)
             if totp:
                 await check_totp(user_id=user_id, totp=totp)

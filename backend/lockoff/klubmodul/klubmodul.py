@@ -20,6 +20,14 @@ U = typing.TypeVar("U", bound="KMClient")
 
 refresh_lock = asyncio.Lock()
 
+KM_MEMBER_TYPES = {
+    1: TokenType.NORMAL,
+    2: TokenType.MORNING,
+    # 3: TokenType.BØRNE_HOLD,
+    # 4: TokenType.JUNIOR_HOLD,
+    # 5: TokenType.MINI_HOLD,
+}
+
 
 class KMClient:
     def __init__(self):
@@ -77,13 +85,9 @@ class KMClient:
             )
         for row in csv.DictReader(response.iter_lines(), delimiter=";", quotechar='"'):
             user_id = int(row["Id"])
-            member_type = (
-                TokenType.NORMAL
-                if "1" in row["Hold"]
-                else TokenType.MORNING
-                if "2" in row["Hold"]
-                else None
-            )
+            hold = [int(i) for i in row["Hold"].split(", ")]
+            lowest_hold_number = min(hold)
+            member_type = KM_MEMBER_TYPES.get(lowest_hold_number)
             name = row["Fornavn"].capitalize() + " " + row["Efternavn"].capitalize()
             email = row["Email"].lower()
             mobile = row["Mobil"]

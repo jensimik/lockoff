@@ -2,7 +2,6 @@ import asyncio
 import hashlib
 import logging
 import pathlib
-from datetime import datetime
 
 from .config import settings
 
@@ -16,6 +15,7 @@ class DISPLAY_CODES:
     GENERIC_ERROR = b"E"
     DAYTICKET_EXPIRED = b"D"
     NO_MEMBER = b"C"
+    MORNING_OUTSIDE_HOURS = b"M"
     QR_ERROR = b"Q"
     QR_ERROR_SIGNATURE = b"S"
     QR_ERROR_EXPIRED = b"X"
