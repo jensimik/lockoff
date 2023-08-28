@@ -30,7 +30,7 @@ MESSAGES = {
     ".": ("READY", "READY TO SCAN", 1),
     "K": ("OK", "ACCESS GRANTED", 1),
     "J": ("ELJEFE", "ELJEFE IN DA HOUSE", 1),
-    "M": ("ERROR", "MORNING OUTSIDE HOURS"),
+    "M": ("ERROR", "MORNING OUTSIDE HOURS", 1),
     "Q": ("ERROR", "ERROR IN YOUR QR CODE", 1),
     "C": ("ERROR", "MEMBERSHIP CANCELED", 1),
     "F": ("ERROR", "COULD NOT FIND USER IN DB", 1),
