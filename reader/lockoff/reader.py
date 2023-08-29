@@ -1,13 +1,21 @@
 import asyncio
 import logging
+import os
 
 import httpx
+import psutil
 import serial_asyncio
+from serial.serialutil import SerialException
 
 from .config import settings
 from .misc import DISPLAY_CODES, O_CMD, GFXDisplay, buzz_in
 
 log = logging.getLogger(__name__)
+
+
+def system_exit():
+    parent = psutil.Process(psutil.Process(os.getpid()).ppid())
+    parent.kill()
 
 
 class ReaderAuth(httpx.Auth):
@@ -31,11 +39,11 @@ class Reader:
 
     async def runner(self, one_time_run: bool = False):
         while True:
-            # read a scan from the barcode reader read until carriage return CR
-            qr_code: str = (
-                (await self._r.readuntil(separator=b"\r")).decode("utf-8").strip()
-            )
             try:
+                # read a scan from the barcode reader read until carriage return CR
+                qr_code: str = (
+                    (await self._r.readuntil(separator=b"\r")).decode("utf-8").strip()
+                )
                 # check the qr_code
                 response = await self.session.post(
                     settings.backend_url, json={"qr_code": qr_code}, timeout=5
@@ -61,11 +69,19 @@ class Reader:
                         data.get("code", DISPLAY_CODES.GENERIC_ERROR.decode()).encode()
                     )
                     await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
+            # serial exception most likely happens if display or qr-reader is disconnected
+            # if it happens then exit the reader code and let docker restart the container
+            except SerialException:
+                log.exception("exit reader due to serial exception")
+                system_exit()
             # generic error? show system error on display
             except Exception as ex:
                 log.exception(f"generic error in reader {ex}")
-                await self.display.send_message(DISPLAY_CODES.GENERIC_ERROR)
-                await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
+                try:
+                    await self.display.send_message(DISPLAY_CODES.GENERIC_ERROR)
+                    await self.o_cmd(cmds=[O_CMD.ERROR_SOUND, O_CMD.ERROR_LED])
+                except SerialException:
+                    system_exit()
             # one_time_run is used for testing
             if one_time_run:
                 break
