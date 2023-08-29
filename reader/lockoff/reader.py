@@ -1,9 +1,9 @@
 import asyncio
 import logging
 import os
+import signal
 
 import httpx
-import psutil
 import serial_asyncio
 from serial.serialutil import SerialException
 
@@ -14,8 +14,8 @@ log = logging.getLogger(__name__)
 
 
 def system_exit():
-    parent = psutil.Process(psutil.Process(os.getpid()).ppid())
-    parent.kill()
+    pid = os.getpid()
+    os.kill(pid, signal.SIGKILL)
 
 
 class ReaderAuth(httpx.Auth):
