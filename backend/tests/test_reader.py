@@ -2,6 +2,7 @@ import asyncio
 
 import pytest
 from lockoff.access_token import TokenError, TokenType, generate_access_token
+from freezegun import freeze_time
 
 # from lockoff.misc import O_CMD, GFXDisplay
 from lockoff.routers.reader import (
@@ -18,19 +19,53 @@ from lockoff.routers.reader import (
     (
         ("trash", TokenError),
         (generate_access_token(user_id=1, token_type=TokenType.NORMAL), False),
-        (generate_access_token(user_id=1, token_type=TokenType.MORNING), False),
-        (generate_access_token(user_id=1, token_type=TokenType.DAY_TICKET), False),
-        (generate_access_token(user_id=2, token_type=TokenType.DAY_TICKET), TokenError),
-        (generate_access_token(user_id=3, token_type=TokenType.DAY_TICKET), False),
     ),
 )
 @pytest.mark.asyncio
-async def test_check_qr_code(qr_code, _raise):
+async def test_check_qr_code_normal(qr_code, _raise):
     if _raise:
         with pytest.raises(_raise):
             await check_qrcode(qr_code=qr_code)
     else:
         await check_qrcode(qr_code=qr_code)
+
+@pytest.mark.parametrize(
+    ["qr_code", "_raise"],
+    (
+        (generate_access_token(user_id=1, token_type=TokenType.MORNING), False),
+    ),
+)
+@pytest.mark.asyncio
+async def test_check_qr_code_morning(qr_code, _raise):
+    with freeze_time("2023-01-01 08:00:00"):
+        if _raise:
+            with pytest.raises(_raise):
+                await check_qrcode(qr_code=qr_code)
+        else:
+            await check_qrcode(qr_code=qr_code)
+    with freeze_time("2023-01-01 20:00:00"):
+        with pytest.raises(TokenError):
+            await check_qrcode(qr_code=qr_code)
+
+@pytest.mark.parametrize(
+    ["qr_code", "_raise"],
+    (
+        (generate_access_token(user_id=1, token_type=TokenType.DAY_TICKET), False),
+        # (generate_access_token(user_id=2, token_type=TokenType.DAY_TICKET), TokenError),
+        # (generate_access_token(user_id=3, token_type=TokenType.DAY_TICKET), False),
+    ),
+)
+@pytest.mark.asyncio
+async def test_check_qr_code_daytickets(qr_code, _raise):
+    with freeze_time("2023-01-01 08:00:00"):
+        if _raise:
+            with pytest.raises(_raise):
+                await check_qrcode(qr_code=qr_code)
+        else:
+            await check_qrcode(qr_code=qr_code)
+    with freeze_time("2023-01-02 08:00:00"):
+        with pytest.raises(TokenError):
+            await check_qrcode(qr_code=qr_code)
 
 
 @pytest.mark.asyncio

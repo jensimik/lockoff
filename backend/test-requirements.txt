@@ -7,3 +7,4 @@ pytest-mock==3.11.1
 pytest-cov==4.1.0
 pytest-httpx==0.25.0
 coverage==7.3.1
+freezegun==1.2.2
