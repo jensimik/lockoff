@@ -55,6 +55,7 @@ services:
       - $PWD/db:/db
       - $PWD/secret:/secret:ro
     environment:
+      - tz=Europe/Copenhagen
       - db_file=/db/lockoff
       - klubmodul_base_url=${KLUBMODUL_BASE_URL}
       - klubmodul_username=${KLUBMODUL_USERNAME}
