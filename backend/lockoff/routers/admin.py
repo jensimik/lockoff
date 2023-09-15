@@ -3,6 +3,7 @@ import logging
 from datetime import datetime, date
 from typing import Annotated
 import itertools
+from statistics import mean
 
 from dateutil.relativedelta import relativedelta
 from fastapi import (
@@ -243,8 +244,8 @@ async def klubmodul_force_resync(
     return schemas.StatusReply(status="sync started")
 
 
-@router.get("/log.json")
-async def get_log(
+@router.get("/log-raw.json")
+async def get_raw_log(
     _: Annotated[
         list[UserModel], Security(depends.get_current_users, scopes=["admin"])
     ],
@@ -271,6 +272,36 @@ async def get_log_unique_daily(
             )
         data.append(row)
     return {"data": sorted(data, key=lambda x: x["day"], reverse=True)}
+
+
+@router.get("/log-user-freq.json")
+async def get_log_user_freq(
+    _: Annotated[
+        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
+    ],
+):
+    data = []
+    rawdata = (
+        await AccessLog.select()
+        .where(
+            AccessLog.token_type.is_in(
+                [TokenType.NORMAL.value, TokenType.MORNING.value]
+            )
+        )
+        .order_by(AccessLog.obj_id)
+    )
+    for user_id, g in itertools.groupby(rawdata, lambda x: x["obj_id"]):
+        lg = list(g)
+        last_t = None
+        diffs = []
+        for x in lg:
+            t = date.fromisoformat(x["timestamp"][:10])
+            if last_t:
+                diff = t - last_t
+                diffs.append(diff.days)
+            last_t = t
+        data.append({"user_id": user_id, "avg_freq": mean(diffs)})
+    return {"data": data}
 
 
 @router.get("/system-status")

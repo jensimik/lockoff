@@ -285,8 +285,11 @@ def test_admin(a1client: TestClient, mocker):
     assert response.status_code == status.HTTP_200_OK
     refresh.assert_awaited_once()
 
-    response = a1client.get("/admin/log.json")
+    response = a1client.get("/admin/log-raw.json")
     assert response.status_code == status.HTTP_200_OK
 
     response = a1client.get("/admin/log-unique-daily.json")
+    assert response.status_code == status.HTTP_200_OK
+
+    response = a1client.get("/admin/log-user-freq.json")
     assert response.status_code == status.HTTP_200_OK
