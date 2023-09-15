@@ -262,11 +262,11 @@ async def get_log_unique_daily(
     data = []
     rawdata = await AccessLog.select().order_by(AccessLog.timestamp, ascending=False)
     for k, g in itertools.groupby(rawdata, lambda x: x["timestamp"][:10]):
-        d = {"d": k}
+        d = {"day": k}
         for tt in TokenType:
             d[tt.name] = len({x for x in g if g["token_type"] == tt})
         data.append(d)
-    return {"data": data}
+    return {"data": sorted(data, key=lambda x: x["day"])}
 
 
 @router.get("/system-status")
