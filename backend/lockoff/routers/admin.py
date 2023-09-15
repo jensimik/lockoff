@@ -300,7 +300,7 @@ async def get_log_user_freq(
                 diff = t - last_t
                 diffs.append(diff.days)
             last_t = t
-        data.append({"user_id": user_id, "avg_freq": mean(diffs)})
+        data.append({"user_id": user_id, "avg_freq": mean(diffs) if diffs else -1})
     return {"data": data}
 
 
