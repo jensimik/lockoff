@@ -292,7 +292,7 @@ async def get_log_user_freq(
     )
     for user_id, g in itertools.groupby(rawdata, lambda x: x["obj_id"]):
         lg = list(g)
-        dates = {date.fromisoformat(x["timestamp"][:10]) for x in lg}
+        dates = sorted({date.fromisoformat(x["timestamp"][:10]) for x in lg})
         diffs = [(x2 - x1).days for (x1, x2) in itertools.pairwise(dates)]
         if diffs:
             data.append(
