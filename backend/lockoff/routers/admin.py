@@ -1,6 +1,6 @@
 import io
 import logging
-from datetime import datetime
+from datetime import datetime, date
 from typing import Annotated
 import itertools
 
@@ -262,12 +262,14 @@ async def get_log_unique_daily(
     data = []
     rawdata = await AccessLog.select().order_by(AccessLog.timestamp)
     for k, g in itertools.groupby(rawdata, lambda x: x["timestamp"][:10]):
-        d = {"day": k}
+        d = date.fromisoformat(k)
+        row = {"day": k, "dow": f"{d:%A}".lower()}
+        lg = list(g)
         for tt in TokenType:
-            d[tt.name] = len(
-                {x["obj_id"] for x in list(g) if TokenType(x["token_type"]) == tt}
+            row[tt.name] = len(
+                {x["obj_id"] for x in lg if TokenType(x["token_type"]) == tt}
             )
-        data.append(d)
+        data.append(row)
     return {"data": sorted(data, key=lambda x: x["day"], reverse=True)}
 
 
