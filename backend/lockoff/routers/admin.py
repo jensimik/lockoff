@@ -3,7 +3,7 @@ import logging
 from datetime import datetime, date
 from typing import Annotated
 import itertools
-from statistics import mean
+import statistics
 
 from dateutil.relativedelta import relativedelta
 from fastapi import (
@@ -300,7 +300,10 @@ async def get_log_user_freq(
                 diff = t - last_t
                 diffs.append(diff.days)
             last_t = t
-        data.append({"user_id": user_id, "avg_freq": mean(diffs) if diffs else -1})
+        if diffs:
+            data.append(
+                {"user_id": user_id, "median_freq": round(statistics.median(diffs), 2)}
+            )
     return {"data": data}
 
 
