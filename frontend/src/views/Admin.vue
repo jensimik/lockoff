@@ -1,6 +1,7 @@
 <script>
 import controllerAPI from "../api/resources/allMethods";
 import router from "../router";
+import JsonCSV from 'vue-json-csv';
 
 export default {
   name: "Admin dashboard",
@@ -9,11 +10,13 @@ export default {
         data: {}, 
         pages_to_print: 1,
         fixed_card_name: "",
+        download_data: false,
     };
   },
   created() {
     this.fetchData();
   },
+  components: {JsonCSV},
   methods: {
     fetchData() {
         controllerAPI.system_status().then((status_data) => {
@@ -21,7 +24,7 @@ export default {
         }).catch((error) => {
             console.log("failed to fetch status data");
             console.log(error);
-        })
+        });
     },
     forceResyncKlubmodul(e) {
         e.target.disabled = true;
@@ -44,7 +47,34 @@ export default {
             console.log("removed");
             window.location.reload();
         })
-    }
+    },
+    generate_raw_log() {
+        controllerAPI.log_raw().then((data) => {
+            this.download_data = data.data;
+
+        }).catch((error) => {
+            console.log("failed to fetch log raw");
+            console.log(error);
+        });
+    },
+    generate_unique_daily() {
+        controllerAPI.log_unique_daily().then((data) => {
+            this.download_data = data.data;
+
+        }).catch((error) => {
+            console.log("failed to fetch log unique daily");
+            console.log(error);
+        });
+    },
+    generate_user_freq() {
+        controllerAPI.log_user_freq().then((data) => {
+            this.download_data = data.data;
+
+        }).catch((error) => {
+            console.log("failed to fetch log user freq");
+            console.log(error);
+        });
+    },
   }
 }
 </script>
@@ -120,6 +150,17 @@ export default {
     </div>
     <div class="flex one">
         <div>
+            <h3>CSV access log data</h3>
+        </div>
+        <div id="buttonactions">
+            <button @click="generate_raw_log">generateRawLog</button>
+            <button @click="generate_unique_daily">generateUniqueDaily</button>
+            <button @click="generate_user_freq">generateUserFreq</button>
+            <JsonCSV v-if="download_data" :data="download_data"><button>download csv</button></JsonCSV>
+        </div>
+    </div>
+    <div class="flex one">
+        <div>
             <h3>Access log most recent</h3>
         </div>
         <div>
@@ -146,6 +187,9 @@ export default {
 </template>
 
 <style scoped>
+#buttonactions > button {
+    margin-right: 1em;
+}
 table {
     width:100%;
 }

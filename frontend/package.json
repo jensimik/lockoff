@@ -14,6 +14,7 @@
     "@sentry/vue": "^7.68.0",
     "picnic": "^7.1.0",
     "vue": "^3.3.4",
+    "vue-json-csv": "^2.1.0",
     "vue-qrcode-reader": "^5.3.4",
     "vue-router": "^4.2.4",
     "vue3-toastify": "^0.1.12"

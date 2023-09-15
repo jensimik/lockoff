@@ -121,5 +121,41 @@ export default {
         } else {
             return response.json();
         }
-    }
+    },
+    async log_raw() {
+        var access_token = getWithExpiry("access_token");
+        const response = await fetch(APISettings.baseURL + '/admin/log-raw.json', {
+            method: 'GET',
+            headers: {...APISettings.headers, Authorization: "Bearer " + access_token}
+        });
+        if (response.status != 200) {
+            throw response.status;
+        } else {
+            return response.json();
+        }
+    },
+    async log_unique_daily() {
+        var access_token = getWithExpiry("access_token");
+        const response = await fetch(APISettings.baseURL + '/admin/log-unique-daily.json', {
+            method: 'GET',
+            headers: {...APISettings.headers, Authorization: "Bearer " + access_token}
+        });
+        if (response.status != 200) {
+            throw response.status;
+        } else {
+            return response.json();
+        }
+    },
+    async log_user_freq() {
+        var access_token = getWithExpiry("access_token");
+        const response = await fetch(APISettings.baseURL + '/admin/log-user-freq.json', {
+            method: 'GET',
+            headers: {...APISettings.headers, Authorization: "Bearer " + access_token}
+        });
+        if (response.status != 200) {
+            throw response.status;
+        } else {
+            return response.json();
+        }
+    },
 }

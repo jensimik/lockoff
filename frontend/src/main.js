@@ -6,6 +6,7 @@ import router from './router';
 import './style.css';
 import Vue3Toasity from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import JsonCSV from 'vue-json-csv'
 
 const app = createApp(App);
 
@@ -27,6 +28,7 @@ Sentry.init({
     replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
   });
 
+app.use(JsonCSV);
 app.use(Vue3Toasity);
 app.use(router);
 
