@@ -243,7 +243,7 @@ async def klubmodul_force_resync(
     return schemas.StatusReply(status="sync started")
 
 
-@router.get("/log.csv")
+@router.get("/log.json")
 async def get_log(
     _: Annotated[
         list[UserModel], Security(depends.get_current_users, scopes=["admin"])
@@ -253,7 +253,7 @@ async def get_log(
     return {"data": data}
 
 
-@router.get("/log-unique-daily.csv")
+@router.get("/log-unique-daily.json")
 async def get_log_unique_daily(
     _: Annotated[
         list[UserModel], Security(depends.get_current_users, scopes=["admin"])
@@ -264,7 +264,7 @@ async def get_log_unique_daily(
     for k, g in itertools.groupby(rawdata, lambda x: x["timestamp"][:10]):
         d = {"day": k}
         for tt in TokenType:
-            d[tt.name] = len({x for x in g if g["token_type"] == tt})
+            d[tt.name] = len({x for x in list(g) if g["token_type"] == tt})
         data.append(d)
     return {"data": sorted(data, key=lambda x: x["day"])}
 
