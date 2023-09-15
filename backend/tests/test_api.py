@@ -5,8 +5,11 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from lockoff.access_token import (TokenType, generate_access_token,
-                                  generate_dl_admin_token)
+from lockoff.access_token import (
+    TokenType,
+    generate_access_token,
+    generate_dl_admin_token,
+)
 from lockoff.config import settings
 from lockoff.routers.auth import send_email, send_mobile
 
@@ -281,3 +284,9 @@ def test_admin(a1client: TestClient, mocker):
     response = a1client.post("/admin/klubmodul-force-resync")
     assert response.status_code == status.HTTP_200_OK
     refresh.assert_awaited_once()
+
+    response = a1client.get("/admin/log.json")
+    assert response.status_code == status.HTTP_200_OK
+
+    response = a1client.get("/admin/log-unique-daily.json")
+    assert response.status_code == status.HTTP_200_OK
