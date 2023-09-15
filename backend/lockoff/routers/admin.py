@@ -264,7 +264,9 @@ async def get_log_unique_daily(
     for k, g in itertools.groupby(rawdata, lambda x: x["timestamp"][:10]):
         d = {"day": k}
         for tt in TokenType:
-            d[tt.name] = len({x for x in list(g) if x["token_type"] == tt.value})
+            d[tt.name] = len(
+                {x["obj_id"] for x in list(g) if x["token_type"] == tt.value}
+            )
         data.append(d)
     return {"data": sorted(data, key=lambda x: x["day"])}
 
