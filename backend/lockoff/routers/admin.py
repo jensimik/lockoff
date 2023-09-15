@@ -2,6 +2,7 @@ import io
 import logging
 from datetime import datetime
 from typing import Annotated
+import itertools
 
 from dateutil.relativedelta import relativedelta
 from fastapi import (
@@ -240,6 +241,32 @@ async def klubmodul_force_resync(
 ) -> schemas.StatusReply:
     background_tasks.add_task(refresh)
     return schemas.StatusReply(status="sync started")
+
+
+@router.get("/log.csv")
+async def get_log(
+    _: Annotated[
+        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
+    ],
+):
+    data = await AccessLog.select().order_by(AccessLog.timestamp, ascending=False)
+    return {"data": data}
+
+
+@router.get("/log-unique-daily.csv")
+async def get_log_unique_daily(
+    _: Annotated[
+        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
+    ],
+):
+    data = []
+    rawdata = await AccessLog.select().order_by(AccessLog.timestamp, ascending=False)
+    for k, g in itertools.groupby(rawdata, lambda x: x["timestamp"][:10]):
+        d = {"d": k}
+        for tt in TokenType:
+            d[tt.name] = len({x for x in g if g["token_type"] == tt})
+        data.append(d)
+    return {"data": data}
 
 
 @router.get("/system-status")
