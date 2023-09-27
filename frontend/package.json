@@ -11,7 +11,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@sentry/vue": "^7.71.0",
+    "@sentry/vue": "^7.72.0",
     "picnic": "^7.1.0",
     "vue": "^3.3.4",
     "vue-json-csv": "^2.1.0",
