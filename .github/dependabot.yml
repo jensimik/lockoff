@@ -8,8 +8,6 @@ updates:
       pip-dep:
         patterns:
           - "*"
-        exclude-patterns:
-          - "starlette"
     ignore:
       - dependency-name: "cryptography"
   - package-ecosystem: "pip"
@@ -20,8 +18,6 @@ updates:
       pip-dep:
         patterns:
           - "*"
-        exclude-patterns:
-          - "starlette"
     ignore:
       - dependency-name: "cryptography"
   - package-ecosystem: "npm"
