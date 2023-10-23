@@ -4,7 +4,7 @@ certifi==2023.7.22
 click==8.1.7
 colorzero==2.0
 dateutils==0.6.12
-fastapi==0.103.2
+fastapi==0.104.0
 gpiozero==2.0
 h11==0.14.0
 httpcore==0.18.0
