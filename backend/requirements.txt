@@ -74,5 +74,5 @@ uvloop==0.17.0
 watchfiles==0.20.0
 weasyprint==60.1
 webencodings==0.5.1
-websockets==11.0.3
+websockets==12.0
 zopfli==0.2.3
