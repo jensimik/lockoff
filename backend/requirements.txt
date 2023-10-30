@@ -4,7 +4,7 @@ annotated-types==0.5.0
 anyio==3.7.1
 base45==0.4.4
 Brotli==1.1.0
-cachetools==5.3.1
+cachetools==5.3.2
 certifi==2023.7.22
 cffi==1.16.0
 charset-normalizer==3.3.0
