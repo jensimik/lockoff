@@ -285,7 +285,7 @@ async def get_log_user_freq(
         await AccessLog.select()
         .where(
             AccessLog.token_type.is_in(
-                [TokenType.NORMAL.value, TokenType.MORNING.value]
+                [TokenType.NORMAL.value, TokenType.OFFPEAK.value]
             )
         )
         .order_by(AccessLog.obj_id)
