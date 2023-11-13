@@ -179,7 +179,7 @@ async def check_token(
             detail="could not verify signature - is it a nkk qr code?",
         )
     match token_type:
-        case TokenType.NORMAL | TokenType.MORNING:
+        case TokenType.NORMAL | TokenType.OFFPEAK:
             user = (
                 await User.select(User.name, User.active, User.token_type)
                 .where(User.id == user_id)
@@ -194,7 +194,7 @@ async def check_token(
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="user not active"
                 )
-            if token_type == TokenType.MORNING:
+            if token_type == TokenType.OFFPEAK:
                 # TODO: do check for hours?
                 pass
         case TokenType.DAY_TICKET:
