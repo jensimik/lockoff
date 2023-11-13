@@ -40,22 +40,22 @@ async def check_member(user_id: int, token_type: TokenType):
         log_and_raise_token_error(
             "did you cancel your membership?", code=DISPLAY_CODES.NO_MEMBER
         )
-    if token_type == TokenType.MORNING:
+    if token_type == TokenType.OFFPEAK:
         now = datetime.now(tz=settings.tz)
-        # weekday
+        # weekdays
         if now.weekday() < 5:
-            if now.hour >= 15:
+            if now.hour in [15, 16, 17, 18, 19]:  # 15:00 until 19:59 is peak?
                 log_and_raise_token_error(
-                    message="morning member outside hours",
-                    code=DISPLAY_CODES.MORNING_OUTSIDE_HOURS,
+                    message="offpeak member outside hours",
+                    code=DISPLAY_CODES.OFFPEAK_OUTSIDE_HOURS,
                 )
         # weekend
-        else:
-            if now.hour >= 12:
-                log_and_raise_token_error(
-                    message="morning member outside hours",
-                    code=DISPLAY_CODES.MORNING_OUTSIDE_HOURS,
-                )
+        # else:
+        #     if now.hour >= 12:
+        #         log_and_raise_token_error(
+        #             message="morning member outside hours",
+        #             code=DISPLAY_CODES.OFFPEAK_OUTSIDE_HOURS,
+        #         )
 
 
 async def check_dayticket(user_id: int):
@@ -107,7 +107,7 @@ async def check_qrcode(qr_code: str) -> tuple[int, str, str]:
     log.info(f"checking user {user_id} {token_type} {totp}")
     # check in database
     match token_type:
-        case TokenType.NORMAL | TokenType.MORNING:  # | TokenType.JUNIOR_HOLD | TokenType.BØRNE_HOLD | TokenType.MINI_HOLD:
+        case TokenType.NORMAL | TokenType.OFFPEAK:  # | TokenType.JUNIOR_HOLD | TokenType.BØRNE_HOLD | TokenType.MINI_HOLD:
             await check_member(user_id=user_id, token_type=token_type)
             if totp:
                 await check_totp(user_id=user_id, totp=totp)
