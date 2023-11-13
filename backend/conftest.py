@@ -64,7 +64,7 @@ async def sample_data():
                         name=f"test user {x}",
                         token_type=TokenType.NORMAL
                         if x in range(5)
-                        else TokenType.MORNING,
+                        else TokenType.OFFPEAK,
                         mobile=simple_hash(f"1000100{x}"),
                         email=simple_hash(f"test{x}@test.dk"),
                         batch_id=batch_id,
@@ -92,7 +92,7 @@ async def sample_data():
                         id=None,
                         obj_id=x,
                         token_type=random.choice(
-                            [TokenType.NORMAL, TokenType.MORNING, TokenType.DAY_TICKET]
+                            [TokenType.NORMAL, TokenType.OFFPEAK, TokenType.DAY_TICKET]
                         ),
                         token_media=random.choice(
                             [TokenMedia.DIGITAL, TokenMedia.PRINT]
