@@ -44,7 +44,8 @@ async def check_member(user_id: int, token_type: TokenType):
         now = datetime.now(tz=settings.tz)
         # weekdays
         if now.weekday() < 5:
-            if now.hour in [15, 16, 17, 18, 19]:  # 15:00 until 19:59 is peak?
+            # if now.hour in [15, 16, 17, 18, 19]:  # 15:00 until 19:59 is peak?
+            if now.hour >= 15:
                 log_and_raise_token_error(
                     message="offpeak member outside hours",
                     code=DISPLAY_CODES.OFFPEAK_OUTSIDE_HOURS,
