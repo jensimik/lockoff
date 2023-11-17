@@ -42,6 +42,9 @@ async def test_check_qr_code_offpeak(qr_code, _raise):
         with pytest.raises(TokenError):
             await check_qrcode(qr_code=qr_code)
     with freeze_time("2023-01-02 20:00:00"):
+        with pytest.raises(TokenError):
+            await check_qrcode(qr_code=qr_code)
+    with freeze_time("2023-01-01 20:00:00"):
         await check_qrcode(qr_code=qr_code)
 
 
