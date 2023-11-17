@@ -22,7 +22,7 @@ refresh_lock = asyncio.Lock()
 
 KM_MEMBER_TYPES = {
     1: TokenType.NORMAL,
-    2: TokenType.MORNING,
+    2: TokenType.OFFPEAK,
     # 3: TokenType.BØRNE_HOLD,
     # 4: TokenType.JUNIOR_HOLD,
     # 5: TokenType.MINI_HOLD,

@@ -29,23 +29,24 @@ async def test_check_qr_code_normal(qr_code, _raise):
     else:
         await check_qrcode(qr_code=qr_code)
 
+
 @pytest.mark.parametrize(
     ["qr_code", "_raise"],
-    (
-        (generate_access_token(user_id=1, token_type=TokenType.MORNING), False),
-    ),
+    ((generate_access_token(user_id=1, token_type=TokenType.OFFPEAK), False),),
 )
 @pytest.mark.asyncio
-async def test_check_qr_code_morning(qr_code, _raise):
-    with freeze_time("2023-01-01 08:00:00"):
-        if _raise:
-            with pytest.raises(_raise):
-                await check_qrcode(qr_code=qr_code)
-        else:
-            await check_qrcode(qr_code=qr_code)
-    with freeze_time("2023-01-01 20:00:00"):
+async def test_check_qr_code_offpeak(qr_code, _raise):
+    with freeze_time("2023-01-02 08:00:00"):
+        await check_qrcode(qr_code=qr_code)
+    with freeze_time("2023-01-02 18:00:00"):
         with pytest.raises(TokenError):
             await check_qrcode(qr_code=qr_code)
+    with freeze_time("2023-01-02 20:00:00"):
+        with pytest.raises(TokenError):
+            await check_qrcode(qr_code=qr_code)
+    with freeze_time("2023-01-01 20:00:00"):
+        await check_qrcode(qr_code=qr_code)
+
 
 @pytest.mark.parametrize(
     ["qr_code", "_raise"],
@@ -57,13 +58,13 @@ async def test_check_qr_code_morning(qr_code, _raise):
 )
 @pytest.mark.asyncio
 async def test_check_qr_code_daytickets(qr_code, _raise):
-    with freeze_time("2023-01-01 08:00:00"):
+    with freeze_time("2023-01-02 08:00:00"):
         if _raise:
             with pytest.raises(_raise):
                 await check_qrcode(qr_code=qr_code)
         else:
             await check_qrcode(qr_code=qr_code)
-    with freeze_time("2023-01-02 08:00:00"):
+    with freeze_time("2023-01-03 08:00:00"):
         with pytest.raises(TokenError):
             await check_qrcode(qr_code=qr_code)
 

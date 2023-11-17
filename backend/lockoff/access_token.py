@@ -19,7 +19,7 @@ door_log = logging.getLogger("door")
 
 class TokenType(Enum):
     NORMAL = 1
-    MORNING = 2
+    OFFPEAK = 2
     DAY_TICKET = 3
     # JUNIOR_HOLD = 4
     # MINI_HOLD = 5

@@ -55,11 +55,11 @@ def test_dl_token(user_id, gen_func, ver_func):
     ["user_id", "token_type", "token_media"],
     (
         (0, TokenType.NORMAL, TokenMedia.DIGITAL),
-        (1, TokenType.MORNING, TokenMedia.DIGITAL),
+        (1, TokenType.OFFPEAK, TokenMedia.DIGITAL),
         (2, TokenType.DAY_TICKET, TokenMedia.DIGITAL),
         (3, TokenType.NORMAL, TokenMedia.DIGITAL),
         (0, TokenType.NORMAL, TokenMedia.PRINT),
-        (1, TokenType.MORNING, TokenMedia.PRINT),
+        (1, TokenType.OFFPEAK, TokenMedia.PRINT),
         (2, TokenType.DAY_TICKET, TokenMedia.PRINT),
         (3, TokenType.NORMAL, TokenMedia.PRINT),
     ),
