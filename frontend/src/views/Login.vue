@@ -144,7 +144,7 @@ const tryagain = async(e) => {
       <input id="otp" type="text" inputmode="numeric" pattern="\d{6}" placeholder="000000" autocomplete="one-time-code" @input="totp_update" v-model="totp" size="6" maxlength="6" required>
     </div>
     <div class="flex one jcenter">
-      <p>if you did not receive a code then double check if your {{ username_type }} is set correct in nkk.klub-modul.dk and <a @click="tryagain">try again later (after 24 hours as we sync klubmodul every day)</a></p>
+      <p>if you did not receive a code then double check if your {{ username_type }} is set correct in nkk.klub-modul.dk and <a @click="tryagain">try again later (after about 2 hours as we sync klubmodul every two hours)</a></p>
     </div>
   </div>
 </template>

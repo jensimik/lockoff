@@ -36,14 +36,18 @@ async def test_check_qr_code_normal(qr_code, _raise):
 )
 @pytest.mark.asyncio
 async def test_check_qr_code_offpeak(qr_code, _raise):
+    # weekday morning allowed
     with freeze_time("2023-01-02 08:00:00"):
         await check_qrcode(qr_code=qr_code)
+    # weekday evening not allowed
     with freeze_time("2023-01-02 18:00:00"):
         with pytest.raises(TokenError):
             await check_qrcode(qr_code=qr_code)
+    # weekday evening not allowed
     with freeze_time("2023-01-02 20:00:00"):
         with pytest.raises(TokenError):
             await check_qrcode(qr_code=qr_code)
+    # weekend allowed late
     with freeze_time("2023-01-01 20:00:00"):
         await check_qrcode(qr_code=qr_code)
 
