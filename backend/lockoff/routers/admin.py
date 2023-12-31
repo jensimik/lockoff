@@ -263,7 +263,7 @@ async def expire_google_passes(
         list[UserModel], Security(depends.get_current_users, scopes=["admin"])
     ],
 ) -> schemas.StatusReply:
-    google_passes = await GPass.select().where(Gpass.status != GPassStatus.DELETED)
+    google_passes = await GPass.select().where(GPass.status != GPassStatus.DELETED)
     with GooglePass() as gp:
         for p in google_passes:
             pass_id = p["id"]
