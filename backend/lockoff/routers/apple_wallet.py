@@ -123,8 +123,12 @@ async def get_updated_pass(
         token_type=TokenType(user["token_type"]),
         token_media=TokenMedia.DIGITAL | TokenMedia.APPLE,
     )
-    expires_display = datetime.utcnow() + relativedelta(
-        day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
+    expires_display = (
+        datetime.utcnow()
+        + relativedelta(
+            day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
+        )
+        - relativedelta(days=1)
     )
     serial = f"{settings.current_season}{user['id']}"
     pkpass_file = ApplePass.create(
