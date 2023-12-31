@@ -119,7 +119,7 @@ class GooglePass:
         expires: datetime,
         qr_code_data: str,
         totp_key: str,
-        expires_delta: relativedelta = relativedelta(days=20),
+        expires_delta: relativedelta = relativedelta(seconds=1),
     ):
         now = datetime.now(tz=settings.tz)
         new_object = {

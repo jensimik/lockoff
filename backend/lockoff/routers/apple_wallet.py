@@ -111,7 +111,7 @@ async def get_updated_pass(
     serial_number: str,
     current_pass: Annotated[dict, Depends(apple_auth_pass)],
 ):
-    user = await User.select().where(User.id == current_pass["user_id"]).first()
+    user = await User.select().where(User.id == current_pass["user_id"], User.active == True).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     access_token = generate_access_token(

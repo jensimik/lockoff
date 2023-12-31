@@ -1,5 +1,6 @@
 import io
 import logging
+import asyncio
 from datetime import datetime, date
 from typing import Annotated
 import itertools
@@ -26,9 +27,21 @@ from ..access_token import (
     verify_access_token,
     verify_dl_admin_token,
 )
-from ..card import generate_png
+from ..card import generate_png, GooglePass, GPassStatus, AppleNotifier
 from ..config import settings
-from ..db import DB, AccessLog, Dayticket, Max, Otherticket, User, UserModel
+from ..db import (
+    DB,
+    AccessLog,
+    Dayticket,
+    Max,
+    Otherticket,
+    User,
+    UserModel,
+    GPass,
+    APDevice,
+    APPass,
+    APReg,
+)
 from ..klubmodul import refresh
 
 router = APIRouter(tags=["admin"])
@@ -242,6 +255,52 @@ async def klubmodul_force_resync(
 ) -> schemas.StatusReply:
     background_tasks.add_task(refresh)
     return schemas.StatusReply(status="sync started")
+
+
+@router.delete("/expire-all-google-passes")
+async def expire_google_passes(
+    _: Annotated[
+        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
+    ],
+) -> schemas.StatusReply:
+    google_passes = await GPass.select().where(GPass.status != GPassStatus.DELETED)
+    with GooglePass() as gp:
+        for p in google_passes:
+            pass_id = p["id"]
+            return_code = (
+                "OK" if await GooglePass.expire_pass(pass_id=pass_id) else "FAIL"
+            )
+            log.info(f"expired pass with id {pass_id} {return_code}")
+    return schemas.StatusReply(status="done")
+
+
+async def expire_apple_passes():
+    passes = await APPass.select().where(APPass.user_id == 3587).first()
+    device_identifiers = []
+    for p in passes:
+        r = await APReg.select().where(APReg.serial_number == p["id"]).first()
+        if r:
+            device_identifiers.append(r["device_library_identifier"])
+
+    devices = await APDevice.select(APDevice.push_token).where(
+        APDevice.id.is_in(device_identifiers)
+    )
+    with AppleNotifier as apn:
+        for device in devices:
+            log.info(f"expired {device}")
+            await apn.notify_update(push_token=device["push_token"])
+            await asyncio.sleep(2)
+
+
+@router.delete("/expire-all-apple-passes")
+async def expire_apple_passes(
+    _: Annotated[
+        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
+    ],
+    background_tasks: BackgroundTasks,
+) -> schemas.StatusReply:
+    background_tasks.add_task(expire_apple_passes)
+    return schemas.StatusReply(status="done")
 
 
 @router.get("/log-raw.json")
