@@ -136,7 +136,7 @@ jobs:
           # Password of default wifi network to connect to.
           wpa-password: ${{ secrets.NKK_WPA_PASSWORD}}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: pi-gen-image
           path: ${{ steps.build.outputs.image-path }}
