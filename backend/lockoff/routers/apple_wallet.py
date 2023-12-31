@@ -95,7 +95,8 @@ async def get_list_of_updateable_passes_to_device(
         APReg.serial_number.join_on(APPass.id).update_tag.as_alias("update_tag"),
     ).where(APReg.device_library_identifier == device_library_identifier)
     if passesUpdatedSince is not None:
-        query = query.where(WhereRaw("update_tag > {}", passesUpdatedSince))
+        if passesUpdatedSince > 0:
+            query = query.where(WhereRaw("update_tag > {}", passesUpdatedSince))
     data = await query
     if not data:
         raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
@@ -111,7 +112,11 @@ async def get_updated_pass(
     serial_number: str,
     current_pass: Annotated[dict, Depends(apple_auth_pass)],
 ):
-    user = await User.select().where(User.id == current_pass["user_id"], User.active == True).first()
+    user = (
+        await User.select()
+        .where(User.id == current_pass["user_id"], User.active == True)
+        .first()
+    )
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     access_token = generate_access_token(
