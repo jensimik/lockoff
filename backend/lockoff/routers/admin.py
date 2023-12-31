@@ -257,7 +257,7 @@ async def klubmodul_force_resync(
     return schemas.StatusReply(status="sync started")
 
 
-@router.post("/expire-all-google-passes")
+@router.delete("/expire-all-google-passes")
 async def expire_google_passes(
     _: Annotated[
         list[UserModel], Security(depends.get_current_users, scopes=["admin"])
@@ -292,7 +292,7 @@ async def expire_apple_passes():
             await asyncio.sleep(2)
 
 
-@router.post("/expire-all-apple-passes")
+@router.delete("/expire-all-apple-passes")
 async def expire_apple_passes(
     _: Annotated[
         list[UserModel], Security(depends.get_current_users, scopes=["admin"])
