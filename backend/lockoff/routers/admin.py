@@ -275,7 +275,7 @@ async def expire_google_passes(
 
 
 async def expire_apple_passes_task():
-    passes = await APPass.select().where(APPass.user_id == 3587).first()
+    passes = await APPass.select().where(APPass.user_id == 3587)
     device_identifiers = []
     for p in passes:
         r = await APReg.select().where(APReg.serial_number == p["id"]).first()
