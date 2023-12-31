@@ -285,7 +285,7 @@ async def expire_apple_passes_task():
     devices = await APDevice.select(APDevice.push_token).where(
         APDevice.id.is_in(device_identifiers)
     )
-    with AppleNotifier as apn:
+    with AppleNotifier() as apn:
         for device in devices:
             log.info(f"expired {device}")
             await apn.notify_update(push_token=device["push_token"])
