@@ -276,7 +276,7 @@ async def expire_google_passes(
 
 async def expire_apple_passes_task():
     async with AppleNotifier() as apn:
-        passes = await APPass.select().where(APPass.user_id == 3587)
+        passes = await APPass.select()  # .where(APPass.user_id == 3587)
         for p in passes:
             async with DB.transaction():
                 await APPass.update({APPass.update_tag: APPass.update_tag + 1}).where(
