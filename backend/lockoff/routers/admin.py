@@ -274,7 +274,7 @@ async def expire_google_passes(
     return schemas.StatusReply(status="done")
 
 
-async def expire_apple_passes():
+async def expire_apple_passes_task():
     passes = await APPass.select().where(APPass.user_id == 3587).first()
     device_identifiers = []
     for p in passes:
@@ -299,7 +299,7 @@ async def expire_apple_passes(
     ],
     background_tasks: BackgroundTasks,
 ) -> schemas.StatusReply:
-    background_tasks.add_task(expire_apple_passes)
+    background_tasks.add_task(expire_apple_passes_task)
     return schemas.StatusReply(status="done")
 
 
