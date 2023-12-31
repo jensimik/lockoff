@@ -275,21 +275,23 @@ async def expire_google_passes(
 
 
 async def expire_apple_passes_task():
-    passes = await APPass.select().where(APPass.user_id == 3587)
-    device_identifiers = []
-    for p in passes:
-        r = await APReg.select().where(APReg.serial_number == p["id"]).first()
-        if r:
-            device_identifiers.append(r["device_library_identifier"])
-
-    devices = await APDevice.select(APDevice.push_token).where(
-        APDevice.id.is_in(device_identifiers)
-    )
     async with AppleNotifier() as apn:
-        for device in devices:
-            log.info(f"expired {device}")
-            await apn.notify_update(push_token=device["push_token"])
-            await asyncio.sleep(2)
+        passes = await APPass.select().where(APPass.user_id == 3587)
+        for p in passes:
+            async with DB.transaction():
+                await APPass.update({APPass.update_tag: APPass.update_tag + 1}).where(
+                    APPass.id == p["id"]
+                )
+            for r in await APReg.select().where(APReg.serial_number == p["id"]):
+                device = (
+                    await APDevice.select(APDevice.push_token)
+                    .where(APDevice.id == r["device_library_identifier"])
+                    .first()
+                )
+                push_token = device["push_token"]
+                log.info(f"requested update of push token {push_token}")
+                await apn.notify_update(push_token=push_token)
+                await asyncio.sleep(2)
 
 
 @router.delete("/expire-all-apple-passes")
