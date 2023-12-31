@@ -106,8 +106,12 @@ async def get_pkpass(
         token_type=TokenType(user["token_type"]),
         token_media=TokenMedia.DIGITAL | TokenMedia.APPLE,
     )
-    expires_display = datetime.utcnow() + relativedelta(
-        day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
+    expires_display = (
+        datetime.utcnow()
+        + relativedelta(
+            day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
+        )
+        - relativedelta(days=1)
     )
     serial = f"{settings.current_season}{user_id}"
     # check if already issued? - then use the same auth_token
@@ -166,8 +170,12 @@ async def get_google_wallet(
         token_type=TokenType(user["token_type"]),
         token_media=TokenMedia.DIGITAL | TokenMedia.ANDROID,
     )
-    expires_display = datetime.now(tz=settings.tz) + relativedelta(
-        day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
+    expires_display = (
+        datetime.now(tz=settings.tz)
+        + relativedelta(
+            day=1, month=1, years=1, hour=0, minute=0, second=0, microsecond=0
+        )
+        - relativedelta(days=1)
     )
     serial = f"{settings.current_season}{user_id}"
     totp_key_bytes = secrets.token_bytes(16)
