@@ -263,10 +263,13 @@ async def expire_google_passes_task():
     )
     async with GooglePass() as gp:
         for p in google_passes:
-            pass_id = p["id"]
-            return_code = "OK" if await gp.expire_pass(pass_id=pass_id) else "FAIL"
-            log.info(f"expired pass with id {pass_id} {return_code}")
-            await asyncio.sleep(2)
+            try:
+                pass_id = p["id"]
+                return_code = "OK" if await gp.expire_pass(pass_id=pass_id) else "FAIL"
+                log.info(f"expired pass with id {pass_id} {return_code}")
+                await asyncio.sleep(2)
+            except Exception as ex:
+                log.exception(f"failed with {ex}")
 
 
 @router.delete("/expire-all-google-passes")
