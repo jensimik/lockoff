@@ -258,9 +258,7 @@ async def klubmodul_force_resync(
 
 
 async def expire_google_passes_task():
-    google_passes = (
-        await GPass.select().where(GPass.status != GPassStatus.DELETED).limit(2)
-    )
+    google_passes = await GPass.select().where(GPass.status != GPassStatus.DELETED)
     async with GooglePass() as gp:
         for p in google_passes:
             try:
