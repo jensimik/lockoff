@@ -55,7 +55,7 @@ class GooglePass:
         )
 
     async def expire_pass(self, pass_id: str):
-        url = f"/genericObject/{self.issuer_id}.{pass_id}"
+        url = f"/genericObject/{settings.google_issuer_id}.{pass_id}"
         patch_body = {"state": "EXPIRED"}
         response = await self.client.patch(url, json=patch_body)
         return response.status_code == 200
