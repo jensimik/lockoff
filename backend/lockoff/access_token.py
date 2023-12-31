@@ -51,7 +51,7 @@ def generate_access_token(
     token_type: TokenType = TokenType.NORMAL,
     token_media: TokenMedia = TokenMedia.PRINT,
     expire_delta: relativedelta = relativedelta(
-        day=20, month=1, years=1, hour=12, minute=0, second=0, microsecond=0
+        day=1, month=1, years=1, hour=1, minute=0, second=0, microsecond=0
     ),
 ) -> bytes:
     """Generate a new access token
