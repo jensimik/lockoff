@@ -257,12 +257,7 @@ async def klubmodul_force_resync(
     return schemas.StatusReply(status="sync started")
 
 
-@router.delete("/expire-all-google-passes")
-async def expire_google_passes(
-    _: Annotated[
-        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
-    ],
-) -> schemas.StatusReply:
+async def expire_google_passes_task():
     google_passes = await GPass.select().where(GPass.status != GPassStatus.DELETED)
     with GooglePass() as gp:
         for p in google_passes:
@@ -271,6 +266,16 @@ async def expire_google_passes(
                 "OK" if await GooglePass.expire_pass(pass_id=pass_id) else "FAIL"
             )
             log.info(f"expired pass with id {pass_id} {return_code}")
+
+
+@router.delete("/expire-all-google-passes")
+async def expire_google_passes(
+    _: Annotated[
+        list[UserModel], Security(depends.get_current_users, scopes=["admin"])
+    ],
+    background_tasks: BackgroundTasks,
+) -> schemas.StatusReply:
+    background_tasks.add_task(expire_google_passes_task)
     return schemas.StatusReply(status="done")
 
 
