@@ -60,16 +60,21 @@ class KMClient:
             "columns": "",
             "filter": {
                 "tableSearch": "",
-                "showMembersOnly": True,
+                "showMembersOnly": False,
                 "showNonMembersOnly": False,
                 "filterByFirstname": "",
                 "filterBySurname": "",
-                "columnFilter": None,
+                "columnFilter": {
+                    "teamenrollments": ["96", "100"],
+                },
                 "columnSearch": None,
                 "filterByProfileId": 0,
             },
             "search": "",
-            "order": None,
+            "order": {
+                "colName": "ProfileId",
+                "dir": "asc",
+            },
         }
         try:
             response = await self.client.post(
