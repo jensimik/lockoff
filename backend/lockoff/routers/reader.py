@@ -38,13 +38,9 @@ async def check_member(user_id: int, token_type: TokenType):
     today = datetime.now(tz=settings.tz)
     user = await User.select(User.id).where(User.id == user_id).first()
     if not user:
-        # do not trust db 1-3 january
-        if today.month == 1 and today.day in [1, 2, 3]:
-            pass
-        else:
-            log_and_raise_token_error(
-                "did you cancel your membership?", code=DISPLAY_CODES.NO_MEMBER
-            )
+        log_and_raise_token_error(
+            "did you cancel your membership?", code=DISPLAY_CODES.NO_MEMBER
+        )
     if token_type == TokenType.OFFPEAK:
         now = datetime.now(tz=settings.tz)
         # weekdays
