@@ -84,9 +84,9 @@ async def check_dayticket(user_id: int):
 
 
 async def check_totp(user_id: int, totp: str):
-    gp = await GPass.select(GPass.totp).where(GPass.user_id == user_id).first()
-    verifier = TOTP(s=gp["totp"], digits=8)
-    if not verifier.verify(otp=totp, valid_window=5):
+    gps = await GPass.select(GPass.totp).where(GPass.user_id == user_id)
+    verifiers = [TOTP(s=gp["totp"], digits=8) for gp in gps]
+    if not any([verifier.verify(otp=totp, valid_window=5) for verifier in verifiers]):
         log_and_raise_token_error(
             "totp code did not match", code=DISPLAY_CODES.QR_ERROR_SIGNATURE
         )
