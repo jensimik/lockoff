@@ -134,7 +134,7 @@ async def sample_data():
             GPass(id=1, user_id=1, totp=base64.b64encode(b"test123").decode(), status=0)
         ).on_conflict(action="DO NOTHING")
 
-        serial = "20231"
+        serial = "20241"
         await APPass.insert(
             APPass(id=serial, auth_token=UPDATE_AUTH_TOKEN, user_id=1, update_tag=0)
         ).on_conflict(target=APPass.id, action="DO UPDATE", values=[APPass.update_tag])
