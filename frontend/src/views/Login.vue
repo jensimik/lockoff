@@ -135,6 +135,7 @@ const tryagain = async(e) => {
         <button @click="email_update">verify</button>
       </div>
     </div>
+    <p>lockoff is synchronized with klubmodul about every hour - so if you just signed up or paid on klubmodul then wait an hour and try again</p>
   </div>
   <div v-show="step == 'totp'">
     <div class="flex one jcenter">
