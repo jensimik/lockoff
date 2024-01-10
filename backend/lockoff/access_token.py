@@ -21,9 +21,9 @@ class TokenType(Enum):
     NORMAL = 1
     OFFPEAK = 2
     DAY_TICKET = 3
-    # JUNIOR_HOLD = 4
-    # MINI_HOLD = 5
-    # BØRNE_HOLD = 6
+    JUNIOR_HOLD = 4
+    BØRNE_HOLD = 5
+    # MINI_HOLD = 6
     OTHER = 9
 
 
