@@ -65,7 +65,7 @@ class KMClient:
                 "filterByFirstname": "",
                 "filterBySurname": "",
                 "columnFilter": {
-                    "teamenrollments": ["96", "100"],
+                    "teamenrollments": ["96", "100", "97", "98"],
                 },
                 "columnSearch": None,
                 "filterByProfileId": 0,
