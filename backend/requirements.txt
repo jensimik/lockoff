@@ -18,9 +18,9 @@ docstring-parser==0.15
 ecdsa==0.18.0
 email-validator==2.1.0.post1
 fastapi==0.108.0
-fastapi-limiter==0.1.5
+fastapi-limiter==0.1.6
 fonttools==4.47.0
-google-auth==2.25.2
+google-auth==2.26.1
 h11==0.14.0
 h2==4.1.0
 hpack==4.0.0
@@ -39,7 +39,7 @@ orjson==3.9.10
 packaging==23.2
 pathspec==0.12.1
 piccolo==1.2.0
-Pillow==10.1.0
+Pillow==10.2.0
 platformdirs==4.1.0
 pluggy==1.3.0
 pyasn1==0.5.1
