@@ -36,7 +36,11 @@ async def get_api_key(api_key_header: str = Security(api_key_header)):
 
 async def check_member(user_id: int, token_type: TokenType):
     today = datetime.now(tz=settings.tz)
-    user = await User.select(User.id).where(User.id == user_id).first()
+    user = (
+        await User.select(User.id)
+        .where(User.id == user_id, User.active == True)
+        .first()
+    )
     if not user:
         log_and_raise_token_error(
             "did you cancel your membership?", code=DISPLAY_CODES.NO_MEMBER
@@ -109,7 +113,7 @@ async def check_qrcode(qr_code: str) -> tuple[int, str, str]:
     log.info(f"checking user {user_id} {token_type} {totp}")
     # check in database
     match token_type:
-        case TokenType.NORMAL | TokenType.OFFPEAK:  # | TokenType.JUNIOR_HOLD | TokenType.BØRNE_HOLD | TokenType.MINI_HOLD:
+        case TokenType.NORMAL | TokenType.OFFPEAK | TokenType.JUNIOR_HOLD | TokenType.BØRNE_HOLD:
             await check_member(user_id=user_id, token_type=token_type)
             if totp:
                 await check_totp(user_id=user_id, totp=totp)
@@ -117,6 +121,8 @@ async def check_qrcode(qr_code: str) -> tuple[int, str, str]:
             await check_dayticket(user_id=user_id)
         case TokenType.OTHER:
             await check_otherticket(user_id=user_id)
+        case _:
+            log_and_raise_token_error("general error", code=DISPLAY_CODES.GENERIC_ERROR)
     log.info(f"{user_id} {token_type} access granted")
     # log in access_log db
     async with DB.transaction():

@@ -31,7 +31,7 @@ router = APIRouter(tags=["card"])
 async def get_qr_code_png(
     user_id: Annotated[int, Depends(verify_dl_member_token)],
 ):
-    user = await User.select().where(User.id == user_id).first()
+    user = await User.select().where(User.id == user_id, User.active == True).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     access_token = generate_access_token(
@@ -57,7 +57,7 @@ async def get_qr_code_png(
 async def get_card_pdf(
     user_id: Annotated[int, Depends(verify_dl_member_token)],
 ):
-    user = await User.select().where(User.id == user_id).first()
+    user = await User.select().where(User.id == user_id, User.active == True).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     access_token = generate_access_token(
@@ -98,7 +98,7 @@ async def get_card_pdf(
 async def get_pkpass(
     user_id: Annotated[int, Depends(verify_dl_member_token)],
 ):
-    user = await User.select().where(User.id == user_id).first()
+    user = await User.select().where(User.id == user_id, User.active == True).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     access_token = generate_access_token(
@@ -162,7 +162,7 @@ async def get_pkpass(
 async def get_google_wallet(
     user_id: Annotated[int, Depends(verify_dl_member_token)],
 ):
-    user = await User.select().where(User.id == user_id).first()
+    user = await User.select().where(User.id == user_id, User.active == True).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     access_token = generate_access_token(
