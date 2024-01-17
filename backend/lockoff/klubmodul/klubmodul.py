@@ -343,6 +343,7 @@ async def refresh():
                         User.email,
                         User.mobile,
                         User.batch_id,
+                        User.token_type,
                         User.active,
                     ],
                 )
