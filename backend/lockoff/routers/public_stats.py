@@ -17,8 +17,11 @@ log = logging.getLogger(__name__)
 
 
 def check_dow_and_time(d1: datetime, d2) -> bool:
-    if (d1.hour == d2.hour) and (d1.weekday() == d2.weekday()):
-        return True
+    if d1.weekday() == d2.weekday():
+        ld2 = d2.replace(year=d1.year, month=d1.month, day=d1.day)
+        ld3 = d2 + relativedelta(hours=1)
+        if ld2 <= d1 <= ld3:
+            return True
     return False
 
 
