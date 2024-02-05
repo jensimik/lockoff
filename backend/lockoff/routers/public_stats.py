@@ -57,7 +57,9 @@ async def current_occupancy():
         # save the count for this date in cunt
         cunt[d] = len(unique_ids)
 
-    historical_median = round(statistics.median(cunt.values()), 2)
+    historical_median = (
+        round(statistics.median(cunt.values()), 2) if cunt.values() else 0
+    )
 
     return {
         "currently": unique_checked_in_last_hour,
