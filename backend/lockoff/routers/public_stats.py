@@ -2,6 +2,7 @@ import logging
 import itertools
 import collections
 import statistics
+import random
 from datetime import datetime, date
 from typing import Annotated
 
@@ -64,4 +65,5 @@ async def current_occupancy():
     return {
         "currently": unique_checked_in_last_hour,
         "historical": historical_median,
+        "hot_girls": random.randint(0, unique_checked_in_last_hour),
     }
