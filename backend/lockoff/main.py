@@ -57,7 +57,8 @@ app.include_router(apple_wallet.router, prefix="/apple-wallet")
 app.include_router(google_wallet.router, prefix="/google-wallet")
 
 
-@app.get("/healtz")  # , dependencies=[Depends(RateLimiter(times=2, seconds=5))])
+@app.api_route("/healtz", methods=["GET", "HEAD"])
+# @app.get("/healtz")  # , dependencies=[Depends(RateLimiter(times=2, seconds=5))])
 async def healthz():
     if not watchdog.healthy():
         raise HTTPException(
