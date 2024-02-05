@@ -26,7 +26,7 @@ def check_dow_and_time(d1: datetime, d2) -> bool:
     return False
 
 
-@router.get("/current-occupancy")
+@router.get("/occupancy")
 async def current_occupancy():
     hour_ago = datetime.now(tz=settings.tz) - relativedelta(hours=1)
     unique_checked_in_last_hour = await AccessLog.count(
