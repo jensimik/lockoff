@@ -33,7 +33,7 @@ async def current_occupancy():
         distinct=[AccessLog.obj_id]
     ).where(AccessLog.timestamp > hour_ago.isoformat(timespec="seconds"))
 
-    quarter_ago = datetime.now(tz=settings.tz) - relativedelta(days=180)
+    quarter_ago = datetime.now(tz=settings.tz) - relativedelta(days=90)
 
     hist_data_raw = (
         await AccessLog.select(AccessLog.obj_id, AccessLog.timestamp)
