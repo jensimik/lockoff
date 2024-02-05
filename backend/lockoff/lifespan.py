@@ -3,7 +3,8 @@ from contextlib import asynccontextmanager
 
 import redis.asyncio as redis
 from fastapi import FastAPI
-from fastapi_limiter import FastAPILimiter
+
+# from fastapi_limiter import FastAPILimiter
 from piccolo import columns
 from piccolo.table import create_db_tables
 
@@ -27,7 +28,7 @@ from .misc import watchdog
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     _redis = redis.from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
-    await FastAPILimiter.init(_redis)
+    # await FastAPILimiter.init(_redis)
     # init db and create tables if not exists
     await create_db_tables(
         User,

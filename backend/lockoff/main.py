@@ -7,12 +7,22 @@ from fastapi_limiter.depends import RateLimiter
 
 from .config import settings
 from .lifespan import lifespan, watchdog
-from .routers import admin, apple_wallet, auth, card, google_wallet, me, reader
+from .routers import (
+    admin,
+    apple_wallet,
+    auth,
+    card,
+    google_wallet,
+    me,
+    reader,
+    public_stats,
+)
 
 log = logging.getLogger(__name__)
 
 origins = [
     "https://lockoff.nkk.dk",
+    "https://nkk.klub-modul.dk",
     "http://localhost:5173",
     "http://192.168.2.186:5173",
     "http://192.168.1.168:5173",
@@ -41,12 +51,13 @@ app.include_router(auth.router)
 app.include_router(card.router)
 app.include_router(me.router)
 app.include_router(reader.router)
+app.include_router(public_stats.router)
 app.include_router(admin.router, prefix="/admin")
 app.include_router(apple_wallet.router, prefix="/apple-wallet")
 app.include_router(google_wallet.router, prefix="/google-wallet")
 
 
-@app.get("/healtz", dependencies=[Depends(RateLimiter(times=2, seconds=5))])
+@app.get("/healtz")  # , dependencies=[Depends(RateLimiter(times=2, seconds=5))])
 async def healthz():
     if not watchdog.healthy():
         raise HTTPException(
