@@ -37,16 +37,22 @@ async def current_occupancy():
         .order_by(AccessLog.timestamp)
     )
 
-    cunt = collections.Counter()
-    for d in [
-        {
-            "obj_id": d["obj_id"],
-            "date": date.fromisoformat(d["timestamp"][:10]),
-        }
-        for d in hist_data_raw
-        if check_dow_and_time(datetime.fromisoformat(d["timestamp"]), hour_ago)
-    ]:
-        cunt[d["date"]] += 1
+    cunt = {}
+    for d, g in itertools.groupby(
+        [
+            {
+                "obj_id": d["obj_id"],
+                "date": date.fromisoformat(d["timestamp"][:10]),
+            }
+            for d in hist_data_raw
+            if check_dow_and_time(datetime.fromisoformat(d["timestamp"]), hour_ago)
+        ],
+        lambda x: x["date"],
+    ):
+        # get unique ids for this date by using a set
+        unique_ids = {gg["obj_id"] for gg in g}
+        # save the count for this date in cunt
+        cunt[d] = len(unique_ids)
 
     historical_median = round(statistics.median(cunt.values()), 2)
 
