@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 
 import pyotp
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
-from fastapi_limiter.depends import RateLimiter
+
+# from fastapi_limiter.depends import RateLimiter
 from jose import jwt
 
 from .. import schemas
@@ -35,8 +36,9 @@ send_funcs = {
 
 
 @router.post(
-    "/request-totp", dependencies=[Depends(RateLimiter(times=10, seconds=300))]
-)
+    "/request-totp"
+)  # , dependencies=[Depends(RateLimiter(times=10, seconds=300))]
+# )
 async def request_totp(
     rt: schemas.RequestTOTP, background_tasks: BackgroundTasks
 ) -> schemas.StatusReply:
@@ -64,7 +66,7 @@ async def request_totp(
     return schemas.StatusReply(status=f"{rt.username_type} message sent")
 
 
-@router.post("/login", dependencies=[Depends(RateLimiter(times=10, seconds=300))])
+@router.post("/login")  # , dependencies=[Depends(RateLimiter(times=10, seconds=300))])
 async def login(
     login_data: schemas.RequestLogin,
 ) -> schemas.JWTToken:
