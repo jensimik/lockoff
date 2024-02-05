@@ -9,6 +9,7 @@ from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Security
 
 from .. import schemas
+from ..config import settings
 from ..db import AccessLog
 
 router = APIRouter(tags=["public_stats"])
