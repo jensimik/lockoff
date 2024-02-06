@@ -23,6 +23,7 @@ log = logging.getLogger(__name__)
 origins = [
     "https://lockoff.nkk.dk",
     "https://nkk.klub-modul.dk",
+    "https://fistbump.nkk.dk",
     "http://localhost:5173",
     "http://192.168.2.186:5173",
     "http://192.168.1.168:5173",
