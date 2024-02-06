@@ -148,9 +148,9 @@ const tryagain = async(e) => {
     </div>
     <p>lockoff is synchronized with klubmodul about every hour - so if you just signed up or paid on klubmodul then wait an hour and try again</p>
     <div class="flex one">
-      <div v-if="occupancy.currently < (occupancy.historical - 1)" style="text-align: center;">💚 less busy than usual (<span :title="occupancy.currently + ' checkins last hour where the average is ' + occupancy.historical + ' for this hour/day'">curr {{ occupancy.currently }} avg {{ occupancy.historical }}</span>)</div>
-      <div v-if="(occupancy.currently >= (occupancy.historical -1)) & (occupancy.currently <= (occupancy.historical + 1))" style="text-align: center;">💛 average busyness (<span :title="occupancy.currently + ' checkins last hour where the average is ' + occupancy.historical + ' for this hour/day'">curr {{ occupancy.currently }} avg {{ occupancy.historical }}</span>)</div>
-      <div v-if="occupancy.currently > (occupancy.historical + 1)" style="text-align: center;">🔥 more busy than usual (<span :title="occupancy.currently + ' checkins last hour where the average is ' + occupancy.historical + ' for this hour/day'">curr {{ occupancy.currently }} avg {{ occupancy.historical }}</span>)</div>
+      <div v-if="occupancy.currently < (occupancy.historical - 2)" style="text-align: center;">💚 less busy than usual (<span :title="occupancy.currently + ' checkins last hour where the average is ' + occupancy.historical + ' for this hour/day'">curr {{ occupancy.currently }} avg {{ occupancy.historical }}</span>)</div>
+      <div v-if="(occupancy.currently >= (occupancy.historical -2)) & (occupancy.currently <= (occupancy.historical + 2))" style="text-align: center;">💛 average busyness (<span :title="occupancy.currently + ' checkins last hour where the average is ' + occupancy.historical + ' for this hour/day'">curr {{ occupancy.currently }} avg {{ occupancy.historical }}</span>)</div>
+      <div v-if="occupancy.currently > (occupancy.historical + 2)" style="text-align: center;">🔥 more busy than usual (<span :title="occupancy.currently + ' checkins last hour where the average is ' + occupancy.historical + ' for this hour/day'">curr {{ occupancy.currently }} avg {{ occupancy.historical }}</span>)</div>
     </div>
   </div>
   <div v-show="step == 'totp'">
