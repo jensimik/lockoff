@@ -6,7 +6,8 @@ from datetime import datetime, timedelta
 import pyotp
 import pytest
 import pytest_asyncio
-from fakeredis import aioredis
+
+# from fakeredis import aioredis
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from fastapi_limiter import FastAPILimiter
@@ -32,8 +33,8 @@ UPDATE_AUTH_TOKEN = "qwerty"
 
 @asynccontextmanager
 async def testing_lifespan(app: FastAPI):
-    _redis = aioredis.FakeRedis(encoding="utf-8", decode_responses=True)
-    await FastAPILimiter.init(_redis)
+    #    _redis = aioredis.FakeRedis(encoding="utf-8", decode_responses=True)
+    #    await FastAPILimiter.init(_redis)
     yield
 
 
@@ -62,9 +63,9 @@ async def sample_data():
                     User(
                         id=x,
                         name=f"test user {x}",
-                        token_type=TokenType.NORMAL
-                        if x in range(5)
-                        else TokenType.OFFPEAK,
+                        token_type=(
+                            TokenType.NORMAL if x in range(5) else TokenType.OFFPEAK
+                        ),
                         mobile=simple_hash(f"1000100{x}"),
                         email=simple_hash(f"test{x}@test.dk"),
                         batch_id=batch_id,
