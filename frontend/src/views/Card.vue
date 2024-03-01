@@ -36,9 +36,9 @@ export default {
             <div class="hleft">
               <h3>{{ user.name }} <span class="membernumber">({{ user.user_id }})</span></h3>
               </div>
-            <div class="hright">
+<!--            <div class="hright">
               <a target="_blank" :href="baseURL + '/' + user.token + '/qr-code.png'"><img class="qrcode" :src="baseURL + '/' + user.token + '/qr-code.png'"></a>
-            </div>
+            </div>-->
           </header>
           <p>{{ user.member_type }} member exp {{ user.expires }}</p>
           <footer>

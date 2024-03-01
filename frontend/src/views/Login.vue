@@ -187,10 +187,10 @@ label {
   font-size: 1.5em;
   width: auto;
 }
-:where([autocomplete=tel-local]):focus, :where([autocomplete=one-time-code]):focus {
+#mobile:focus, #otp:focus {
   border: none;
 }
-:where([autocomplete=tel-local]) {
+#mobile {
   --otp-digits: 8;
   --otp-ls: 2ch;
   --otp-gap: 1.25;
@@ -223,7 +223,7 @@ label {
   padding-block: var(--otp-pb, 1ch);
   padding-inline-start: calc(((var(--otp-ls) - 1ch) / 2) * var(--otp-gap));
 }
-:where([autocomplete=one-time-code]) {
+#otp {
   --otp-digits: 6;
   --otp-ls: 2ch;
   --otp-gap: 1.25;
