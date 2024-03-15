@@ -94,7 +94,7 @@ async def get_qr_code_png(
         user_id=ticket_id,
         token_type=TokenType.DAY_TICKET,
         token_media=TokenMedia.PRINT,
-        expire_delta=relativedelta(months=3),
+        expire_delta=relativedelta(months=12),
     )
     img = generate_png(qr_code_data=access_token.decode())
     with io.BytesIO() as f:
