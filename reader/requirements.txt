@@ -18,7 +18,7 @@ packaging==24.0
 pluggy==1.4.0
 pydantic==2.6.4
 pydantic-settings==2.2.1
-pydantic_core==2.18.0
+pydantic_core==2.16.3
 pyserial==3.5
 pyserial-asyncio==0.6
 python-dateutil==2.9.0.post0
