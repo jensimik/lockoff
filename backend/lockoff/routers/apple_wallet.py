@@ -112,7 +112,7 @@ async def get_updated_pass(
     current_pass: Annotated[dict, Depends(apple_auth_pass)],
 ):
     if not serial_number.startswith(str(settings.current_season)):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
     user = (
         await User.select()
         .where(User.id == current_pass["user_id"], User.active == True)
