@@ -11,19 +11,19 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@sentry/vue": "^7.110.1",
+    "@sentry/vue": "^7.111.0",
     "picnic": "^7.1.0",
-    "vue": "^3.4.22",
+    "vue": "^3.4.23",
     "vue-json-csv": "^2.1.0",
-    "vue-qrcode-reader": "^5.5.3",
-    "vue-router": "^4.3.0",
+    "vue-qrcode-reader": "^5.5.4",
+    "vue-router": "^4.3.2",
     "vue3-toastify": "^0.2.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
     "@vitest/coverage-v8": "^1.5.0",
     "@vue/test-utils": "^2.4.5",
-    "vite": "^5.2.9",
+    "vite": "^5.2.10",
     "vitest": "^1.3.1"
   }
 }
