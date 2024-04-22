@@ -17,7 +17,7 @@ dnspython==2.6.1
 docstring-parser==0.16
 ecdsa==0.19.0
 email-validator==2.1.1
-fastapi==0.110.1
+fastapi==0.110.2
 fastapi-limiter==0.1.6
 fonttools==4.51.0
 google-auth==2.29.0
@@ -41,7 +41,7 @@ pathspec==0.12.1
 piccolo==1.5.0
 Pillow==10.3.0
 platformdirs==4.2.0
-pluggy==1.4.0
+pluggy==1.5.0
 pyasn1==0.6.0
 pyasn1-modules==0.4.0
 pycparser==2.22
