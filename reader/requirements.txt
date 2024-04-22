@@ -4,7 +4,7 @@ certifi==2024.2.2
 click==8.1.7
 colorzero==2.0
 dateutils==0.6.12
-fastapi==0.110.1
+fastapi==0.110.2
 gpiozero==2.0.1
 h11==0.14.0
 httpcore==1.0.5
@@ -15,7 +15,7 @@ iniconfig==2.0.0
 mock-serial==0.0.1
 orjson==3.10.1
 packaging==24.0
-pluggy==1.4.0
+pluggy==1.5.0
 pydantic==2.7.0
 pydantic-settings==2.2.1
 pydantic_core==2.18.1
