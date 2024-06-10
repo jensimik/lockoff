@@ -1,4 +1,4 @@
-pytest==8.2.1
+pytest==8.2.2
 mock_serial==0.0.1
 lupa==2.2
 sortedcontainers==2.4.0
