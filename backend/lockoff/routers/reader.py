@@ -48,7 +48,7 @@ async def check_member(user_id: int, token_type: TokenType):
     if token_type == TokenType.OFFPEAK:
         now = datetime.now(tz=settings.tz)
         # from 10 july to 10 august offpeak members have full access
-        if (now.month == 7 and now.day > 9) or (now.month == 8 and now.day < 11):
+        if (now.month == 7 and now.day >= 10) or (now.month == 8 and now.day <= 10):
             return
         # weekdays monday-thursday (friday+weekend is open for offpeak)
         if now.weekday() < 4:
