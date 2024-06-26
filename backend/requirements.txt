@@ -47,7 +47,7 @@ pyasn1-modules==0.4.0
 pycparser==2.22
 pydantic==2.7.4
 pydantic-settings==2.3.3
-pydantic_core==2.19.0
+pydantic_core==2.18.4
 pydyf==0.10.0
 pyotp==2.9.0
 pyphen==0.15.0
