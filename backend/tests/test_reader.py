@@ -50,6 +50,14 @@ async def test_check_qr_code_offpeak(qr_code, _raise):
     # weekend allowed late
     with freeze_time("2023-01-01 20:00:00"):
         await check_qrcode(qr_code=qr_code)
+    # weekday evening in period july-10 to augst-10 is allowed
+    with freeze_time("2023-07-12 18:00:00"):
+        await check_qrcode(qr_code=qr_code)
+    with freeze_time("2023-08-08 18:00:00"):
+        await check_qrcode(qr_code=qr_code)
+    with freeze_time("2023-07-09 18:00:00"):
+        with pytest.raises(TokenError):
+            await check_qrcode(qr_code=qr_code)
 
 
 @pytest.mark.parametrize(
