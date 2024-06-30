@@ -56,7 +56,7 @@ class Settings(BaseSettings):
     secret: bytes = "changeme"
     jwt_secret: str = ""
     admin_user_ids: list[int] = [1]
-    eljefe: list[int] = [3587, 4281]
+    eljefe: list[int] = [3587, 4281, 33698]
     db_file: str = "/tmp/lockoff.db3"
     redis_url: str = "redis://localhost"
     google_service_account: pathlib.Path = pathlib.Path(
