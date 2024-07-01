@@ -20,7 +20,7 @@ email-validator==2.2.0
 fastapi==0.111.0
 fastapi-limiter==0.1.6
 fonttools==4.53.0
-google-auth==2.30.0
+google-auth==2.31.0
 h11==0.14.0
 h2==4.1.0
 hpack==4.0.0
@@ -39,7 +39,7 @@ orjson==3.10.5
 packaging==24.1
 pathspec==0.12.1
 piccolo==1.13.0
-Pillow==10.3.0
+Pillow==10.4.0
 platformdirs==4.2.2
 pluggy==1.5.0
 pyasn1==0.6.0
