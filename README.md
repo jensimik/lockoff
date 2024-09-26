@@ -18,4 +18,11 @@ Display:
 - [Pico GFX pack](https://shop.pimoroni.com/products/pico-gfx-pack?variant=40414469062739)
 - Show status messages from the controller (connected and powered with USB)
 
+![lockoff1](https://github.com/user-attachments/assets/674ae202-a883-4bad-ba9a-e3ef5b5fd088)
+
+
+https://github.com/user-attachments/assets/c801137b-c7ea-4c59-a9cf-34055e9e2a4f
+
+
+
 [![backend](https://github.com/jensimik/lockoff/actions/workflows/backend.yml/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/backend.yml) [![reader](https://github.com/jensimik/lockoff/actions/workflows/reader.yml/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/reader.yml) [![frontend](https://github.com/jensimik/lockoff/actions/workflows/frontend.yml/badge.svg)](https://github.com/jensimik/lockoff/actions/workflows/frontend.yml) [![cov-backend](https://codecov.io/gh/jensimik/lockoff/branch/main/graph/badge.svg?token=6ZCJSY0L7K&flag=backend)](https://codecov.io/gh/jensimik/lockoff) [![cov-reader](https://codecov.io/gh/jensimik/lockoff/branch/main/graph/badge.svg?token=6ZCJSY0L7K&flag=reader)](https://codecov.io/gh/jensimik/lockoff) [![cov-frontend](https://codecov.io/gh/jensimik/lockoff/branch/main/graph/badge.svg?token=6ZCJSY0L7K&flag=frontend)](https://codecov.io/gh/jensimik/lockoff)
