@@ -1,10 +1,10 @@
-pytest==8.2.2
-fakeredis==2.23.3
+pytest==8.3.4
+fakeredis==2.26.1
 lupa==2.2
 sortedcontainers==2.4.0
-pytest-asyncio==0.23.7
+pytest-asyncio==0.24.0
 pytest-mock==3.14.0
-pytest-cov==5.0.0
-pytest-httpx==0.30.0
-coverage==7.5.4
+pytest-cov==6.0.0
+pytest-httpx==0.35.0
+coverage==7.6.8
 freezegun==1.5.1
