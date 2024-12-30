@@ -11,7 +11,7 @@ charset-normalizer==3.4.1
 click==8.1.8
 colorama==0.4.6
 colorzero==2.0
-cryptography==38.0.4
+cryptography==44.0.0
 cssselect2==0.7.0
 dnspython==2.7.0
 docstring-parser==0.16
