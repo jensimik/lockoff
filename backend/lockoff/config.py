@@ -63,7 +63,7 @@ class Settings(BaseSettings):
         "/secret/google-service-account.json"
     )
     google_issuer_id: str = ""
-    current_season: int = 2024
+    current_season: int = 2025
     tz: tzfile = gettz("Europe/Copenhagen")
     reader_token: str = ""
 
