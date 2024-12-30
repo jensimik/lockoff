@@ -232,12 +232,22 @@ class ApplePass:
         manifest = json.dumps(_hashes)
         # create signature
         signature = (
-            pkcs7.PKCS7SignatureBuilder()
-            .set_data(manifest.encode("UTF-8"))
-            .add_signer(self.CERT, self.PRIV_KEY, hashes.SHA1())
+            pkcs7.PKCS7SignatureBuilder(
+                manifest.encode("UTF-8"),  # data
+                [
+                    (self.CERT, self.PRIV_KEY, hashes.SHA1(), None),
+                ],  # hack to allow using newest cryptography lib and still use SHA1 which is deprecated otherwise?
+            )
             .add_certificate(self.WWDR_CERT)
             .sign(serialization.Encoding.DER, self.OPTIONS)
         )
+        # signature = (
+        #     pkcs7.PKCS7SignatureBuilder()
+        #     .set_data(manifest.encode("UTF-8"))
+        #     .add_signer(self.CERT, self.PRIV_KEY, hashes.SHA1())
+        #     .add_certificate(self.WWDR_CERT)
+        #     .sign(serialization.Encoding.DER, self.OPTIONS)
+        # )
         # create pkpass zipfile
         with zipfile.ZipFile(zip_file, "w") as zf:
             zf.writestr("signature", signature)
