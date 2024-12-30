@@ -90,7 +90,9 @@ async def test_klubmodul_get_members(httpx_mock):
 async def test_klubmodul_refresh(httpx_mock):
     # login
     httpx_mock.add_response(
-        method="POST", url=f"{settings.klubmodul_base_url}/default.aspx"
+        method="POST",
+        url=f"{settings.klubmodul_base_url}/default.aspx",
+        is_reusable=True,
     )
     # get csv
     httpx_mock.add_response(
@@ -103,6 +105,7 @@ async def test_klubmodul_refresh(httpx_mock):
 4;F5;E;f5@e.dk;80808085;asdf;
 5;F4;E;f4@e.dk;80808084;asdf;2
 """,
+        is_reusable=True,
     )
 
     await refresh()

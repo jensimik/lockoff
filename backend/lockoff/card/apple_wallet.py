@@ -236,12 +236,10 @@ class ApplePass:
                 manifest.encode("UTF-8"),  # data
                 [
                     (self.CERT, self.PRIV_KEY, hashes.SHA1(), None),
-                ],  # signers hack to allow using newest cryptography lib?
+                ],  # hack to allow using newest cryptography lib and still use SHA1 which is deprecated otherwise?
             )
-            #            .set_data(manifest.encode("UTF-8"))
-            .add_certificate(self.WWDR_CERT).sign(
-                serialization.Encoding.DER, self.OPTIONS
-            )
+            .add_certificate(self.WWDR_CERT)
+            .sign(serialization.Encoding.DER, self.OPTIONS)
         )
         # signature = (
         #     pkcs7.PKCS7SignatureBuilder()
