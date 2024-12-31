@@ -163,7 +163,7 @@ def test_apple_wallet_callbacks(a2client: TestClient):
 
     device_library_identifier = "test-device"
     pass_type_identifier = "pass-type-id"
-    serial_number = "20241"
+    serial_number = "20251"
     data = {"pushToken": "push-token", "pushServiceUrl": "https://localhost/something"}
     response = a2client.post(
         f"/apple-wallet/v1/devices/{device_library_identifier}/registrations/{pass_type_identifier}/{serial_number}",
