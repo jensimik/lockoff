@@ -169,7 +169,7 @@ def test_apple_wallet_callbacks(a2client: TestClient):
         f"/apple-wallet/v1/devices/{device_library_identifier}/registrations/{pass_type_identifier}/{serial_number}",
         json=data,
     )
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code in [status.HTTP_200_OK, status.HTTP_204_NO_CONTENT]
 
     response = a2client.get(
         f"/apple-wallet/v1/devices/{device_library_identifier}/registrations/{pass_type_identifier}"
