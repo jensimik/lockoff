@@ -360,7 +360,7 @@ async def klubmodul_runner(one_time_run: bool = False):
             await refresh()
             log.info("klubmodul refresh done")
             # sleep for one hours and then sync again
-            await asyncio.sleep(60 * 60)
+            await asyncio.sleep(60 * settings.klubmodul_refresh_delay)
         except (KlubmodulException, Exception) as ex:
             log.exception(f"failed to fetch klubmodul data retry in an hour {ex}")
             await asyncio.sleep(60 * 60)

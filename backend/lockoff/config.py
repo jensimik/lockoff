@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     klubmodul_password: str = ""
     klubmodul_base_url: str = "https://changeme.klub-modul.dk"
     klubmodul_admin_user_id: int = 3535  # change to your own user_id for the admin user
+    klubmodul_refresh_delay: int = 60
     apple_pass_certificate: pathlib.Path = pathlib.Path("/secret/apple-certificate.pem")
     apple_pass_key: pathlib.Path = pathlib.Path("/secret/apple-key.encrypted")
     apple_pass_key_password: bytes = ""
