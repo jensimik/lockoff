@@ -2,7 +2,7 @@ pytest==8.3.4
 mock_serial==0.0.1
 lupa==2.2
 sortedcontainers==2.4.0
-pytest-asyncio==0.25.0
+pytest-asyncio==0.25.1
 pytest-mock==3.14.0
 pytest-cov==6.0.0
 pytest-httpx==0.35.0
