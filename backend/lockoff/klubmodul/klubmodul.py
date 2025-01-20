@@ -84,7 +84,7 @@ class KMClient:
             )
         except httpx.TimeoutException:
             raise KlubmodulException("failed to get member profiles due to timeout")
-        if response.is_error:
+        if response.is_error or (not response.is_success):
             raise KlubmodulException(
                 "failed to get member profiles: " + response.reason_phrase
             )
