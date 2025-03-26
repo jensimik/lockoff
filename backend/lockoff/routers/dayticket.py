@@ -30,9 +30,11 @@ async def get_api_key(api_key_header: str = Security(api_key_header)):
 async def get_dayticket():
     batch_id = datetime.now(tz=settings.tz).isoformat(timespec="seconds")
     async with DB.transaction():
-        ticket_id = await Dayticket.insert(
-            Dayticket(id=None, batch_id=batch_id)
-        ).returning(Dayticket.id)[0]["id"]
+        ticket_id = (
+            await Dayticket.insert(Dayticket(id=None, batch_id=batch_id)).returning(
+                Dayticket.id
+            )
+        )[0]["id"]
     access_token = generate_access_token(
         user_id=ticket_id,
         token_type=TokenType.DAY_TICKET,
