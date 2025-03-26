@@ -32,7 +32,7 @@ async def get_dayticket():
     async with DB.transaction():
         ticket_id = await Dayticket.insert(
             Dayticket(id=None, batch_id=batch_id)
-        ).returning(Dayticket.id)
+        ).returning(Dayticket.id)[0]["id"]
     access_token = generate_access_token(
         user_id=ticket_id,
         token_type=TokenType.DAY_TICKET,
