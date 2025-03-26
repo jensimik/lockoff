@@ -16,6 +16,7 @@ from .routers import (
     me,
     reader,
     public_stats,
+    dayticket,
 )
 
 log = logging.getLogger(__name__)
@@ -53,6 +54,7 @@ app.include_router(card.router)
 app.include_router(me.router)
 app.include_router(reader.router)
 app.include_router(public_stats.router)
+app.include_router(dayticket.router)
 app.include_router(admin.router, prefix="/admin")
 app.include_router(apple_wallet.router, prefix="/apple-wallet")
 app.include_router(google_wallet.router, prefix="/google-wallet")

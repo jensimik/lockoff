@@ -67,6 +67,7 @@ class Settings(BaseSettings):
     current_season: int = 2025
     tz: tzfile = gettz("Europe/Copenhagen")
     reader_token: str = ""
+    ext_dayticket_token: str = ""
 
     @classmethod
     def settings_customise_sources(
