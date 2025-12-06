@@ -5,8 +5,8 @@ import { useRoute } from 'vue-router';
 export default {
   name: "Print Daytickets",
   data() {
-    return { 
-        data: {}, 
+    return {
+        data: {},
     };
   },
   mounted() {
@@ -28,7 +28,7 @@ export default {
 <template>
     <div class="print-container">
         <article class="ticket" v-for="ticket in data" :key="ticket.dayticket_id">
-            <img class="qrcode" :src="'https://lockoff-api.gnerd.dk/admin/daytickets/' + ticket.dl_token + '/qr-code.png'" />
+            <img class="qrcode" :src="'https://lockoff.tail00b5c.ts.net/admin/daytickets/' + ticket.dl_token + '/qr-code.png'" />
             <div class="padding"></div>
             <div class="ticket-text">
                 <p class="nkk-title">Nørrebro klatreklub</p>
@@ -74,11 +74,11 @@ export default {
     margin: 0;
 }
 
-@media print { 
+@media print {
     @page { margin: 5mm }
     .ticket {
         page-break-inside: avoid;
-    } 
+    }
     body {
         max-width: none;
         font: 10pt Arial, Helvetica, sans-serif;

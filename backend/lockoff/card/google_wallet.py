@@ -1,7 +1,7 @@
 import typing
 from datetime import datetime
-from types import TracebackType
 from enum import IntEnum
+from types import TracebackType
 
 import httpx
 from dateutil.relativedelta import relativedelta
@@ -104,7 +104,7 @@ class GooglePass:
                 ]
             },
             "callbackOptions": {
-                "url": "https://lockoff-api.gnerd.dk/google-wallet/callback"
+                "url": "https://lockoff.tail00b5c.ts.net/google-wallet/callback"
             },
             "multipleDevicesAndHoldersAllowedStatus": "ONE_USER_ALL_DEVICES",
             "ViewUnlockRequirement": "UNLOCK_NOT_REQUIRED",
