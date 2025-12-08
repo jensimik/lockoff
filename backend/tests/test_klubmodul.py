@@ -75,6 +75,7 @@ async def test_klubmodul_get_members(httpx_mock):
 4;F5;E;f5@e.dk;80808085;asdf;
 5;F4;E;f4@e.dk;80808084;asdf;2
 """,
+        is_reusable=True,
     )
 
     async with KMClient() as km:
