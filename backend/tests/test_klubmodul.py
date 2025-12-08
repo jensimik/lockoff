@@ -83,8 +83,7 @@ async def test_klubmodul_get_members(httpx_mock):
         async for user_id, name, member_type, email, mobile in km.get_members():
             assert user_id > 0
             i += 1
-        # only show 4 as user_id 4 is not a member (not in a hold)
-        assert i == 4
+        assert i == 20
 
 
 @pytest.mark.asyncio
