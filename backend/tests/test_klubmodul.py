@@ -67,7 +67,7 @@ async def test_klubmodul_get_members(httpx_mock):
     # get csv
     httpx_mock.add_response(
         method="POST",
-        url=f"{settings.klubmodul_base_url}/Adminv2/SearchProfile/ExportCsv",
+        url=f"{settings.klubmodul_base_url}/Adminv2/TeamEnrollmentList/ExportCsv",
         text="""Id;Fornavn;Efternavn;Email;Mobil;NogetAndet;Hold
 1;F1;E;f1@e.dk;80808081;adsf;1
 2;F2;E;f2@e.dk;80808082;asdf;2
@@ -97,7 +97,7 @@ async def test_klubmodul_refresh(httpx_mock):
     # get csv
     httpx_mock.add_response(
         method="POST",
-        url=f"{settings.klubmodul_base_url}/Adminv2/SearchProfile/ExportCsv",
+        url=f"{settings.klubmodul_base_url}/Adminv2/TeamEnrollmentList/ExportCsv",
         text="""Id;Fornavn;Efternavn;Email;Mobil;NogetAndet;Hold
 1;F1;E;f1@e.dk;80808081;adsf;1
 2;F2;E;f2@e.dk;80808082;asdf;2

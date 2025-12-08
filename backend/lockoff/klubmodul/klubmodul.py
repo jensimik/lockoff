@@ -90,43 +90,15 @@ class KMClient:
 
         for list_id, member_type in KM_LISTS.items():
             async for row in self._get_list(list_id):
-                pass
-
-        data = {
-            "exportDetails": None,
-            "columns": "",
-            "filter": {
-                "tableSearch": "",
-                "teamId": 102,
-                "showTrialHour": False,
-                "showWaitingList": False,
-                "filterByName": "",
-            },
-            "search": "",
-            "order": None,
-        }
-        try:
-            response = await self.client.post(
-                "/Adminv2/TeamEnrollmentList/ExportCsv",
-                json=data,
-                timeout=60.0,  # crazy slow
-            )
-        except httpx.TimeoutException:
-            raise KlubmodulException("failed to get member profiles due to timeout")
-        if response.is_error or (not response.is_success):
-            raise KlubmodulException(
-                "failed to get member profiles: " + response.reason_phrase
-            )
-        for row in csv.DictReader(response.iter_lines(), delimiter=";", quotechar='"'):
-            user_id = int(row["Id"])
-            hold = [int(i) for i in row["Hold"].split(", ") if i]
-            lowest_hold_number = min(hold) if hold else -1
-            member_type = KM_MEMBER_TYPES.get(lowest_hold_number)
-            name = row["Fornavn"].capitalize() + " " + row["Efternavn"].capitalize()
-            email = row["Email"].lower()
-            mobile = row["Mobil"]
-            if member_type:
-                yield user_id, name, member_type, email, mobile
+                user_id = int(row["Id"])
+                # hold = [int(i) for i in row["Hold"].split(", ") if i]
+                # lowest_hold_number = min(hold) if hold else -1
+                # member_type = KM_MEMBER_TYPES.get(lowest_hold_number)
+                name = row["Fornavn"].capitalize() + " " + row["Efternavn"].capitalize()
+                email = row["Email"].lower()
+                mobile = row["Mobil"]
+                if member_type:
+                    yield user_id, name, member_type, email, mobile
 
     async def get_members_old(self):
         """ "async generator which yield valid user_id, member_type, email, mobile,"""
