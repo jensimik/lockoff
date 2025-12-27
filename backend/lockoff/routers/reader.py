@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, date
+from datetime import date, datetime
 
 from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Security, status
@@ -67,27 +67,27 @@ async def check_member(user_id: int, token_type: TokenType):
         #         )
 
 
-async def check_dayticket(user_id: int):
-    if ticket := await Dayticket.select().where(Dayticket.id == user_id).first():
-        if ticket["expires"] == 0:
-            # first use - set expire at midnight of current day
-            expire = datetime.now(tz=settings.tz) + relativedelta(
-                hour=23, minute=59, second=59, microsecond=0
-            )
-            async with DB.transaction():
-                await Dayticket.update(
-                    {Dayticket.expires: int(expire.timestamp())}
-                ).where(Dayticket.id == user_id)
-        elif datetime.now(tz=settings.tz) > datetime.fromtimestamp(
-            ticket["expires"], tz=settings.tz
-        ):
-            log_and_raise_token_error(
-                "dayticket is expired", code=DISPLAY_CODES.DAYTICKET_EXPIRED
-            )
-    else:
-        log_and_raise_token_error(
-            "no such dayticket!?", code=DISPLAY_CODES.DAYTICKET_EXPIRED
-        )
+# async def check_dayticket(user_id: int):
+#     if ticket := await Dayticket.select().where(Dayticket.id == user_id).first():
+#         if ticket["expires"] == 0:
+#             # first use - set expire at midnight of current day
+#             expire = datetime.now(tz=settings.tz) + relativedelta(
+#                 hour=23, minute=59, second=59, microsecond=0
+#             )
+#             async with DB.transaction():
+#                 await Dayticket.update(
+#                     {Dayticket.expires: int(expire.timestamp())}
+#                 ).where(Dayticket.id == user_id)
+#         elif datetime.now(tz=settings.tz) > datetime.fromtimestamp(
+#             ticket["expires"], tz=settings.tz
+#         ):
+#             log_and_raise_token_error(
+#                 "dayticket is expired", code=DISPLAY_CODES.DAYTICKET_EXPIRED
+#             )
+#     else:
+#         log_and_raise_token_error(
+#             "no such dayticket!?", code=DISPLAY_CODES.DAYTICKET_EXPIRED
+#         )
 
 
 async def check_totp(user_id: int, totp: str):
@@ -126,7 +126,8 @@ async def check_qrcode(qr_code: str) -> tuple[int, str, str]:
             if totp:
                 await check_totp(user_id=user_id, totp=totp)
         case TokenType.DAY_TICKET:
-            await check_dayticket(user_id=user_id)
+            pass
+            # await check_dayticket(user_id=user_id)
         case TokenType.OTHER:
             await check_otherticket(user_id=user_id)
         case _:
