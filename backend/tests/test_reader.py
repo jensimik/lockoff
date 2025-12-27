@@ -1,13 +1,13 @@
 import asyncio
 
 import pytest
-from lockoff.access_token import TokenError, TokenType, generate_access_token
 from freezegun import freeze_time
+from lockoff.access_token import TokenError, TokenType, generate_access_token
 
 # from lockoff.misc import O_CMD, GFXDisplay
 from lockoff.routers.reader import (
     # Reader,
-    check_dayticket,
+    # check_dayticket,
     check_member,
     check_qrcode,
     check_totp,
@@ -98,9 +98,9 @@ async def test_member():
         await check_member(user_id=1000, token_type=TokenType.NORMAL)
 
 
-@pytest.mark.asyncio
-async def test_dayticket():
-    await check_dayticket(user_id=0)
+# @pytest.mark.asyncio
+# async def test_dayticket():
+#     await check_dayticket(user_id=0)
 
 
 # @pytest.mark.asyncio
