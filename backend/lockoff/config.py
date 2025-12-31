@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     apple_pass_team_identifier: str = "LLFSXFW7XK"
     apple_pass_latitude: float = 55.69942723771949
     apple_pass_longitude: float = 12.543439832016006
-    apple_pass_relevant_text: str = "lets climb! 🐒"
+    apple_pass_relevant_text: str = "lets crimp! 🐒"
     apple_pass_proximity_uuid: str = "812366E1-4479-404B-B4A1-110FBBA9F625"
     apple_pass_web_service_url: str = "https://lockoff.tail00b5c.ts.net/apple-wallet/"
     apple_apn_auth_key: pathlib.Path = pathlib.Path("/secret/apple-apn-auth-key.pem")
@@ -64,7 +64,7 @@ class Settings(BaseSettings):
         "/secret/google-service-account.json"
     )
     google_issuer_id: str = ""
-    current_season: int = 2025
+    current_season: int = 2026
     tz: tzfile = gettz("Europe/Copenhagen")
     reader_token: str = ""
     ext_dayticket_token: str = ""
