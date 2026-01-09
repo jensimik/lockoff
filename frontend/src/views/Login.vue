@@ -19,7 +19,7 @@ const ac = new AbortController();
 
 const options = ref([
   { text: 'verify mobile', value: 'mobile' },
-// dont allow email verify  { text: 'verify email', value: 'email' },
+  { text: 'verify email', value: 'email' },
 ])
 
 const selector_change = async(e) => {
