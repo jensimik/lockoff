@@ -19,7 +19,7 @@ const ac = new AbortController();
 
 const options = ref([
   { text: 'verify mobile', value: 'mobile' },
-  { text: 'verify email', value: 'email' },
+// dont allow email verify  { text: 'verify email', value: 'email' },
 ])
 
 const selector_change = async(e) => {
@@ -88,7 +88,7 @@ const totp_update = async(e) => {
     e.target.blur();
     // Cancel the WebOTP API.
     ac.abort();
-    controllerAPI.login(username.value, username_type.value, totp.value).then((token_data) => {  
+    controllerAPI.login(username.value, username_type.value, totp.value).then((token_data) => {
         toast.success("logged in");
         setWithExpiry("access_token", token_data.access_token, 7100 * 1000);
         if (next_hop)
@@ -202,11 +202,11 @@ label {
   --_otp-digit: 0;
 
   all: unset;
-  background: 
-  linear-gradient(90deg, 
+  background:
+  linear-gradient(90deg,
     var(--otp-bg, #BBB) calc(var(--otp-gap) * var(--otp-ls)),
     transparent 0),
-    linear-gradient(90deg, 
+    linear-gradient(90deg,
     var(--otp-bg, #EEE) calc(var(--otp-gap) * var(--otp-ls)),
     transparent 0
   );
@@ -235,11 +235,11 @@ label {
   --_otp-digit: 0;
 
   all: unset;
-  background: 
-  linear-gradient(90deg, 
+  background:
+  linear-gradient(90deg,
     var(--otp-bg, #BBB) calc(var(--otp-gap) * var(--otp-ls)),
     transparent 0),
-    linear-gradient(90deg, 
+    linear-gradient(90deg,
     var(--otp-bg, #EEE) calc(var(--otp-gap) * var(--otp-ls)),
     transparent 0
   );
