@@ -299,6 +299,7 @@ class KMClient:
                 {"columnName": "dd_target_profiles", "values": [f"{user_id}"]},
             ],
             "extraArgs": {
+                "window.location.href": "https://nkk.klub-modul.dk/Adminv2/Newsmail",
                 "formValues": [
                     {"columnName": "broadcast_media", "value": "email"},
                     {"columnName": "send_email", "value": "savedraft"},
