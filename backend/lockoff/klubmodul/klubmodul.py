@@ -228,7 +228,7 @@ class KMClient:
                     {"columnName": "dd_target_genders", "values": []},
                     {"columnName": "genders_as_filter", "value": False},
                     {"columnName": "dd_target_promotion_team_names", "values": []},
-                    {"columnName": "dd_target_profiles", "values": []},
+                    {"columnName": "dd_target_profiles", "values": [f"{user_id}"]},
                 ]
             },
         }
@@ -271,7 +271,7 @@ class KMClient:
                     "value": f"{settings.klubmodul_admin_user_id}-1",
                 },
                 {"columnName": "mail_text", "value": message},
-                {"columnName": "test_email", "value": ""},
+                {"columnName": "test_email", "value": "webmaster@nkk.dk"},
                 {"columnName": "is_news_mail", "value": False},
                 {"columnName": "is_scheduled_mail", "value": False},
                 {"columnName": "scheduled_date", "value": ""},
@@ -294,6 +294,8 @@ class KMClient:
                 {"columnName": "dd_target_genders", "values": []},
                 {"columnName": "genders_as_filter", "value": False},
                 {"columnName": "dd_target_promotion_team_names", "values": []},
+                {"columnName": "dd_target_teams_IsTrialHour", "values": []},
+                {"columnName": "dd_target_instructors", "values": []},
                 {"columnName": "dd_target_profiles", "values": [f"{user_id}"]},
             ],
             "extraArgs": {
@@ -307,7 +309,7 @@ class KMClient:
                         "value": f"{settings.klubmodul_admin_user_id}-1",
                     },
                     {"columnName": "mail_text", "value": message},
-                    {"columnName": "test_email", "value": ""},
+                    {"columnName": "test_email", "value": "webmaster@nkk.dk"},
                     {"columnName": "is_news_mail", "value": False},
                     {"columnName": "is_scheduled_mail", "value": False},
                     {"columnName": "scheduled_date", "value": ""},
@@ -336,7 +338,9 @@ class KMClient:
                     {"columnName": "dd_target_genders", "values": []},
                     {"columnName": "genders_as_filter", "value": False},
                     {"columnName": "dd_target_promotion_team_names", "values": []},
-                    {"columnName": "dd_target_profiles", "values": []},
+                    {"columnName": "dd_target_teams_IsTrialHour", "values": []},
+                    {"columnName": "dd_target_instructors", "values": []},
+                    {"columnName": "dd_target_profiles", "values": [f"{user_id}"]},
                 ]
             },
         }
