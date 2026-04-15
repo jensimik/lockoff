@@ -96,12 +96,12 @@ class KMClient:
 
         for list_id, member_type in KM_LISTS.items():
             async for row in self._get_list(list_id):
-                user_id = int(row["Id"])
+                user_id = int(row["ID"])
                 # hold = [int(i) for i in row["Hold"].split(", ") if i]
                 # lowest_hold_number = min(hold) if hold else -1
                 # member_type = KM_MEMBER_TYPES.get(lowest_hold_number)
                 name = row["Fornavn"].capitalize() + " " + row["Efternavn"].capitalize()
-                email = row["Email"].lower()
+                email = row["E-mail"].lower()
                 mobile = row["Mobil"]
                 if member_type:
                     yield user_id, name, member_type, email, mobile
@@ -229,7 +229,7 @@ class KMClient:
                     {"columnName": "genders_as_filter", "value": False},
                     {"columnName": "dd_target_promotion_team_names", "values": []},
                     {"columnName": "dd_target_profiles", "values": [f"{user_id}"]},
-                ]
+                ],
             },
         }
         try:
@@ -342,7 +342,7 @@ class KMClient:
                     {"columnName": "dd_target_teams_IsTrialHour", "values": []},
                     {"columnName": "dd_target_instructors", "values": []},
                     {"columnName": "dd_target_profiles", "values": [f"{user_id}"]},
-                ]
+                ],
             },
         }
         try:
