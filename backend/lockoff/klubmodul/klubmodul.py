@@ -1,6 +1,7 @@
 import asyncio
 import csv
 import logging
+import re
 import typing
 from datetime import datetime
 from types import TracebackType
@@ -49,7 +50,28 @@ class KMClient:
         )
 
     async def _km_login(self) -> None:
-        # login and session cookie is set quite ugly with viewstate data :-|
+        # First GET the login page to establish session + extract fresh viewstate
+        try:
+            resp = await self.client.get("/default.aspx", timeout=10.0)
+        except httpx.TimeoutException:
+            raise KlubmodulException("failed to fetch login page due to timeout")
+        if resp.is_error:
+            raise KlubmodulException(
+                "failed to fetch login page: " + resp.reason_phrase
+            )
+
+        # Extract ASP.NET hidden fields from the response
+        def _extract(name: str) -> str:
+            m = re.search(rf'id="{name}".*?value="([^"]+)"', resp.text, re.DOTALL)
+            if not m:
+                raise KlubmodulException(f"could not extract {name} from login page")
+            return m.group(1)
+
+        login_data["__VIEWSTATE"] = _extract("__VIEWSTATE")
+        login_data["__VIEWSTATEGENERATOR"] = _extract("__VIEWSTATEGENERATOR")
+        login_data["__EVENTVALIDATION"] = _extract("__EVENTVALIDATION")
+
+        # Now POST to login — klubmodul returns 302 on success, 200 on failure
         try:
             response = await self.client.post(
                 "/default.aspx",
@@ -60,7 +82,10 @@ class KMClient:
             raise KlubmodulException("failed to login due to timeout")
         if response.is_error:
             raise KlubmodulException("failed to login: " + response.reason_phrase)
-        return True
+        if response.status_code != 302:
+            raise KlubmodulException(
+                f"login failed (expected 302 redirect, got {response.status_code})"
+            )
 
     async def _get_list(self, list_id: int):
         data = {
