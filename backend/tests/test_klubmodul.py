@@ -12,12 +12,32 @@ async def test_login_timeout(httpx_mock):
             pass
 
 
+LOGIN_PAGE_HTML = """<html><body>
+    <input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="abc" />
+    <input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="def" />
+    <input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="ghi" />
+</body></html>"""
+
+
+def _mock_login(httpx_mock):
+    # GET login page to extract viewstate
+    httpx_mock.add_response(
+        method="GET",
+        url=f"{settings.klubmodul_base_url}/default.aspx",
+        text=LOGIN_PAGE_HTML,
+    )
+    # POST login — klubmodul returns 302 on success
+    httpx_mock.add_response(
+        method="POST",
+        url=f"{settings.klubmodul_base_url}/default.aspx",
+        status_code=302,
+        headers={"location": "/ShowContentPage.aspx?AliasPageName=default.aspx"},
+    )
+
+
 @pytest.mark.asyncio
 async def test_klubmodul_send_sms(httpx_mock):
-    # login
-    httpx_mock.add_response(
-        method="POST", url=f"{settings.klubmodul_base_url}/default.aspx"
-    )
+    _mock_login(httpx_mock)
     # send sms
     httpx_mock.add_response(
         method="POST",
@@ -36,17 +56,14 @@ async def test_klubmodul_send_sms(httpx_mock):
 
 @pytest.mark.asyncio
 async def test_klubmodul_send_email(httpx_mock):
-    # login
-    httpx_mock.add_response(
-        method="POST", url=f"{settings.klubmodul_base_url}/default.aspx"
-    )
-    # send sms
+    _mock_login(httpx_mock)
+    # send email
     httpx_mock.add_response(
         method="POST",
         url=f"{settings.klubmodul_base_url}/Adminv2/NewsMail/__Create",
         json={"savedId": 100},
     )
-    # remove sms
+    # remove email
     httpx_mock.add_response(
         method="DELETE",
         url=f"{settings.klubmodul_base_url}/Adminv2/Newsmail/__Delete",
