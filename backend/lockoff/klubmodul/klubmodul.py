@@ -38,8 +38,8 @@ KM_LISTS = {
     132: TokenType.BØRNE_HOLD,
     128: TokenType.OFFPEAK,
     122: TokenType.JUNIOR_HOLD,
-    130: TokenType.JUNIOR_HOLD,
-    104: TokenType.JUNIOR_HOLD,
+    #    130: TokenType.JUNIOR_HOLD,
+    #    104: TokenType.JUNIOR_HOLD,
 }
 
 
