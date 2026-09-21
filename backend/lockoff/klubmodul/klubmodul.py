@@ -32,12 +32,12 @@ KM_MEMBER_TYPES = {
 KM_LISTS = {
     117: TokenType.NORMAL,  # normal
     118: TokenType.NORMAL,  # landshold
-    119: TokenType.BØRNE_HOLD,
-    120: TokenType.BØRNE_HOLD,
-    121: TokenType.BØRNE_HOLD,
-    132: TokenType.BØRNE_HOLD,
+    158: TokenType.BØRNE_HOLD,
+    156: TokenType.BØRNE_HOLD,
+    154: TokenType.BØRNE_HOLD,
+    151: TokenType.BØRNE_HOLD,
     128: TokenType.OFFPEAK,
-    122: TokenType.JUNIOR_HOLD,
+    152: TokenType.JUNIOR_HOLD,
     #    130: TokenType.JUNIOR_HOLD,
     #    104: TokenType.JUNIOR_HOLD,
 }
